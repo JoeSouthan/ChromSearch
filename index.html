@@ -1,0 +1,64 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Chromosome 12 Search Engine (Name subject to change - any ideas?)</title>
+	<link href="css/style.css" rel="stylesheet" type="text/css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script language="javascript" type="text/javascript" src="js/js.js"></script>
+</head>
+
+<body>
+<div id="help">
+	<a id="closepopup">x</a>
+	<div class="float-left">
+		<h2>Help!</h2>
+		<p>1. Enter your search in the search box (GenBank Accession Number, Chromosome Location or Gene ID)</p>
+		<p>2. Select the type of search you would like to do.</p>
+		<p>3. Submit the search.</p>
+	</div>
+</div>
+<div id="overlay"></div>
+<div class="wrapper">
+	<div class="header">
+    	<h1>12Chrom</h1>
+        <span class="subheader">Chromosome 12 Analysis Tool</span>
+        <div class="navbar">
+			<div class="item">
+				<a href="#">Home</a>
+			</div>
+			<div class="item">
+				<a href="#">EnzCutter</a>
+			</div>
+			<div class="item">
+				<a href="#" id="showhelp">Help</a>
+			</div>
+			<div class="item">
+				<a href="#">Contact </a>
+			</div>
+        </div>
+    </div>
+    <div class="searchform">
+    			<div class="left"><img src="img/clippy.gif" alt="Clippy" width="94" height="87" /></div>
+                <h2 class="center">It looks like you're about to search.</h2>
+    	<form method="post" action="cgi-bin/search_results.pl">
+        	<div class="search_wrapper">
+            	<span>Search Query:</span><input type="text" name="query" autofocus="autofocus" size="60" placeholder="Enter your search"/>
+                <br />
+				<br />
+                <span>Gene Identifier</span><input type="radio" name="searchType" value="GeneID" />
+                <span>Protein Product</span><input type="radio" name="searchType" value="proteinProduct" />
+                <span>GenBank Accession</span><input type="radio" name="searchType" value="genBank" />
+                <span>Chromosomal Location</span><input type="radio" name="searchType" value="location" />
+                <br />
+				<br />
+                <input type="submit" value="Submit" />
+                <input type="reset" value="Reset" />
+            </div>
+        </form>
+    </div>
+    <div class="footer">Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
+
+</div>
+</body>
+</html>

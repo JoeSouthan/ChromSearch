@@ -1,0 +1,75 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Results - Chromosome _ Search Engine (Name subject to change - any ideas?)</title>
+<link href="css/style.css" rel="stylesheet" type="text/css">
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+<script language="javascript" type="text/javascript" src="js/js.js"></script>
+</head>
+
+<body>
+<div class="wrapper">
+	<div class="header">
+    	<h1>Single Result</h1>
+    </div>
+    <div class="searchform">
+    	<h2 class="center">Single result for: <i>$gene</i>.</h2>
+        <div class="singleresult">
+        	<div class="info">
+            	<span>Genename | Gene Accession | Location</span>
+            </div>
+            <div class="single-left">
+            	<h2>Sequence Characteristics</h2>
+                <p>Some text</p>
+                <h2>Common Restriction Sites</h2>
+                <h3>EcoR1</h3>
+                <p>Some Text</p>
+                <h3>BamH1</h3>
+                <h3>BsuMI</h3>
+                <p>Would you like to <a href="#cutter" id="show4">cut your own?</a></p>
+                <div id="cutter">
+                <form method="post" action="cgi-bin/enz_cutter.pl">
+                	<input type="hidden" name="gene" value="$genename" />
+                	<input type="checkbox" name="enzyme" value="EcoRI"/>EcoR1 <br />
+                	<input type="checkbox" name="enzyme" value="BsuMI"/>BsuMI <br />
+                	<input type="checkbox" name="enzyme" value="Foo"/>Foo <br />
+                	<input type="checkbox" name="enzyme" value="Bar"/>Bar <br />
+                    <input type="text" width="100" name="custom" placeholder="Custom search" /> Use AA|AAAA to define your search<br />
+					<input type="submit" value="Submit" /><input type="reset" value="Reset" />
+                
+                </form>
+                
+                
+                
+                </div>
+            </div>
+            <div class="single-right">
+            	<h2>Protein Products</h2>
+                <ul>
+                	<li>Something</li>
+                    <li>Something Else</li>
+                </ul>
+                 
+            </div>
+            
+            <div class="clearfix"></div>
+            
+            <div class="single-wide">
+            	<h2>Sequences</h2>
+            	<a href="#" id="show1">Click to reveal DNA Sequence</a>
+            	<div id="SequenceDNA">Sequence goes here</div>
+                <br />
+                <a href="#" id="show2">Click to reveal Translated Amino Acid Sequence</a>
+                <div id="SequenceAA">AA goes here</div>
+            </div>
+        </div>
+       
+        <div class="footer">
+        	<p>Results generated in 0.023</p>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,282 @@
+@charset "utf-8";
+/* CSS Document */
+/* Main Tags */
+body{
+	font:14px Tahoma, Geneva, sans-serif;
+	color:#333333;
+	background-color:#6C8CA5;
+	/*background-image:url('http://joes-pi.dyndns.org/img/dna2.png');
+	background-repeat:no-repeat;
+	background-attachment:fixed;
+	background-position:right;*/
+}
+h1 {
+	text-shadow:2px 2px #000;
+	margin:0;
+	color:#fff;
+}
+h3 {
+	font-size:16px;
+	font-weight:500;
+	margin:0;
+	background-color:#CCCCCC;
+	clear:both;
+	padding:5px;
+}
+a {
+	color:#7D4840;
+	text-decoration:none;
+	font-weight:bold;
+}
+a:hover {
+	color:#763227;
+	text-decoration:underline;
+}
+ul {
+	margin:5px;
+}
+li{
+	list-style-type:circle;
+	padding:5px;
+}
+pre {
+	line-height:11%;
+}
+/*--------*/
+
+/* Custom Divs */
+.subheader {
+	font-size:9px;
+	line-height:90%;
+	display:block;
+}
+.wrapper {
+	margin:20px auto;
+	background-color:#fff;
+	width:900px;
+	padding:0 10px 20px;
+	border-radius:20px 20px 10px 10px;
+	box-shadow:10px 10px 3px #000;
+	overflow:auto;
+}
+.header {
+	background-color:#1E2D39;
+	color:#FFF;
+	padding:10px;
+	width:900px;
+	position:relative;
+	left:-10px;
+	text-align:center;
+	border-radius:10px 10px 0 0;
+	height:60px;
+}
+.search_wrapper {
+	text-align:center;
+}
+.center {
+	text-align:center;
+}
+.left {
+	float:left;
+	display:inline;
+	width:0;
+	position:relative;
+	left:65px;
+}
+.searchform {
+}
+.result {
+	float:left;
+	width:100%;
+	background-color:#779399;
+	height:55px;
+	padding:5px 0;
+}
+/*
+.result div {
+	background:#FFF;
+	padding:10px;
+	float:left;
+	margin:0 5px;
+*/
+
+/*
+.genename {
+	font-weight:bold;
+	width:10%;
+	background:#FFF;
+	padding:17px 10px;
+	float:left;
+	margin:0 5px;	
+	overflow:hidden;
+	height:16px;}
+*/
+
+.genename {
+	font-weight:bold;
+	width:100px;
+	background:#FFF;
+	padding:20px 0 0 5px;
+	float:left;
+	margin:0 5px;	
+	overflow:hidden;
+	height:35px;
+	text-align:center;
+}
+.diagram {
+	width:655px;
+	height:55px;
+	float:left;
+	background:#FFF;
+	float:left;
+	padding:0 !important;
+	margin:0 !important;
+	overflow:hidden;
+}
+.link {
+	width:100px;
+	overflow:hidden;
+	background:#FFF;
+	padding:19px 10px;
+	float:left;
+	margin:0 5px;
+	height:17px;
+}
+.footer {
+	float:right;
+	margin:30px 0 0;
+	color:#999;
+	text-align:right;
+}
+
+
+.singleresult {
+	float:left;
+	width:100%;
+	background-color:#779399;
+	padding:5px 0;
+}
+.info {
+	clear:both;
+	width:95%;
+	padding:10px;
+	background-color:#FFF;
+	margin:10px auto;
+	text-align:center;
+}
+.single-left {
+	float:left;
+	width:60.8%;
+	padding:10px;
+	margin:10px;
+	background-color:#fff;
+}
+.single-right {
+	float:left;
+	width:30%;
+	padding:10px;
+	margin:10px;
+	background-color:#fff;
+}
+.single-wide {
+	width:95%;
+	padding:10px;
+	background-color:#fff;
+	margin:10px auto;
+	clear:both;
+}
+.clearfix {
+	clear:both;
+}
+.singleresult h2 {
+	margin:0 0 10px 0;
+}
+#SequenceDNA {
+	display:none;
+}
+#SequenceAA{
+	display:none;
+}
+#codonusage  {
+	display:none;
+	word-wrap:break-word;
+}
+#cutter{
+	display:none;
+	float:left;
+	width:auto;
+	overflow:hidden;
+}
+.overline {
+	text-decoration:overline;
+}
+.underline {
+	text-decoration:underline;
+}
+.navbar {
+	height:20px;
+	float:right;
+}
+.navbar div {
+	padding:5px;
+	float:left;
+	width:auto;
+	color:#fff;
+	text-weight:bold;
+	border-radius:5px 5px 0 0;
+	opacity:0.4;
+	background:#fff;
+	margin:0 4px 0 0;
+	position:relative;
+	top:2px;
+}
+.navbar div:hover {
+	opacity:1;
+}
+#closepopup {
+	position:absolute;
+	right:5px;
+	top:5px;
+	display:block;
+
+}
+#overlay {
+	display:none;
+	position:fixed;
+	height:100%;
+	width:100%;
+	top:0;
+	left:0;
+	background:#000;
+	z-index:1;
+	opacity:0.5;
+}
+#help {
+	display:none;
+	position:fixed;
+	background:#fff;
+	border:2px solid #000;
+	z-index:2;
+	padding:10px;
+	border-radius:5px;
+	width:30%;
+}
+.float-left {
+	float:left;
+	padding:5px;
+}
+
+/* colours */
+.red {
+	color:#763227;
+	font-weight:bold;
+
+}
+.brown {
+	color:#765D27;
+	font-weight:bold;
+}
+.green {
+	color:#00CC00;
+	font-weight:bold;
+}
