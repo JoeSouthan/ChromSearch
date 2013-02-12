@@ -27,8 +27,8 @@ foreach my $params (@params) {
 #Do Results				
 #Subroutine to call from the package
 #Debug
-#~ $query = "TEST1234";
-#~ $type = "GeneID";
+$query = "TEST1234";
+$type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
@@ -37,7 +37,11 @@ my @resultArray = split ( ',', $returnSearch);
 my @sequences;
 
 #Debug
-@sequences = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
+my @sequences1 = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
+my @sequences2 = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
+my @sequences3 = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
+my @sequences4 = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
+
 #	Limitation! 
 #	All gene names must be unique
 @resultArray = qw (Test test1 test2 test3);
@@ -48,7 +52,7 @@ for (my $i=0; $i<@resultArray; $i++){
 	#get the sequence
 	#my @sequenceFetch = $soap->showCodingSequence($resultArray[$i])->result;
 	#Debug
-	$results{$resultArray[$i]} = [@sequences];
+	$results{$resultArray[$i]} = [@sequences."$i"];
 }
 
 #Reference
