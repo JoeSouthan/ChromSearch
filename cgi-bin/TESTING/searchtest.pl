@@ -8,8 +8,7 @@ my $soap = SOAP::Lite
 				
 my ($query, $type) = @ARGV;
 
-print $query;
-print $type;
-print my $returnSearch = $soap
-	->getSearchResults($_[0],$_[1])
-	->result;
+#print $query;
+#print $type;
+print my $returnSearch = $soap->getSearchResults($query,$type)->result;
+print my $hello = $soap->showCodingSeq($query)->result;

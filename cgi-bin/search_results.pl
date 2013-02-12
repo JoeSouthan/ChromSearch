@@ -3,6 +3,7 @@ use strict;
 use SOAP::Lite;
 use CGI;
 use Time::HiRes qw ( time );
+use Data::Dumper;
 my $timestart = time();
 my $cgi = new CGI;
 my @params= $cgi->param();
@@ -25,13 +26,29 @@ foreach my $params (@params) {
 
 #Do Results				
 #Subroutine to call from the package
-my $returnSearch = $soap ->getSearchResults($query,$type)->result;
+#Debug
+$query = "TEST1234";
+$type = "GeneID";
+my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
+my %results;
 my @resultArray = split ( ',', $returnSearch);
+my @sequences;
 
 #Debug
+@sequences = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
 @resultArray = qw (Test test test test);
+
+#Build the result hash
+for (my $i=0; $i<@resultArray; $i++){
+	#get the sequence
+	#my @sequenceFetch = $soap->showCodingSequence($resultArray[$i])->result;
+	#Debug
+	$results{$resultArray[$i]} = [@sequences];
+}
+
+#Reference
 my $resultRef = \@resultArray;
 
 
@@ -188,14 +205,14 @@ __EOF2
 
 #General Error
 sub htmlError {
-my @faultSub;
-if (ref($_[0]) eq "ARRAY") {
-	@faultSub = @{$_[0]};
-} else {
-	 @faultSub = prettyErrors($_[0]);
-}
-#Print the Header
-htmlHeader($cgi);
+	my @faultSub;
+	if (ref($_[0]) eq "ARRAY") {
+		@faultSub = @{$_[0]};
+	} else {
+		 @faultSub = prettyErrors($_[0]);
+	}
+	#Print the Header
+	htmlHeader($cgi);
 print <<__WHOOPS;
 	<div>
 		<h2 class="center">Sorry &#9785;</h2>
@@ -224,6 +241,6 @@ sub prettyErrors {
 	} elsif ($error eq "INVALID_ID") {
 		return "The ID entered was invalid.";
 	} else {
-		return "Unknown Error.";
+		return "Unknown Error. $error";
 	}	
 }
