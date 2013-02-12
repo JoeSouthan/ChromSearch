@@ -38,6 +38,8 @@ my @sequences;
 
 #Debug
 @sequences = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
+#	Limitation! 
+#	All gene names must be unique
 @resultArray = qw (Test test1 test2 test3);
 
 #Build the result hash
