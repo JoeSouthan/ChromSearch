@@ -38,7 +38,7 @@ my @sequences;
 
 #Debug
 @sequences = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
-@resultArray = qw (Test test test test);
+@resultArray = qw (Test test1 test2 test3);
 
 #Build the result hash
 for (my $i=0; $i<@resultArray; $i++){
@@ -49,7 +49,7 @@ for (my $i=0; $i<@resultArray; $i++){
 }
 
 #Reference
-my $resultRef = \@resultArray;
+my $resultRef = \%results;
 
 
 #Time to check
@@ -107,9 +107,9 @@ print <<__EOF;
 	<title>Results - Chromosome 12 Search Engine (Name subject to change - any ideas?)</title>
 	<link href="../css/style.css" rel="stylesheet" type="text/css">
 __EOF
-	if (defined ($_[1])) {
-		genChartJS($_[1]);
-	}
+	#if (defined ($_[1])) {
+	#	genChartJS($_[1]);
+	#}
 print <<__JSOUTPUT;
 </head>
 
@@ -170,28 +170,36 @@ __JS2
 __JS3
 }
 
-#Main Output
+#=============================
+#	Main HTML Output
+#=============================
 sub htmlOut {
 
-#Gotta Catch 'em all
-my ($resultArrayRef, $cgi, $query, $gentime) = @_;
-my @resultArray = @{$resultArrayRef};
+	#Gotta Catch 'em all
+	my ($resultRef, $cgi, $query, $gentime) = @_;
+	#my @resultArray = @{$resultArrayRef};
+	my %resultHash = %{$resultRef};
+	my $hashLength = scalar keys %resultHash;
+	my $counter = 0;
 
-#Print HTML
-	htmlHeader($cgi,$resultArrayRef);
+	#Print HTML
+	htmlHeader($cgi,$resultRef);
 	
-print "<h2 class=\"center\">Results for: <i>$query</i>.</h2>";
-#Loop it!
-for (my $i = 0; $i<@resultArray; $i++){
-print <<__EOF2;
-	<div class="result">
-        	<div class="genename">$resultArray[$i]</div>
-            <div class="diagram" id="chart_div$i">
-            </div>
-            <div class="link"><a href="return_single.pl?gene=$resultArray[$i]">More &raquo;</a></div>
-    </div>
+	print "<h2 class=\"center\">Results for: <i>$query</i>.</h2>";
+	#Loop it!
+
+	for my $genes (sort keys %resultHash){
+		#print "$genes: @{$resultHash{$genes}} ";
+		print <<__EOF2;
+		<div class="result">
+				<div class="genename">$genes</div>
+				<div class="diagram" id="chart_div$counter">
+				</div>
+				<div class="link"><a href="return_single.pl?gene=$genes">More &raquo;</a></div>
+		</div>
 __EOF2
-}
+		$counter++;
+	}
 	htmlFooter($gentime);
 }
 
