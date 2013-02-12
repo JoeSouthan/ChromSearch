@@ -27,8 +27,8 @@ foreach my $params (@params) {
 #Do Results				
 #Subroutine to call from the package
 #Debug
-#~ $query = "TEST1234";
-#~ $type = "GeneID";
+$query = "TEST1234";
+$type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
