@@ -160,24 +160,42 @@ __JS1
 		my %sequenceLength;
 		foreach my $seq (@sequence) {
 			if ($seq =~/^NCS:(.*)/) {
-				my $hashkey = "$count NCS";
-				$sequenceLength{'$hashKey'} = scalar ($1);
+				my $hashKey = $count."NCS";
+				$sequenceLength{ $hashKey } = length ($1);
 				$count++;
 			} elsif ($seq =~/^CODON:(.*)/){
-				my $hashkey = "$count CODON";
-				$sequenceLength{'$hashKey'} = scalar ($1);
+				my $hashKey = $count."CODON";
+				$sequenceLength{ $hashKey } = length ($1);
 				$count++;
 			} elsif ($seq =~/^INTRON:(.*)/){
-				my $hashkey = "$count INTRON";
-				$sequenceLength{'$hashKey'} = scalar ($1);
+				my $hashKey = $count."INTRON";
+				$sequenceLength{ $hashKey } = length ($1);
 				$count++;
 			}
 		}
+		#Total Length
+		# my $totalLength;
+		# for my $counts (values %sequenceLength) {
+			# $totalLength += $counts;
+		# }
+		print "\t\tvar data$count2 = google.visualization.arrayToDataTable([\n";
+		#Build the table Headers
+		#eg ['Gene', 'NCR', 'Intron', 'Exon'],
+		my $header = "['Gene', "; 
+		#Now do the data
+		#['$genes',  1000,      400, 500]
+		my $data = "['$genes' ,";
+		for my $types (sort keys %sequenceLength){
+			$header .= " '$types' ,";
+			$data .= " $sequenceLength{$types} ,";
+		}
+		$header .= " 'End' ],";
+		$data .= " 0] \t\t\n\]\)\;";
+		print "\t\t$header\n\t\t$data\n";
+
+        #]);
+		
 		print <<__JS2;
-		var data$count2 = google.visualization.arrayToDataTable([
-          ['Gene', 'NCR', 'Intron', 'Exon'],
-          ['$genes',  1000,      400, 500]
-        ]);
 		var chart$count2 = new google.visualization.BarChart(document.getElementById('chart_div$count2'));
         chart$count2.draw(data$count2, options);
 __JS2
