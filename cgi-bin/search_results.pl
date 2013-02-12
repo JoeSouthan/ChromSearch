@@ -107,9 +107,9 @@ print <<__EOF;
 	<title>Results - Chromosome 12 Search Engine (Name subject to change - any ideas?)</title>
 	<link href="../css/style.css" rel="stylesheet" type="text/css">
 __EOF
-	#if (defined ($_[1])) {
-	#	genChartJS($_[1]);
-	#}
+	if (defined ($_[1])) {
+		genChartJS($_[1]);
+	}
 print <<__JSOUTPUT;
 </head>
 
@@ -135,9 +135,9 @@ print <<__EOF3;
 __EOF3
 }
 sub genChartJS {
-	
-my @results = @{$_[0]};
-print <<__JS1;
+	my $count2 = 0;
+	my %resultHash = %{$_[0]};
+	print <<__JS1;
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
     <script type="text/javascript">
     function drawChart() {
@@ -150,16 +150,38 @@ print <<__JS1;
           height: 50
         };
 __JS1
-	for (my $i=0; $i<@results; $i++) {
-		print <<__JS2
-		var data$i = google.visualization.arrayToDataTable([
-          ['Gene', 'NCR', 'Intron', 'Exon'],
-          ['Gene',  1000,      400, 500]
-        ]);
-		var chart$i = new google.visualization.BarChart(document.getElementById('chart_div$i'));
-        chart$i.draw(data$i, options);
-__JS2
+	for my $genes (sort keys %resultHash){
+		#Start a counter - Maintains order
+		my $count=0;
+		#Get the array from the hash
+		my @sequence = @{$resultHash{$genes}};
 		
+		#get the sequence lengths
+		my %sequenceLength;
+		foreach my $seq (@sequence) {
+			if ($seq =~/^NCS:(.*)/) {
+				my $hashkey = "$count NCS";
+				$sequenceLength{'$hashKey'} = scalar ($1);
+				$count++;
+			} elsif ($seq =~/^CODON:(.*)/){
+				my $hashkey = "$count CODON";
+				$sequenceLength{'$hashKey'} = scalar ($1);
+				$count++;
+			} elsif ($seq =~/^INTRON:(.*)/){
+				my $hashkey = "$count INTRON";
+				$sequenceLength{'$hashKey'} = scalar ($1);
+				$count++;
+			}
+		}
+		print <<__JS2;
+		var data$count2 = google.visualization.arrayToDataTable([
+          ['Gene', 'NCR', 'Intron', 'Exon'],
+          ['$genes',  1000,      400, 500]
+        ]);
+		var chart$count2 = new google.visualization.BarChart(document.getElementById('chart_div$count2'));
+        chart$count2.draw(data$count2, options);
+__JS2
+		$count2++;
 	}
 	print <<__JS3;
 		}
