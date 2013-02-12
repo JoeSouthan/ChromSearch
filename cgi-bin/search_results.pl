@@ -27,8 +27,8 @@ foreach my $params (@params) {
 #Do Results				
 #Subroutine to call from the package
 #Debug
-$query = "TEST1234";
-$type = "GeneID";
+#~ $query = "TEST1234";
+#~ $type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
@@ -43,6 +43,7 @@ my @sequences;
 @resultArray = qw (Test test1 test2 test3);
 
 #Build the result hash
+#Change @sequences-> @sequenceFetch once showcodingseq is implimented
 for (my $i=0; $i<@resultArray; $i++){
 	#get the sequence
 	#my @sequenceFetch = $soap->showCodingSequence($resultArray[$i])->result;
@@ -90,18 +91,62 @@ if (@queryFault){
 }		
 
 
-# =============================
+# ====================================================
 #
 #	
 #	Subroutines
 #
 #
-# =============================
+# ====================================================
 
-#Header for the page
+#=============================
+#	Main HTML Output
+#		For a successful search, output the HTML
+#		Takes 
+#			[0] = Hash reference - String
+#			[1] = CGI header - String
+#			[2] = The Query - String
+#			[3] = Generation time - String
+#=============================
+sub htmlOut {
+
+	#Gotta Catch 'em all
+	my ($resultRef, $cgi, $query, $gentime) = @_;
+	#my @resultArray = @{$resultArrayRef};
+	my %resultHash = %{$resultRef};
+	my $hashLength = scalar keys %resultHash;
+	my $counter = 0;
+
+	#Print HTML
+	htmlHeader($cgi,$resultRef);
+	
+	print "<h2 class=\"center\">Results for: <i>$query</i>.</h2>";
+	#Loop it!
+
+	for my $genes (sort keys %resultHash){
+		#print "$genes: @{$resultHash{$genes}} ";
+		print <<__EOF2;
+		<div class="result">
+				<div class="genename">$genes</div>
+				<div class="diagram" id="chart_div$counter">
+				</div>
+				<div class="link"><a href="return_single.pl?gene=$genes">More &raquo;</a></div>
+		</div>
+__EOF2
+		$counter++;
+	}
+	htmlFooter($gentime);
+}
+#=============================
+#	HTML Header
+#		Provides the header for the output page
+#		Takes:
+#			[0] = CGI header - String
+#			(1) = Optional; if the page contains a gene layout barchart, send the result hash reference over - String
+#=============================
 sub htmlHeader {
-print $_[0]->header();
-print <<__EOF;
+	print $_[0]->header();
+	print <<__EOF;
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -112,17 +157,21 @@ __EOF
 	if (defined ($_[1])) {
 		genChartJS($_[1]);
 	}
-print <<__JSOUTPUT;
+	print <<__JSOUTPUT;
 </head>
 
-<body>
-	<div class="wrapper">
-		<div class="header">
-			<h1>Results</h1>
-		</div>
-		<div class="searchform">
+	<body>
+		<div class="wrapper">
+			<div class="header">
+				<h1>Results</h1>
+			</div>
+			<div class="searchform">
 __JSOUTPUT
 }
+#=============================
+#	HTML Footer
+#		Prints the Footer
+#=============================
 sub htmlFooter {
 print <<__EOF3;
    
@@ -136,6 +185,63 @@ print <<__EOF3;
 </html>
 __EOF3
 }
+
+
+#=============================
+#	HTML Errors
+#		Takes an array reference or string and outputs an error page
+#=============================
+
+sub htmlError {
+	my @faultSub;
+	if (ref($_[0]) eq "ARRAY") {
+		@faultSub = @{$_[0]};
+	} else {
+		 @faultSub = prettyErrors($_[0]);
+	}
+	#Print the Header
+	htmlHeader($cgi);
+	print <<__WHOOPS;
+	<div>
+		<h2 class="center">Sorry &#9785;</h2>
+		<p class="center">Error: @faultSub</p>
+	</div>
+__WHOOPS
+	#Print the Footer
+	htmlFooter($gentime);
+
+}
+#=============================
+#	Nice errors
+#		Turns ugly errors, into nice errors!
+#=============================
+sub prettyErrors {
+	my ($error) = @{_};
+	#Catch DB errors
+	if ($error eq "ZERO_LENGTH_PARAM") {
+		return "Search was of zero length, please enter a suitable search.";
+	} elsif ($error eq "EMPTY_ID") {
+		return "No ID was entered.";
+	} elsif ($error eq "UNRECOGNIZED_ID") {
+		return "Unknown ID.";
+	} elsif ($error eq "NO_DB_CONNECTION") {
+		return "The Database connection has failed. A trained team of monkeys have been dispached.";
+	} elsif ($error eq "NO_DB_MATCHES") {
+		return "No results can be found for your search.";
+	} elsif ($error eq "DB_COLUMN_EMPTY") {
+		return "There is no data (Database error).";
+	} elsif ($error eq "INVALID_ID") {
+		return "The ID entered was invalid.";
+	} else {
+		return "Unknown Error. $error";
+	}	
+}
+#=============================
+#	JS Output
+#		Ouputs Google Charts Bar Chart javascript
+#		Takes:
+#			[0] = Result hash reference
+#=============================
 sub genChartJS {
 	my $count2 = 0;
 	my %resultHash = %{$_[0]};
@@ -210,87 +316,4 @@ __JS2
 
 	</script>
 __JS3
-}
-
-#=============================
-#	Main HTML Output
-#=============================
-sub htmlOut {
-
-	#Gotta Catch 'em all
-	my ($resultRef, $cgi, $query, $gentime) = @_;
-	#my @resultArray = @{$resultArrayRef};
-	my %resultHash = %{$resultRef};
-	my $hashLength = scalar keys %resultHash;
-	my $counter = 0;
-
-	#Print HTML
-	htmlHeader($cgi,$resultRef);
-	
-	print "<h2 class=\"center\">Results for: <i>$query</i>.</h2>";
-	#Loop it!
-
-	for my $genes (sort keys %resultHash){
-		#print "$genes: @{$resultHash{$genes}} ";
-		print <<__EOF2;
-		<div class="result">
-				<div class="genename">$genes</div>
-				<div class="diagram" id="chart_div$counter">
-				</div>
-				<div class="link"><a href="return_single.pl?gene=$genes">More &raquo;</a></div>
-		</div>
-__EOF2
-		$counter++;
-	}
-	htmlFooter($gentime);
-}
-
-#
-#
-#
-#	HTML Errors
-#
-#
-#
-
-#General Error
-sub htmlError {
-	my @faultSub;
-	if (ref($_[0]) eq "ARRAY") {
-		@faultSub = @{$_[0]};
-	} else {
-		 @faultSub = prettyErrors($_[0]);
-	}
-	#Print the Header
-	htmlHeader($cgi);
-print <<__WHOOPS;
-	<div>
-		<h2 class="center">Sorry &#9785;</h2>
-		<p class="center">Error: @faultSub</p>
-	</div>
-__WHOOPS
-	htmlFooter($gentime);
-
-}
-
-sub prettyErrors {
-	my ($error) = @{_};
-	#Catch DB errors
-	if ($error eq "ZERO_LENGTH_PARAM") {
-		return "Search was of zero length, please enter a suitable search.";
-	} elsif ($error eq "EMPTY_ID") {
-		return "No ID was entered.";
-	} elsif ($error eq "UNRECOGNIZED_ID") {
-		return "Unknown ID.";
-	} elsif ($error eq "NO_DB_CONNECTION") {
-		return "The Database connection has failed. A trained team of monkeys have been dispached.";
-	} elsif ($error eq "NO_DB_MATCHES") {
-		return "No results can be found for your search.";
-	} elsif ($error eq "DB_COLUMN_EMPTY") {
-		return "There is no data (Database error).";
-	} elsif ($error eq "INVALID_ID") {
-		return "The ID entered was invalid.";
-	} else {
-		return "Unknown Error. $error";
-	}	
 }
