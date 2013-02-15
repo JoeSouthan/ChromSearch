@@ -2,6 +2,7 @@
 use strict;
 use SOAP::Lite;
 use CGI;
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser); 
 use Time::HiRes qw ( time );
 use Data::Dumper;
 my $timestart = time();

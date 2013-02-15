@@ -261,6 +261,14 @@ pre {
 	border-radius:5px;
 	width:30%;
 }
+#spinner {
+	display:none;
+	position:relative;
+	left:50%;
+}
+#cutter-text {
+	font-weight:bold;
+}
 .float-left {
 	float:left;
 	padding:5px;
