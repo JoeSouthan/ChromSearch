@@ -83,7 +83,7 @@ print <<__EOF1;
                 <p>Some Text</p>
                 <h3>BamH1</h3>
                 <h3>BsuMI</h3>
-                <p>Would you like to <a href="#cutter" id="show4">cut your own?</a></p>
+                <p id="cutter-text">Would you like to <a href="#cutter" id="show4">cut your own?</a></p>
 				<div id="spinner">
 					<img src="../img/ajaxloader.gif" alt="Loading" width="24" height="24" />
 				</div>
