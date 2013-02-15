@@ -12,10 +12,7 @@ use CodonImager;
 
 my $timestart = time();
 my $cgi = new CGI;
-my $soap = SOAP::Lite
-				#The package to call
-				->uri('ChromoDB')
-				->proxy('http://joes-pi.dyndns.org/cgi-bin/Modules');
+my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin/Modules');
 #	
 #	Get the param from the link and find the relevant info
 #	
@@ -23,14 +20,6 @@ my $soap = SOAP::Lite
 my ($before, $gene)= 1;
 my @values = split(/&/,$ENV{QUERY_STRING});
 ($before, $gene) = split(/=/, $values[0]);
-
-
-#Search Statements
-#my $showall = $soap->showAllIdentifiers($gene)->result;
-#my $DNASeq = $soap->getDNAsequence($gene)->result;
-#my $AASeq = $soap->getAAsequence($gene)->result;
-#my @showCodingSeq = $soap->showCodingSeq($gene)->result;
-
 
 
 #Dummy Data
@@ -95,20 +84,11 @@ print <<__EOF1;
                 <h3>BamH1</h3>
                 <h3>BsuMI</h3>
                 <p>Would you like to <a href="#cutter" id="show4">cut your own?</a></p>
+				<div id="spinner">
+					<img src="../img/ajaxloader.gif" alt="Loading" width="24" height="24" />
+				</div>
                 <div id="cutter">
-                <form method="post" action="enz_cutter.pl">
-                	<input type="hidden" name="gene" value="$geneID" />
-                	<input type="checkbox" name="enzyme" value="EcoRI"/>EcoR1 <br />
-                	<input type="checkbox" name="enzyme" value="BsuMI"/>BsuMI <br />
-                	<input type="checkbox" name="enzyme" value="Foo"/>Foo <br />
-                	<input type="checkbox" name="enzyme" value="Bar"/>Bar <br />
-                    <input type="text" width="100" name="custom" placeholder="Custom search" /> Use AA|AAAA to define your search<br />
-					<input type="submit" value="Submit" /><input type="reset" value="Reset" />
-                
-                </form>
-                
-                
-                
+				
                 </div>
             </div>
             <div class="single-right">

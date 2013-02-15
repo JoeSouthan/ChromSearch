@@ -24,9 +24,9 @@ $(document).ready(function(){
   $("#show3").click(function() { 
     $("#codonusage").slideToggle("fast");
   });
-  $("#show4").click(function() { 
-    $("#cutter").slideToggle("fast");
-  });
+  // $("#show4").click(function() { 
+    // $("#cutter").slideToggle("fast");
+  // });
   $("#showhelp").click(function() {
 	  $("#overlay").fadeIn("fast");
 	  $("#help").fadeIn("fast");
@@ -40,7 +40,12 @@ $(document).ready(function(){
 	  $("#overlay").fadeOut("fast");
 	  $("#help").fadeOut("fast");
 	});
-	$(window).resize(function() {  
+  $("#show4").click(function() {
+	  $("#spinner").fadein("fast");
+	  $("#cutter").load("home.html");
+	  $("#help").fadeOut("fast");
+	});	
+  $(window).resize(function() {  
 	centerPopup();  
 	}); 
 });
