@@ -15,11 +15,11 @@ function centerPopup(){
 $(document).ready(function(){ 
 	$.ajaxSetup({
         beforeSend: function(xhr, status) {
-            $("#spinner").show();
+            $("#spinner").fadeIn("fast");
         },
         complete: function() {
-            $("#spinner").hide();
-			$("#cutter").slideDown();
+            $("#spinner").fadeOut("fast");
+			$("#cutter").slideDown("fast");
 			$("cutter-text").fadeOut("fast");
 			$("#cutter-text").html("Please Choose what restriction enzymes to cut with:");
 			$("cutter-text").fadeIn("fast");
