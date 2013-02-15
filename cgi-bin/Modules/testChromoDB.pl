@@ -10,7 +10,8 @@ print "\nCalling the SOAP server...\n";
 print "The SOAP server says:\n";
 use SOAP::Lite +autodispatch =>
     uri => 'urn:ChromoDB',
-    proxy => 'http://student.cryst.bbk.ac.uk/cgi-bin/cgiwrap/scouls01/SOAPProxy.pl';
+    #proxy => 'http://student.cryst.bbk.ac.uk/cgi-bin/cgiwrap/scouls01/SOAPProxy.pl';
+    proxy => 'http://joes-pi.dyndns.org/cgi-bin/proxy.pl';
 
 print sayHello("Test Script");
 print "\n\n";
@@ -71,18 +72,18 @@ if( $results eq 'ERROR:ZERO_LENGTH_ARGUMENT'){
 }
 
 # CONDITION: Correct parameters of Test1234 (assumes this dummy data is in DB) and GeneID
-print "\nTesting 'getSearchResults' 'Test1234' and 'GeneID' as parameters\n";
-my $results = getSearchResults("Test1234","GeneID");
-if( $results eq 'Test1234'){
+print "\nTesting 'getSearchResults' '2627128' and 'GeneID' as parameters\n";
+my $results = getSearchResults("2627128","GeneID");
+if( $results eq '2627128'){
 	print "Returned: ",$results,"\nPassed\n";
 }else{
 	print "Returned: ",$results,"\nFailed\n";
 }
 
-# CONDITION: Correct parameters of HEX1 (assumes this dummy data is in DB) and ProteinProduct
-print "\nTesting 'getSearchResults' 'HEX1' and 'ProteinProduct' as parameters\n";
-my $results = getSearchResults("HEX1","ProteinProduct");
-if( $results eq 'HEX1'){
+# CONDITION: Correct parameters of DNA primase 1 (assumes this dummy data is in DB) and ProteinProduct
+print "\nTesting 'getSearchResults' 'DNA primase 1' and 'ProteinProduct' as parameters\n";
+my $results = getSearchResults("DNA primase 1","ProteinProduct");
+if( $results eq 'DNA primase 1'){
 	print "Returned: ",$results,"\nPassed\n";
 }else{
 	print "Returned: ",$results,"\nFailed\n";
@@ -97,10 +98,10 @@ if( $results eq 'AB002805'){
 	print "Returned: ",$results,"\nFailed\n";
 }
 
-# CONDITION: Correct parameters of 4p12.2 (assumes this dummy data is in DB) and ChromosomeLocation
-print "\nTesting 'getSearchResults' '4p12.2' and 'ChromosomeLocation' as parameters\n";
-my $results = getSearchResults("4p12.2","ChromosomeLocation");
-if( $results eq '4p12.2'){
+# CONDITION: Correct parameters of q13 (assumes this dummy data is in DB) and ChromosomeLocation
+print "\nTesting 'getSearchResults' 'q13' and 'ChromosomeLocation' as parameters\n";
+my $results = getSearchResults("q13","ChromosomeLocation");
+if( $results eq 'q13'){
 	print "Returned: ",$results,"\nPassed\n";
 }else{
 	print "Returned: ",$results,"\nFailed\n";

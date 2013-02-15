@@ -320,10 +320,11 @@ sub databaseConnect{
 	#my $dbname = 'biocomp2'; 
 	#my $user = 'c2';
 	#my $password = 'coursework123'; 
-	#my $dbserver = 'localhost';
+	#my $dbserver = 'joes-pi.dyndns.org';
 	
 	# Specify the location and name of the database
-	my $datasource = "dbi:mysql:database=$dbname;host=$dbserver";
+	my $datasource = "dbi:mysql:database=$dbname;host=$dbserver;";
+	
 	
 	# Attempt to connect to the database (turn off DBI error reporting )
 	my $dbh = DBI->connect($datasource, $user, $password, {PrintError => 0});

@@ -18,10 +18,11 @@ sub sayHello {
 sub showAllIdentifiers{
 	
 	# Get the second input, first is the SOAP class variable
-	my $id = $_[1];
+	my ($class, $identifer) = @_;
+	#my $id = $_[1];
 	
 	# Check for blank input, return error is zero length
-	if( 0 == length($id)){
+	if( 0 == length($identifier)){
 		return 'ERROR:ZERO_LENGTH_ARGUMENT';
 	}
 
