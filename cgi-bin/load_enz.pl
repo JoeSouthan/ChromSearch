@@ -14,6 +14,12 @@ my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin
 # When implimented:
 # my @enzymes = $soap->getSupportedRES("Names")->paramsout;
 
+#Get what gene they want to cut with
+
+my ($before, $gene)= 1;
+my @values = split(/&/,$ENV{QUERY_STRING});
+($before, $gene) = split(/=/, $values[0]);
+
 #Debug
 my @enzymes = qw (EcoRI BamFI BsuMI);
 
@@ -31,11 +37,17 @@ print <<__HTML;
 <script language="javascript" type="text/javascript" src="../js/js.js"></script>
 </head>
 <body>
+<form method="post" action="enz_cutter.pl">
+    <input type="hidden" name="gene" value="$gene" />
 __HTML
 foreach my $enz (@enzymes) {
-	print "<input type=\"checkbox\" name=\"enzyme\" value=\"$enz\"/>$enz <br />\n";
+	print "\t<input type=\"checkbox\" name=\"enzyme\" value=\"$enz\"/>$enz <br />\n";
 }
 print <<__FOOTER;
+    <input type="text" width="100" name="custom" placeholder="Custom search" /> Use AA|AAAA to define your search<br />
+	<input type="submit" value="Submit" /><input type="reset" value="Reset" />
+                
+    </form>
 </body>
 </html>
 __FOOTER
