@@ -13,20 +13,6 @@ function centerPopup(){
     }); 
 }
 $(document).ready(function(){ 
-	$.ajaxSetup({
-        beforeSend: function(xhr, status) {
-            $("#spinner").fadeIn("fast");
-        },
-        complete: function() {
-            $("#spinner").fadeOut("fast");
-			$("#cutter").slideDown("fast");
-			$("cutter-text").fadeOut("fast");
-			$("#cutter-text").html("Please Choose what restriction enzymes to cut with:");
-			$("cutter-text").fadeIn("fast");
-        }
-    });
-
-
   $("#show1").click(function() { 
     $("#SequenceDNA").slideToggle("fast");
   });
@@ -52,9 +38,6 @@ $(document).ready(function(){
 	  $("#overlay").fadeOut("fast");
 	  $("#help").fadeOut("fast");
 	});
-  $("#show4").click(function() {
-	  $("#cutter").load("load_enz.pl");
-	});	
   $(window).resize(function() {  
 	centerPopup();  
 	}); 

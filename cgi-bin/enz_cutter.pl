@@ -59,8 +59,8 @@ print <<__HTML;
 <html>
 <head>
 <meta charset="utf-8">
-<title>Results - Chromosome _ Search Engine (Name subject to change - any ideas?)</title>
-<link href="css/style.css" rel="stylesheet" type="text/css">
+<title>Results - Chromosome 12 Search Engine</title>
+<link href="../css/style.css" rel="stylesheet" type="text/css">
 </head>
 
 <body>
