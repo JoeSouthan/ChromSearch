@@ -28,8 +28,8 @@ foreach my $params (@params) {
 #Do Results				
 #Subroutine to call from the package
 #Debug
-$query = "TEST1234";
-$type = "GeneID";
+# $query = "TEST1234";
+# $type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
@@ -41,7 +41,7 @@ my @sequences;
 @sequences = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
 #	Limitation! 
 #	All gene names must be unique
-@resultArray = qw (Test test1 test2 test3);
+#@resultArray = qw (Test test1 test2 test3);
 
 #Build the result hash
 #Change @sequences-> @sequenceFetch once showcodingseq is implimented

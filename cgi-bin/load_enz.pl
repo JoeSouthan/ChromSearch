@@ -15,10 +15,14 @@ my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin
 # my @enzymes = $soap->getSupportedRES("Names")->paramsout;
 
 #Get what gene they want to cut with
+my $gene;
+my @params= $cgi->param();
+foreach my $params (@params) {
+	if ($params eq "gene") {
+		$gene = $cgi->param($params);
+	}
+}
 
-my ($before, $gene)= 1;
-my @values = split(/&/,$ENV{QUERY_STRING});
-($before, $gene) = split(/=/, $values[0]);
 
 #Debug
 my @enzymes = qw (EcoRI BamFI BsuMI);

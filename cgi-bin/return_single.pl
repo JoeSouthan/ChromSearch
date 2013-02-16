@@ -56,6 +56,27 @@ print <<__EOF1;
 <link href="../css/style.css" rel="stylesheet" type="text/css">
 <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 <script language="javascript" type="text/javascript" src="../js/js.js"></script>
+<script language="javascript" type="text/javascript">
+\$(document).ready(function(){ 
+	\$.ajaxSetup({
+		url: 'load_enz.pl',
+		data: {'gene': '$geneID'},
+        beforeSend: function(xhr, status) {
+            \$("#spinner").fadeIn("fast");
+        },
+        complete: function(xhr, status) {
+            \$("#spinner").fadeOut("fast");
+			\$("#cutter").slideDown("fast");
+			\$("cutter-text").fadeOut("fast");
+			\$("#cutter-text").html("Please Choose what restriction enzymes to cut with:");
+			\$("cutter-text").fadeIn("fast");
+        }
+    });
+	\$("#show4").click(function() {
+	  \$("#cutter").load("load_enz.pl");
+	});	
+});
+</script>
 </head>
 
 <body>
@@ -72,7 +93,7 @@ print <<__EOF1;
             <div class="single-left">
             	<h2>Sequence Characteristics</h2>
                 <p>Some text</p>
-				<h2>Codon Usage<h2>
+				<h2>Codon Usage</h2>
 				<div class="center">
 					<img src="$image" alt="Codon Usage"/>
 					<img src="../img/bar.png" alt="Codon Usage" width="500px" height="30px" />
