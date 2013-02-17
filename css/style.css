@@ -83,6 +83,9 @@ pre {
 	position:relative;
 	left:65px;
 }
+.right {
+	text-align:right;
+}
 .searchform {
 }
 .result {
@@ -269,11 +272,13 @@ pre {
 #cutter-text {
 	font-weight:bold;
 }
+#advanced {
+	display:none;
+}
 .float-left {
 	float:left;
 	padding:5px;
 }
-
 /* colours */
 .red {
 	color:#763227;

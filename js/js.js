@@ -38,6 +38,9 @@ $(document).ready(function(){
 	  $("#overlay").fadeOut("fast");
 	  $("#help").fadeOut("fast");
 	});
+  $("#showadvanced").click(function() {
+    $("#advanced").slideToggle("fast");
+	});
   $(window).resize(function() {  
 	centerPopup();  
 	}); 

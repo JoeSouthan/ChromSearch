@@ -13,7 +13,7 @@ my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin
 
 #Do search, Take post
 #Declaring variables for search
-my ($query, $type, @queryFault, $fault);
+my ($query, $type, @queryFault, $fault, $perpage);
 
 
 #Take the Params from the POST
@@ -22,8 +22,16 @@ foreach my $params (@params) {
 		$query = $cgi->param($params);
 	} elsif ($params eq "searchType") {
 		$type = $cgi->param($params);
+	} elsif ($params eq "perpage") {
+		$perpage = $cgi->param($params);
 	}
 }
+
+#Set default page limit just incase
+unless (defined($perpage)) {
+	$perpage = 20;
+}
+
 
 #Do Results				
 #Subroutine to call from the package
@@ -53,6 +61,13 @@ for (my $i=0; $i<@resultArray; $i++){
 }
 #Reference
 my $resultRef = \%results;
+
+#Pagination
+my $resultCount = scalar keys %results;
+my $pagecount = int(($resultCount/$perpage)+1);
+
+
+
 
 
 #Time to check
