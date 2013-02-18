@@ -13,7 +13,7 @@ my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin
 
 #Do search, Take post
 #Declaring variables for search
-my ($query, $type, @queryFault, $fault, $perpage);
+my ($query, $type, @queryFault, $fault, $perpage, $pageNumber);
 
 
 #Take the Params from the POST
@@ -24,20 +24,23 @@ foreach my $params (@params) {
 		$type = $cgi->param($params);
 	} elsif ($params eq "perpage") {
 		$perpage = $cgi->param($params);
+	} elsif ($params eq "page") {
+		$pageNumber = $cgi->param($params);
 	}
 }
 
 #Set default page limit just incase
 unless (defined($perpage)) {
-	$perpage = 20;
+	$perpage = 5;
+	$pageNumber = 1;
 }
 
 
 #Do Results				
 #Subroutine to call from the package
 #Debug
-# $query = "TEST1234";
-# $type = "GeneID";
+ $query = "2780780";
+ $type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
@@ -49,7 +52,7 @@ my @sequences;
 @sequences = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
 #	Limitation! 
 #	All gene names must be unique
-#@resultArray = qw (Test test1 test2 test3);
+@resultArray = qw (01 02 03 04 05 06 07 08 09 10 11);
 
 #Build the result hash
 #Change @sequences-> @sequenceFetch once showcodingseq is implimented
@@ -65,10 +68,41 @@ my $resultRef = \%results;
 #Pagination
 my $resultCount = scalar keys %results;
 my $pagecount = int(($resultCount/$perpage)+1);
-
-
-
-
+my $beforeCount = $pageNumber * $perpage;
+#my $afterCount = $resultCount-($beforeCount+$perpage);
+my %before;
+my %after;
+my %result_copy = %results;
+#Look through the hash, find what to delete
+#Count before
+my $count = 0;
+for my $keys (sort keys %results) {
+	if ($count >= $beforeCount) {
+		last;
+	} else {
+		print $keys."\n";
+		$before{$count} = $keys;
+		$count++;
+	}
+}
+for my $delete (values %before) {
+		delete $results{$delete};
+}
+#save the x amount needed
+my $afterCounter = 0;
+	for my $result (sort keys %results){
+		if ($afterCounter >= $perpage){
+			last;
+		} else {
+		$after{$afterCounter} = $result;
+		$afterCounter++;
+		}
+	}
+	
+#rebuild results
+foreach my $r (sort keys %after) {
+}
+	print Dumper %after;
 
 #Time to check
 #Did they enter a query or type?
@@ -149,6 +183,13 @@ sub htmlOut {
 		</div>
 __EOF2
 		$counter++;
+	}
+	if ($pagecount > 1) {
+		print "\t\t<p>\n\t\t";
+		for (my $i = 1 ; $i < $pagecount; $i++) {
+			print "<span><a href=\"?page=$i\">[$i]</a></span>";
+		}
+		print "\t\t</p>\n";
 	}
 	htmlFooter($gentime);
 }
