@@ -31,16 +31,17 @@ foreach my $params (@params) {
 
 #Set default page limit just incase
 unless (defined($perpage)) {
-	$perpage = 5;
 	$pageNumber = 0;
+	$perpage = 5;
 }
+
 
 
 #Do Results				
 #Subroutine to call from the package
 #Debug
- $query = "2780780";
- $type = "GeneID";
+# $query = "2780780";
+# $type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
@@ -185,9 +186,8 @@ __EOF2
 		$counter++;
 	}
 	if ($pagecount > 1) {
-		print "\t\t<p>\n\t\t<span>[0]";
-		for (my $i = 1 ; $i < $pagecount; $i++) {
-			print "<span><a href=\"?page=$i\">[$i]</a></span>";
+		for (my $i = 0 ; $i < $pagecount; $i++) {
+			print "<span><a href=\"?page=$i&searchType=$type&query=$query&perpage=$perpage\">[$i]</a></span>";
 		}
 		print "\t\t</p>\n";
 	}
