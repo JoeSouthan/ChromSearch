@@ -13,7 +13,7 @@ my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin
 
 #Do search, Take post
 #Declaring variables for search
-my ($query, $type, @queryFault, $fault);
+my ($query, $type, @queryFault, $fault, $perpage, $pageNumber);
 
 
 #Take the Params from the POST
@@ -22,13 +22,25 @@ foreach my $params (@params) {
 		$query = $cgi->param($params);
 	} elsif ($params eq "searchType") {
 		$type = $cgi->param($params);
+	} elsif ($params eq "perpage") {
+		$perpage = $cgi->param($params);
+	} elsif ($params eq "page") {
+		$pageNumber = $cgi->param($params);
 	}
 }
+
+#Set default page limit just incase
+unless (defined($perpage)) {
+	$pageNumber = 0;
+	$perpage = 5;
+}
+
+
 
 #Do Results				
 #Subroutine to call from the package
 #Debug
-# $query = "TEST1234";
+# $query = "2780780";
 # $type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
@@ -41,7 +53,7 @@ my @sequences;
 @sequences = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
 #	Limitation! 
 #	All gene names must be unique
-#@resultArray = qw (Test test1 test2 test3);
+@resultArray = qw (01 02 03 04 05 06 07 08 09 10 11);
 
 #Build the result hash
 #Change @sequences-> @sequenceFetch once showcodingseq is implimented
@@ -54,6 +66,44 @@ for (my $i=0; $i<@resultArray; $i++){
 #Reference
 my $resultRef = \%results;
 
+#Pagination
+	my $resultCount = scalar keys %results;
+	my $pagecount = int(($resultCount/$perpage)+1);
+	my $beforeCount = $pageNumber * $perpage;
+	my @before;
+	my @after;
+	my %result_copy;
+	#Look through the hash, find what to delete
+	#Count before
+	my $count = 0;
+	for my $keys (sort keys %results) {
+		if ($count >= $beforeCount) {
+			last;
+		} else {
+			$before[$count] = $keys;
+			$count++;
+		}
+	}
+	for my $delete (@before) {
+			delete $results{$delete};
+	}
+	#save the x amount needed
+	my $afterCounter = 0;
+	for my $result (sort keys %results){
+		if ($afterCounter >= $perpage){
+			last;
+		} else {
+		$after[$afterCounter] = $result;
+		$afterCounter++;
+		}
+	}
+		
+	#rebuild results
+	foreach my $r (@after) {
+		$result_copy{$r} = $results{$r};
+	}
+	#Set the new result hash
+	%results = %result_copy;
 
 #Time to check
 #Did they enter a query or type?
@@ -134,6 +184,12 @@ sub htmlOut {
 		</div>
 __EOF2
 		$counter++;
+	}
+	if ($pagecount > 1) {
+		for (my $i = 0 ; $i < $pagecount; $i++) {
+			print "<span><a href=\"?page=$i&searchType=$type&query=$query&perpage=$perpage\">[$i]</a></span>";
+		}
+		print "\t\t</p>\n";
 	}
 	htmlFooter($gentime);
 }
