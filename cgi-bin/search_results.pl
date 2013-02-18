@@ -32,7 +32,7 @@ foreach my $params (@params) {
 #Set default page limit just incase
 unless (defined($perpage)) {
 	$perpage = 5;
-	$pageNumber = 1;
+	$pageNumber = 0;
 }
 
 
@@ -66,43 +66,43 @@ for (my $i=0; $i<@resultArray; $i++){
 my $resultRef = \%results;
 
 #Pagination
-my $resultCount = scalar keys %results;
-my $pagecount = int(($resultCount/$perpage)+1);
-my $beforeCount = $pageNumber * $perpage;
-#my $afterCount = $resultCount-($beforeCount+$perpage);
-my %before;
-my %after;
-my %result_copy = %results;
-#Look through the hash, find what to delete
-#Count before
-my $count = 0;
-for my $keys (sort keys %results) {
-	if ($count >= $beforeCount) {
-		last;
-	} else {
-		print $keys."\n";
-		$before{$count} = $keys;
-		$count++;
+	my $resultCount = scalar keys %results;
+	my $pagecount = int(($resultCount/$perpage)+1);
+	my $beforeCount = $pageNumber * $perpage;
+	my @before;
+	my @after;
+	my %result_copy;
+	#Look through the hash, find what to delete
+	#Count before
+	my $count = 0;
+	for my $keys (sort keys %results) {
+		if ($count >= $beforeCount) {
+			last;
+		} else {
+			$before[$count] = $keys;
+			$count++;
+		}
 	}
-}
-for my $delete (values %before) {
-		delete $results{$delete};
-}
-#save the x amount needed
-my $afterCounter = 0;
+	for my $delete (@before) {
+			delete $results{$delete};
+	}
+	#save the x amount needed
+	my $afterCounter = 0;
 	for my $result (sort keys %results){
 		if ($afterCounter >= $perpage){
 			last;
 		} else {
-		$after{$afterCounter} = $result;
+		$after[$afterCounter] = $result;
 		$afterCounter++;
 		}
 	}
-	
-#rebuild results
-foreach my $r (sort keys %after) {
-}
-	print Dumper %after;
+		
+	#rebuild results
+	foreach my $r (@after) {
+		$result_copy{$r} = $results{$r};
+	}
+	#Set the new result hash
+	%results = %result_copy;
 
 #Time to check
 #Did they enter a query or type?
@@ -185,7 +185,7 @@ __EOF2
 		$counter++;
 	}
 	if ($pagecount > 1) {
-		print "\t\t<p>\n\t\t";
+		print "\t\t<p>\n\t\t<span>[0]";
 		for (my $i = 1 ; $i < $pagecount; $i++) {
 			print "<span><a href=\"?page=$i\">[$i]</a></span>";
 		}
