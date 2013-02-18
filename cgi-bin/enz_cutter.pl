@@ -61,12 +61,39 @@ print <<__HTML;
 <meta charset="utf-8">
 <title>Results - Chromosome 12 Search Engine</title>
 <link href="../css/style.css" rel="stylesheet" type="text/css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script language="javascript" type="text/javascript" src="../js/js.js"></script>
 </head>
 
 <body>
+<div id="help">
+	<a id="closepopup">x</a>
+	<div class="float-left">
+		<h2>Help!</h2>
+		<p>1. Enter your search in the search box (GenBank Accession Number, Chromosome Location or Gene ID)</p>
+		<p>2. Select the type of search you would like to do.</p>
+		<p>3. Submit the search.</p>
+	</div>
+</div>
+<div id="overlay"></div>
 <div class="wrapper">
 	<div class="header">
     	<h1>Results</h1>
+		<span class="subheader">Chromosome 12 Analysis Tool</span>
+        <div class="navbar">
+			<div class="item">
+				<a href="../index.html">Home</a>
+			</div>
+			<div class="item">
+				<a href="enz_cutter.pl">EnzCutter</a>
+			</div>
+			<div class="item">
+				<a href="#" id="showhelp">Help</a>
+			</div>
+			<div class="item">
+				<a href="#">Contact </a>
+			</div>
+        </div>
     </div>
     <div class="searchform">
     	<h2 class="center">Enzymatic Cleavage results for: <i>$gene</i>.</h2>
