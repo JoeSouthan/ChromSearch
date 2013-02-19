@@ -9,7 +9,7 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Time::HiRes qw ( time );
 
 my $cgi = new CGI;
-my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin/Modules');
+my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/proxy.pl');
 
 # When implimented:
 # my @enzymes = $soap->getSupportedRES("Names")->paramsout;

@@ -12,7 +12,7 @@ use CodonImager;
 
 my $timestart = time();
 my $cgi = new CGI;
-my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin/Modules');
+my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/proxy.pl');
 #	
 #	Get the param from the link and find the relevant info
 #	
@@ -80,9 +80,34 @@ print <<__EOF1;
 </head>
 
 <body>
+<div id="help">
+	<a id="closepopup">x</a>
+	<div class="float-left">
+		<h2>Help!</h2>
+		<p>1. Enter your search in the search box (GenBank Accession Number, Chromosome Location or Gene ID)</p>
+		<p>2. Select the type of search you would like to do.</p>
+		<p>3. Submit the search.</p>
+	</div>
+</div>
+<div id="overlay"></div>
 <div class="wrapper">
 	<div class="header">
     	<h1>Single Result</h1>
+		<span class="subheader">Chromosome 12 Analysis Tool</span>
+        <div class="navbar">
+			<div class="item">
+				<a href="../index.html">Home</a>
+			</div>
+			<div class="item">
+				<a href="enz_cutter.pl">EnzCutter</a>
+			</div>
+			<div class="item">
+				<a href="#" id="showhelp">Help</a>
+			</div>
+			<div class="item">
+				<a href="#">Contact </a>
+			</div>
+        </div>
     </div>
     <div class="searchform">
     	<h2 class="center">Single result for: <i>$geneID</i>.</h2>

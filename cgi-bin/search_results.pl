@@ -8,7 +8,7 @@ use Data::Dumper;
 my $timestart = time();
 my $cgi = new CGI;
 my @params= $cgi->param();
-my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin/proxy.pl');
+my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/proxy.pl');
 
 
 #Do search, Take post
@@ -32,7 +32,7 @@ foreach my $params (@params) {
 #Set default page limit just incase
 unless (defined($perpage)) {
 	$pageNumber = 0;
-	$perpage = 5;
+	$perpage = 10;
 }
 
 
@@ -40,8 +40,8 @@ unless (defined($perpage)) {
 #Do Results				
 #Subroutine to call from the package
 #Debug
-# $query = "2780780";
-# $type = "GeneID";
+ #$query = "2780780";
+ #$type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
@@ -53,7 +53,7 @@ my @sequences;
 @sequences = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
 #	Limitation! 
 #	All gene names must be unique
-@resultArray = qw (01 02 03 04 05 06 07 08 09 10 11);
+#@resultArray = qw (01 02 03 04 05 06 07 08 09 10 11);
 
 #Build the result hash
 #Change @sequences-> @sequenceFetch once showcodingseq is implimented
@@ -170,7 +170,7 @@ sub htmlOut {
 	#Print HTML
 	htmlHeader($cgi,$resultRef);
 	
-	print "<h2 class=\"center\">Results for: <i>$query</i>.</h2>";
+	print "<h2 class=\"center\">$resultCount Result(s) for: <i>$query</i>.</h2>";
 	#Loop it!
 
 	for my $genes (sort keys %resultHash){
@@ -187,7 +187,11 @@ __EOF2
 	}
 	if ($pagecount > 1) {
 		for (my $i = 0 ; $i < $pagecount; $i++) {
+			if ($i == $pageNumber) {
+				print "<span>[$i]</span>";
+			} else {
 			print "<span><a href=\"?page=$i&searchType=$type&query=$query&perpage=$perpage\">[$i]</a></span>";
+			}
 		}
 		print "\t\t</p>\n";
 	}
@@ -209,6 +213,8 @@ sub htmlHeader {
 	<meta charset="utf-8">
 	<title>Results - Chromosome 12 Search Engine (Name subject to change - any ideas?)</title>
 	<link href="../css/style.css" rel="stylesheet" type="text/css">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<script language="javascript" type="text/javascript" src="../js/js.js"></script>
 __EOF
 	if (defined ($_[1])) {
 		genChartJS($_[1]);
@@ -217,9 +223,35 @@ __EOF
 </head>
 
 	<body>
+	<div id="help">
+	<a id="closepopup">x</a>
+	<div class="float-left">
+		<h2>Help!</h2>
+		<p>1. Enter your search in the search box (GenBank Accession Number, Chromosome Location or Gene ID)</p>
+		<p>2. Select the type of search you would like to do.</p>
+		<p>3. Submit the search.</p>
+	</div>
+</div>
+<div id="overlay"></div>
 		<div class="wrapper">
+
 			<div class="header">
 				<h1>Results</h1>
+			        <span class="subheader">Chromosome 12 Analysis Tool</span>
+        <div class="navbar">
+			<div class="item">
+				<a href="../index.html">Home</a>
+			</div>
+			<div class="item">
+				<a href="enz_cutter.pl">EnzCutter</a>
+			</div>
+			<div class="item">
+				<a href="#" id="showhelp">Help</a>
+			</div>
+			<div class="item">
+				<a href="#">Contact </a>
+			</div>
+        </div>
 			</div>
 			<div class="searchform">
 __JSOUTPUT

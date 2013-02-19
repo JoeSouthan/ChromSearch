@@ -5,9 +5,11 @@ use Data::Dumper;
 my $soap = SOAP::Lite
 				#The package to call
 				->uri('ChromoDB')
-				->proxy('http://joes-pi.dyndns.org/cgi-bin/proxy.pl');
+				->proxy('http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/proxy.pl');
 				
 my ($query, $type) = @ARGV;
+ $query = "2780780";
+ $type = "GeneID";
 
 #print $query;
 #print $type;
