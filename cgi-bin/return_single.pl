@@ -22,6 +22,10 @@ my ($before, $gene)= 1;
 my @values = split(/&/,$ENV{QUERY_STRING});
 ($before, $gene) = split(/=/, $values[0]);
 
+#Debug
+# unless(defined($gene)) {
+	# $gene = "Test";
+# }
 
 #Dummy Data
 #Avaliable Restiction Enzymes
@@ -46,71 +50,8 @@ my $timegen = $timestop - $timestart;
 #unless (defined ($gene)) {
 #	print "Please specify a gene name";
 #} else {
-print $cgi->header();
+	htmlHeader($cgi,$geneID);
 print <<__EOF1;
-
-<!DOCTYPE HTML>
-<html>
-<head>
-<meta charset="utf-8">
-<title>Results - Chromosome 12 Search Engine (Name subject to change - any ideas?)</title>
-<link href="../css/style.css" rel="stylesheet" type="text/css">
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
-<script language="javascript" type="text/javascript" src="../js/js.js"></script>
-<script language="javascript" type="text/javascript">
-\$(document).ready(function(){ 
-	\$.ajaxSetup({
-		url: 'load_enz.pl',
-		data: {'gene': '$geneID'},
-        beforeSend: function(xhr, status) {
-            \$("#spinner").fadeIn("fast");
-        },
-        complete: function(xhr, status) {
-            \$("#spinner").fadeOut("fast");
-			\$("#cutter").slideDown("fast");
-			\$("cutter-text").fadeOut("fast");
-			\$("#cutter-text").html("Please Choose what restriction enzymes to cut with:");
-			\$("cutter-text").fadeIn("fast");
-        }
-    });
-	\$("#show4").click(function() {
-	  \$("#cutter").load("load_enz.pl");
-	});	
-});
-</script>
-</head>
-
-<body>
-<div id="help">
-	<a id="closepopup">x</a>
-	<div class="float-left">
-		<h2>Help!</h2>
-		<p>1. Enter your search in the search box (GenBank Accession Number, Chromosome Location or Gene ID)</p>
-		<p>2. Select the type of search you would like to do.</p>
-		<p>3. Submit the search.</p>
-	</div>
-</div>
-<div id="overlay"></div>
-<div class="wrapper">
-	<div class="header">
-    	<h1>Single Result</h1>
-		<span class="subheader">Chromosome 12 Analysis Tool</span>
-        <div class="navbar">
-			<div class="item">
-				<a href="../index.html">Home</a>
-			</div>
-			<div class="item">
-				<a href="enz_cutter.pl">EnzCutter</a>
-			</div>
-			<div class="item">
-				<a href="#" id="showhelp">Help</a>
-			</div>
-			<div class="item">
-				<a href="#">Contact </a>
-			</div>
-        </div>
-    </div>
-    <div class="searchform">
     	<h2 class="center">Single result for: <i>$geneID</i>.</h2>
         <div class="singleresult">
         	<div class="info">

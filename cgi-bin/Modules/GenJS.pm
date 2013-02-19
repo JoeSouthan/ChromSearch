@@ -3,7 +3,7 @@ package GenJS;
 use strict;
 use Exporter;
 our @ISA = qw(Exporter);
-our @EXPORT = qw (genChartJS);
+our @EXPORT = qw (genChartJS genResultJS);
 
 #=============================
 #	JS Output
@@ -85,5 +85,36 @@ __JS2
 
 	</script>
 __JS3
+}
+#=============================
+#	JS Output
+#		Ouputs Ajax loader for enzymes
+#		Takes:
+#			[0] = GeneID String
+#=============================
+sub genResultJS {
+print <<__JS;
+	<script language="javascript" type="text/javascript">
+\$(document).ready(function(){ 
+	\$.ajaxSetup({
+		url: 'load_enz.pl',
+		data: {'gene': '$_[0]'},
+        beforeSend: function(xhr, status) {
+            \$("#spinner").fadeIn("fast");
+        },
+        complete: function(xhr, status) {
+            \$("#spinner").fadeOut("fast");
+			\$("#cutter").slideDown("fast");
+			\$("cutter-text").fadeOut("fast");
+			\$("#cutter-text").html("Please Choose what restriction enzymes to cut with:");
+			\$("cutter-text").fadeIn("fast");
+        }
+    });
+	\$("#show4").click(function() {
+	  \$("#cutter").load("load_enz.pl");
+	});	
+});
+</script>
+__JS
 }
 1;

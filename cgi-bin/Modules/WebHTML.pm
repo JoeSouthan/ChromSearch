@@ -64,6 +64,7 @@ __EOF2
 #		Takes:
 #			[0] = CGI header - String
 #			(1) = Optional; if the page contains a gene layout barchart, send the result hash reference over - String
+#			(1) = If you pass a string, it will generate JS for loading ajax page on return_single
 #=============================
 sub htmlHeader {
 	print $_[0]->header();
@@ -78,7 +79,14 @@ sub htmlHeader {
 	<script language="javascript" type="text/javascript" src="../js/js.js"></script>
 __EOF
 	if (defined ($_[1])) {
-		genChartJS($_[1]);
+		#Check if its the result hash
+		if (ref($_[1]) eq "HASH") {
+			genChartJS($_[1]);
+		} else {
+		#It's got to be result_single
+			genResultJS($_[1]);
+		
+		}
 	}
 	print <<__JSOUTPUT;
 </head>

@@ -42,8 +42,8 @@ unless (defined($perpage)) {
 #Do Results				
 #Subroutine to call from the package
 #Debug
- $query = "2780780";
- $type = "GeneID";
+#$query = "2780780";
+#$type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
