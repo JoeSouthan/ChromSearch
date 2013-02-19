@@ -12,7 +12,7 @@ use CodonImager;
 
 my $timestart = time();
 my $cgi = new CGI;
-my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin/Modules');
+my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/proxy.pl');
 #	
 #	Get the param from the link and find the relevant info
 #	

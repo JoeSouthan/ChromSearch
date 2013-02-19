@@ -8,7 +8,7 @@ use Data::Dumper;
 my $timestart = time();
 my $cgi = new CGI;
 my @params= $cgi->param();
-my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin/proxy.pl');
+my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/proxy.pl');
 
 
 #Do search, Take post
@@ -32,7 +32,7 @@ foreach my $params (@params) {
 #Set default page limit just incase
 unless (defined($perpage)) {
 	$pageNumber = 0;
-	$perpage = 5;
+	$perpage = 10;
 }
 
 
@@ -40,8 +40,8 @@ unless (defined($perpage)) {
 #Do Results				
 #Subroutine to call from the package
 #Debug
-# $query = "2780780";
-# $type = "GeneID";
+ #$query = "2780780";
+ #$type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array
@@ -53,7 +53,7 @@ my @sequences;
 @sequences = qw ( NCS:ATGCCCCCATATATATATACCCCATATA CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT CODON:ATATATATATATATATATTAT INTRON:CCCCAAATTTATTTATTAT);
 #	Limitation! 
 #	All gene names must be unique
-@resultArray = qw (01 02 03 04 05 06 07 08 09 10 11);
+#@resultArray = qw (01 02 03 04 05 06 07 08 09 10 11);
 
 #Build the result hash
 #Change @sequences-> @sequenceFetch once showcodingseq is implimented

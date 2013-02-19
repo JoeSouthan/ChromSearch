@@ -10,7 +10,7 @@ use Data::Dumper;#Debug
 my $cgi = new CGI;
 my $soap = SOAP::Lite
 				->uri('ChromoDB')
-				->proxy('http://joes-pi.dyndns.org/cgi-bin/Modules');
+				->proxy('http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/proxy.pl');
 my $time = time();
 
 #Find what enzymes they want  - POST
