@@ -9,6 +9,7 @@ use CGI::Carp qw(warningsToBrowser fatalsToBrowser);
 use Time::HiRes qw ( time );
 use lib 'Modules';
 use CodonImager;
+use WebHTML;
 
 my $timestart = time();
 my $cgi = new CGI;

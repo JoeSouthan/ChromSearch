@@ -1,6 +1,7 @@
 #! /usr/bin/perl -w
 package WebHTML;
 use GenJS;
+use HelpText;
 use strict;
 use Exporter;
 our @ISA = qw(Exporter);
@@ -86,10 +87,9 @@ __EOF
 	<div id="help">
 	<a id="closepopup">x</a>
 	<div class="float-left">
-		<h2>Help!</h2>
-		<p>1. Enter your search in the search box (GenBank Accession Number, Chromosome Location or Gene ID)</p>
-		<p>2. Select the type of search you would like to do.</p>
-		<p>3. Submit the search.</p>
+__JSOUTPUT
+		&helpTextError();
+print <<__NAVPRINT
 	</div>
 </div>
 <div id="overlay"></div>
@@ -114,7 +114,7 @@ __EOF
         </div>
 			</div>
 			<div class="searchform">
-__JSOUTPUT
+__NAVPRINT
 }
 #=============================
 #	HTML Footer
