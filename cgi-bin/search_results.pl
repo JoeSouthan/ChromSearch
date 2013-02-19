@@ -170,7 +170,7 @@ sub htmlOut {
 	#Print HTML
 	htmlHeader($cgi,$resultRef);
 	
-	print "<h2 class=\"center\">Results for: <i>$query</i>.</h2>";
+	print "<h2 class=\"center\">$resultCount Result(s) for: <i>$query</i>.</h2>";
 	#Loop it!
 
 	for my $genes (sort keys %resultHash){
@@ -187,7 +187,11 @@ __EOF2
 	}
 	if ($pagecount > 1) {
 		for (my $i = 0 ; $i < $pagecount; $i++) {
+			if ($i == $pageNumber) {
+				print "<span>[$i]</span>";
+			} else {
 			print "<span><a href=\"?page=$i&searchType=$type&query=$query&perpage=$perpage\">[$i]</a></span>";
+			}
 		}
 		print "\t\t</p>\n";
 	}
