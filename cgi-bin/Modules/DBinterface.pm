@@ -1,6 +1,7 @@
 package DBinterface;
 
 use DBI; # Comment out for SOAP Testing
+use Test::More;
 
 # Subroutines
 
