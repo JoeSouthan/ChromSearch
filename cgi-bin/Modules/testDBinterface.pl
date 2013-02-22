@@ -80,7 +80,7 @@ my $results = DBinterface::querySearch("Test1234","geneId");
 if( $results eq 'Test1234' ){
 	print "Returned ",$results,"\nPassed\n";
 }else{
-	print "$results\n";
+	print "Returned ",$results,"\nFailed\n";
 }
 
 # CONDITION: Valid parameters for proteinName
@@ -90,7 +90,7 @@ my $results = DBinterface::querySearch("HEX1","proteinName");
 if( $results eq 'HEX1' ){
 	print "Returned ",$results,"\nPassed\n";
 }else{
-	print "$results\n";
+	print "Returned ",$results,"\nFailed\n";
 }
 
 # CONDITION: Valid parameters for Accession number

@@ -104,7 +104,7 @@ sub querySearch{
 	my ($searchString, $idType) = @_;
 	
 	# Run search query **$searchstring must be in quotes***
-	my $sqlQuery = "SELECT $idType FROM gene WHERE $idType='$searchString'";
+	my $sqlQuery = "SELECT geneId FROM gene WHERE $idType='$searchString'";
 	
 	# Run query
 	my @id = DBinterface::queryRun($sqlQuery);
