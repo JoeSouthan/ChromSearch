@@ -18,11 +18,11 @@ sub sayHello {
 sub showAllIdentifiers{
 	
 	# Get the second input, first is the SOAP class variable
-	my ($class, $identifer) = @_;
-	#my $id = $_[1];
+	#my ($class, $identifer) = @_;
+	my $id = $_[1];
 	
 	# Check for blank input, return error is zero length
-	if( 0 == length($identifier)){
+	if( 0 == length($id)){
 		return 'ERROR:ZERO_LENGTH_ARGUMENT';
 	}
 
@@ -153,7 +153,7 @@ sub getGeneSummaryData{
 	my %geneData;
 	
 	# Get gene name , if unnamed set to unnamed.
-	my $geneName = 
+	my $geneName = 0;
 	
 	# Get gene ID
 	
