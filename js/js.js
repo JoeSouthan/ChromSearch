@@ -27,16 +27,16 @@ $(document).ready(function(){
   // });
   $("#showhelp").click(function() {
 	  $("#overlay").fadeIn("fast");
-	  $("#help").fadeIn("fast");
+	  $("#help").slideDown("fast");
 	  centerPopup();
 	});
   $("#closepopup").click(function() {
 	  $("#overlay").fadeOut("fast");
-	  $("#help").fadeOut("fast");
+	  $("#help").slideUp("fast");
 	});
   $("#overlay").click(function() {
 	  $("#overlay").fadeOut("fast");
-	  $("#help").fadeOut("fast");
+	  $("#help").slideUp("fast");
 	});
   $("#showadvanced").click(function() {
     $("#advanced").slideToggle("fast");

@@ -6,6 +6,33 @@
 	<link href="css/style.css" rel="stylesheet" type="text/css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 	<script language="javascript" type="text/javascript" src="js/js.js"></script>
+	<script language="javascript" type="text/javascript">
+$(document).ready(function(){ 
+	var searchType = $('input[name=searchType]:checked' , '#mainSearch').val();
+	var searchString = $("input", "#mainSearch").val();
+	$.ajaxSetup({
+		url: 'search_results.pl',
+		data: {'searchType': searchType, 'query': searchString},
+        beforeSend: function(xhr, status) {
+            $("#loader").fadeIn("fast");
+			$("#overlay").fadeIn("fast");
+			$("#main").fadeOut("fast");
+        },
+        complete: function(xhr, status) {
+            $("#loader").fadeOut("fast");
+			$("#overlay").fadeOut("fast");
+			$("#main").fadeIn("fast");
+        },
+		error: function(jqXHR, exception) {
+			alert("Ajax error: " + jqXHR.status +".");
+		}
+    });		
+	$("#submitSearch").click(function() {
+		$("#main").load("http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/search_results.pl");
+	});	
+});
+
+</script>
 </head>
 
 <body>
@@ -19,29 +46,39 @@
 	</div>
 </div>
 <div id="overlay"></div>
+<div class="navbar-wrapper">
+	<div class="navbar-inner-wrapper">
+		<div class="header">
+			<h1>12Chrom</h1>
+	         
+		</div>
+		<span class="subheader">Chromosome 12 Analysis Tool</span>
+		<div class="navbar">
+					<div class="item">
+						<a href="#">Home</a>
+					</div>
+					<div class="item">
+						<a href="cgi-bin/enz_cutter.pl">EnzCutter</a>
+					</div>
+					<div class="item">
+						<a href="#" id="showhelp">Help</a>
+					</div>
+					<div class="item">
+						<a href="#">Contact </a>
+					</div>
+				</div>
+	</div>
+</div>
 <div class="wrapper">
-	<div class="header">
-    	<h1>12Chrom</h1>
-        <span class="subheader">Chromosome 12 Analysis Tool</span>
-        <div class="navbar">
-			<div class="item">
-				<a href="#">Home</a>
-			</div>
-			<div class="item">
-				<a href="cgi-bin/enz_cutter.pl">EnzCutter</a>
-			</div>
-			<div class="item">
-				<a href="#" id="showhelp">Help</a>
-			</div>
-			<div class="item">
-				<a href="#">Contact </a>
-			</div>
-        </div>
-    </div>
+<div class="center" id="loader">
+	<h2 class="center">Please Wait...</h2>
+	<img src="img/bars.gif" width="160" height"20" alt="Loading" />
+</div>
+<div id="main">
     <div class="searchform">
     			<div class="left"><img src="img/clippy.gif" alt="Clippy" width="94" height="87" /></div>
                 <h2 class="center">It looks like you're about to search.</h2>
-    	<form method="post" action="cgi-bin/search_results.pl">
+    	<form method="post" action="DummyResults/dummyresults.html" id="mainSearch">
         	<div class="search_wrapper">
             	<span>Search Query:</span><input type="text" name="query" autofocus="autofocus" size="60" placeholder="Enter your search"/>
                 <br />
@@ -57,12 +94,14 @@
 					<span>Number of results per page</span><input type="text" name="perpage" value="10" size="2" />
 				</div>
                 <input type="submit" value="Submit" />
+				<a href="#"	id="submitSearch">Clicky</a>
                 <input type="reset" value="Reset" />
             </div>
         </form>
     </div>
     <div class="footer">Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
 
+	</div>
 </div>
 </body>
 </html>
