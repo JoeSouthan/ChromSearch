@@ -18,20 +18,20 @@ $(document).ready(function(){
 			$("#overlay").fadeIn("fast");
 			$("#main").fadeOut("fast");
         },
-        complete: function(xhr, status) {
-            $("#loader").fadeOut("fast");
-			$("#overlay").fadeOut("fast");
-			$("#main").fadeIn("fast");
-        },
 		error: function(jqXHR, exception) {
 			alert("Ajax error: " + jqXHR.status +".");
 		}
-    });		
+		});
+		
 	$("#submitSearch").click(function() {
-		$("#main").load("http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/search_results.pl");
+		$("#main").load("cgi-bin/search_results.pl");
 	});	
 });
-
+$(document).ajaxComplete(function(event,request, settings) {
+            $("#loader").fadeOut("fast");
+			$("#overlay").fadeOut("fast");
+			$("#main").fadeIn("fast");
+});
 </script>
 </head>
 
