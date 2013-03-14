@@ -4,35 +4,11 @@
 	<meta charset="utf-8">
 	<title>Chromosome 12 Search Engine (Name subject to change - any ideas?)</title>
 	<link href="css/style.css" rel="stylesheet" type="text/css">
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+	<link rel="icon" type="image/png" href="img/favicon.png" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.1/jquery.min.js"></script>
 	<script language="javascript" type="text/javascript" src="js/js.js"></script>
-	<script language="javascript" type="text/javascript">
-$(document).ready(function(){ 
-	var searchType = $('input[name=searchType]:checked' , '#mainSearch').val();
-	var searchString = $("input", "#mainSearch").val();
-	$.ajaxSetup({
-		url: 'search_results.pl',
-		data: {'searchType': searchType, 'query': searchString},
-        beforeSend: function(xhr, status) {
-            $("#loader").fadeIn("fast");
-			$("#overlay").fadeIn("fast");
-			$("#main").fadeOut("fast");
-        },
-		error: function(jqXHR, exception) {
-			alert("Ajax error: " + jqXHR.status +".");
-		}
-		});
-		
-	$("#submitSearch").click(function() {
-		$("#main").load("cgi-bin/search_results.pl");
-	});	
-});
-$(document).ajaxComplete(function(event,request, settings) {
-            $("#loader").fadeOut("fast");
-			$("#overlay").fadeOut("fast");
-			$("#main").fadeIn("fast");
-});
-</script>
+	<script language="javascript" type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script language="javascript" type="text/javascript" src="js/jquery.address-1.5.min.js"></script>
 </head>
 
 <body>
@@ -55,13 +31,13 @@ $(document).ajaxComplete(function(event,request, settings) {
 		<span class="subheader">Chromosome 12 Analysis Tool</span>
 		<div class="navbar">
 					<div class="item">
-						<a href="#">Home</a>
+						<a href="/">Home</a>
 					</div>
 					<div class="item">
 						<a href="cgi-bin/enz_cutter.pl">EnzCutter</a>
 					</div>
 					<div class="item">
-						<a href="#" id="showhelp">Help</a>
+						<a href="help" id="showhelp">Help</a>
 					</div>
 					<div class="item">
 						<a href="#">Contact </a>
@@ -93,9 +69,7 @@ $(document).ajaxComplete(function(event,request, settings) {
 				<div id="advanced">
 					<span>Number of results per page</span><input type="text" name="perpage" value="10" size="2" />
 				</div>
-                <input type="submit" value="Submit" />
-				<a href="#"	id="submitSearch">Clicky</a>
-                <input type="reset" value="Reset" />
+				<a href="/submit"	id="submitSearch">Submit</a>
             </div>
         </form>
     </div>
