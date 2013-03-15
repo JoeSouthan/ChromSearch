@@ -2,14 +2,32 @@
 package HelpText;
 use strict;
 use Exporter;
+use Pod::Simple::HTML;
+use File::Slurp;
+use Data::Dumper;
 our @ISA = qw(Exporter);
 our @EXPORT = qw (helpTextError helpTextSearch);
 
+
 sub helpTextError {
-	print <<__ERROR1;
-		<h2>Error!</h2>
-		<p>Please try again</p>
-__ERROR1
+	my @files = glob ("help/*.pod");
+	my %help;
+	for (my $i=0; $i<@files; $i++) {
+		my $sectionName;
+		if ($files[$i] =~ /help\/(\d+)_(\w+_\w+?).pod/ ) {
+			$sectionName = "$1-$2";
+		} else {
+			last;
+		}
+		my @filearray = read_file($files[$i]);
+		$help{$sectionName} = [@filearray];
+	}
+	
+	for my $keys (sort keys %help) {
+		print "$keys @{$help{$keys}} ";
+	}
+	
+	
 }
 sub helpText {
 	print <<__HELP	
