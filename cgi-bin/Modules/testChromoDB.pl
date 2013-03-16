@@ -27,7 +27,7 @@ print "************************** TEST : 'showAllIdentifiers' ******************
 my $id = showAllIdentifiers('');
 ok( $id eq 'ERROR:ZERO_LENGTH_ARGUMENT',"with no identifier specified");
 
-	
+
 # CONDITION: Incorrect identifier
 
 my $id = showAllIdentifiers("geneseq");
@@ -53,25 +53,25 @@ print "************************** TEST : 'getSearchResults' ********************
 my $results = getSearchResults("","");
 ok( $results eq 'ERROR:ZERO_LENGTH_ARGUMENT', "with no parameters");
 
-# CONDITION: Correct parameters of Test1234 (assumes this dummy data is in DB) and GeneID
+# CONDITION: Correct parameters of 2780780 (assumes this dummy data is in DB) and GeneID
 
-my $results = getSearchResults("2627128","GeneID");
-ok( $results eq '2627128', "with '2627128' and 'GeneID' as parameters");
+my $results = getSearchResults("2780780","GeneID");
+ok( $results eq '2780780', "with '2780780' and 'GeneID' as parameters");
 
-# CONDITION: Correct parameters of DNA primase 1 (assumes this dummy data is in DB) and ProteinProduct
+# CONDITION: Correct parameters of DUSP6 (assumes this dummy data is in DB) and ProteinProduct
 
-my $results = getSearchResults("DNA primase 1","ProteinProduct");
-ok( $results eq 'DNA primase 1', "with 'DNA primase 1' and 'ProteinProduct' as parameters");
+my $results = getSearchResults("DUSP6","ProteinProduct");
+ok( $results eq '60683881', "with 'DNA primase 1' and 'ProteinProduct' as parameters");
 
 # CONDITION: Correct parameters of AB002805 (assumes this dummy data is in DB) and AccessionNumber
 
 my $results = getSearchResults("AB002805","AccessionNumber");
-ok( $results eq 'AB002805', "with 'AB002805' and 'AccessionNumber' as parameters");
+ok( $results eq '2780780', "with 'AB002805' and 'AccessionNumber' as parameters");
 
 # CONDITION: Correct parameters of q13 (assumes this dummy data is in DB) and ChromosomeLocation
 
 my $results = getSearchResults("q13","ChromosomeLocation");
-ok( $results eq 'q13', "with 'q13' and 'ChromosomeLocation' as parameters");
+ok( length($results), "with 'q13' and 'ChromosomeLocation' as parameters");
 
 # CONDITION: Correct parameters of but not in DB
 

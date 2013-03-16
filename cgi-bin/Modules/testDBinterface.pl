@@ -18,12 +18,12 @@ ok( $dbhandle ne undef,'Test DB connection' );
 print "\n************************** TEST : 'queryRun' **************************\n";
 
 
-# CONDITION: Valid string 'SELECT geneId FROM gene WHERE geneId='Test1234'
+# CONDITION: Valid string 'SELECT geneId FROM gene WHERE geneId='2780780'
 
-my $sqlQuery = "SELECT geneID FROM gene WHERE geneID='Test1234'";
+my $sqlQuery = "SELECT geneID FROM gene WHERE geneId='2780780'";
 my @queryData = DBinterface::queryRun($sqlQuery);
-ok(@queryData, "Testing 'queryRun' with valid string 'SELECT geneID FROM gene WHERE 
-geneId'Test1234'");
+ok(@queryData, "Testing 'queryRun' with valid string 'SELECT geneId FROM gene WHERE 
+geneId = '2780780'");
 
 # CONDITION: Valid string 'SELECT geneId FROM gene'
 
@@ -48,28 +48,29 @@ print "\n************************** TEST: 'querySearch' ************************
 
 # CONDITION: Valid parameters for geneId
 
-my $results = DBinterface::querySearch("Test1234","geneId");
-ok($results eq 'Test1234', 
-"with valid parameters 'Test1234' as search string and 'geneId' as identifier type" );
+my $results = DBinterface::querySearch("2780780","geneId");
+ok($results eq '2780780', 
+"with valid parameters '2780780' as search string and 'geneId' as identifier type" );
 
 # CONDITION: Valid parameters for proteinName
 
-my $results = DBinterface::querySearch("HEX1","proteinName");
-ok( $results eq 'HEX1', 
-"with valid parameters 'HEX1' as search string and 'proteinName' as type");
+my $results = DBinterface::querySearch("DUSP6","proteinName");
+ok( $results eq '60683881', 
+"with valid parameters 'DUSP1' as search string and 'proteinName' as type");
 
 # CONDITION: Valid parameters for Accession number
 
 my $results = DBinterface::querySearch("AB002805","accessionNo");
-ok( $results eq 'AB002805',
+ok( $results eq '2780780',
 "with valid parameters 'AB002805' as search string and 'accessionNo' as type");
 	
 
 # CONDITION: Valid parameters for chromosome location
 
-my $results = DBinterface::querySearch("4p12.2","chromLoc");
-ok( $results eq '4p12.2',
-"with valid parameters '4p12.2' as search string and 'chromLoc' as type" );
+my $results = DBinterface::querySearch("12q13","chromLoc");
+ok( length($results),
+"with valid parameters '12q13' as search string and 'chromLoc' as type" );
+
 	
 # CONDITION: Valid parameters but not in DB
 
