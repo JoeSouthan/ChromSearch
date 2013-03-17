@@ -69,16 +69,24 @@ sub getSearchResults{
 	# Send a search query to the DB
 	my @queryResult = DBinterface::querySearch($searchString, $id);
 	
-	# need to include
-	
-	# If string not empty return the string containing the matches from querySearch
-	if(defined(@queryResult)){
-		my $searchResults = join(",",@queryResult);
-		return $searchResults;
-	}else{
+	# If string return an no matches
+	if(!defined(@queryResult)){
 		# If is null return null string or error code
 		return "ERROR:NO_DB_MATCHES"; # Ask Joe what he would like back if there are no matches
 	}
+	
+	# Retrieve coding data for each gene in the list of results.
+	for(my $i = 0; $i < scalar(@queryResult); $i++){
+		my $searchEntry = $queryResult[$i];
+		$searchEntry =~ /(\w+)/;
+		my @sequence = DBinterface::buildCodingSeq($1);
+		my $concatSeq = join(",",@sequence);
+		$queryResult[$i] .= "|$concatSeq";
+	}
+
+	my $searchResults = join(">",@queryResult);
+	
+	return $searchResults;
 }
 
 ##########################################################################################################

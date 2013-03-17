@@ -1,7 +1,7 @@
 #! /usr/bin/perl 
 
 use strict;
-use Test::Simple tests => 21;
+use Test::Simple tests => 23;
 use DBinterface;
 
 ################################ TEST: 'databaseConnect'###############################
@@ -160,15 +160,30 @@ ok( $seq eq 'ERROR:DB_COLUMN_EMPTY',"with no sequence data");
 
 my $seq = DBinterface::querySequence('AB002805', 'GeneSeq');
 ok( length($seq), "with valid argument accession number 'AB002805'");
-
+#print $seq,"\n";
 
 ################################ TEST : 'buildCodingSeq' ################################
 
 print "\n************************** TEST: 'buildCodingSeq' **************************\n";
 
 my @seq = DBinterface::buildCodingSeq('AB002805');
-ok( @seq, "with valid argument accession number 'AB002805'");
+ok( @seq, "with valid argument accession number 'AB002805' with one exon");
+foreach my $entry (@seq){
+	print $entry,"\n";
+}
 
+@seq = DBinterface::buildCodingSeq('AB005990');
+ok( @seq, "with valid argument accession number 'AB005990' with more than one exon");
+foreach my $entry (@seq){
+	print $entry,"\n";
+}
+
+# PRODUCES  A BUG returns -1 on the last NCS
+@seq = DBinterface::buildCodingSeq('GU994024');
+ok( @seq, "with valid argument accession number 'GU994024' with more than one exon");
+foreach my $entry (@seq){
+	print $entry,"\n";
+}
 
 
 

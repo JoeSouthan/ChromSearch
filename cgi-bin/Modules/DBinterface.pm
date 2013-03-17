@@ -242,10 +242,9 @@ sub buildCodingSeq{
 	# Get accession number for DB lookup
 	my $accessionNo = $_[0];
 	
-	# Get coding information from DB, this includes type, start position and end position
-	# of exons, introns and non-coding sequences
-	my $sqlQuery = "SELECT type, featStart, featEnd FROM seqFeat WHERE accessionNo='$accessionNo'
-	ORDER BY featStart DESC";
+	# Specify query includes start position and end position of exons from give accessionNo.
+	my $sqlQuery = "SELECT featStart, featEnd FROM seqFeat WHERE accessionNo='$accessionNo'
+	ORDER BY LENGTH(featStart)";
 	
 	# Fetch the exon coding sequence information from DB, array will progress as 
 	# Type, start, stop then repeat for next item.
@@ -254,89 +253,96 @@ sub buildCodingSeq{
 		return 'ERROR:DB_COLUMN_EMPTY';
 	}
 	
+	# Get the length of the sequence
+	# Specify query includes start position and end position of exons from give accessionNo.
+	my $sqlQuerySeqlength = "SELECT geneSeqLen FROM gene WHERE accessionNo='$accessionNo'";
+	
+	my @sequenceLength = DBinterface::queryRun($sqlQuerySeqlength);
+	if (@sequenceLength eq 'NO_DATA'){
+		return 'ERROR:DB_COLUMN_EMPTY';
+	}
+	#print @sequenceLength;
+	
+	#foreach my $entry (@tableRows){
+	#	print $entry,"\n";
+	#}
+	
+	
 	# Create comma separated string only for devlop purposes
 	my $string = join(",",@tableRows);
+	
 	#print $string,"\n";
 	
 	# Read array and cut the sequence up according to the start stop sequence features,
 	# assumes that MySQL has put items in correct order.  
 	# If not may have to implement sort function
 	
-	# Array to hold final data that is presented back to website
+	# Array to hold final data that is passed back to caller
 	my @CDSarray;
 	
 	# Used to track position in array
-	my $CDSindex = 0; 
+	my $tableRowIndex = 0; 
 	
 	
-	
-	# All entries are either marked Exon or non-coding introns are inferred from the data and must 
+	# All entries are exons, all non-coding introns are inferred from the data and must 
 	# be present in the final array.
 	
-	# Is first entry a non-coding sequence if so it will start at 1 as there is never non-coding within sequence
-	# Sequence therefore begins with a non-coding sequence. 
+	# Deal with first entry outside of loop as it is a bit inefficient to run the check
+	# every iteration of the loop below.
 	
 	# Is first entry an exon? If so, does it start at one? 
+	if( 1 == $tableRows[0] ){
 	
-	# If yes, then sequecne starts with exon.
-	
-	# If no then infer an intron and calculate intron length, sequecne begins with intron.
-	
-	
-	
-	# Extract start and end positions of each coding type, put them into array.
-	for( my $i = 0; $i < scalar(@tableRows); $i++){
-	
-		my ($segType, $segStart, $segStop); 
+		# If yes, then sequecne starts with exon.
+		my $entry = join(":","EXON",$tableRows[0],$tableRows[1]);
+		push(@CDSarray, $entry);
 		
-		# Extract type 
-		$segType = $tableRows[$i];
-	
-		# Move counter along one
-		$i++; 
+		# Offset the beginning of the array for the coming loop.
+		$tableRowIndex = 2; 
 		
-		# Get start number (next in the array)
+		if(defined($tableRows[2])){
+			# Set the segement follwing as an NCS
+			my $ncsEntry = join(":","NCS",$tableRows[1]+1,$tableRows[2]-1);
+			push(@CDSarray, $ncsEntry);
+		}else{
+			my $ncsEntry = join(":","NCS",$tableRows[1]+1,@sequenceLength);
+			push(@CDSarray, $ncsEntry);
+		}
+		
+	}else{
+		# If no then infer an intron and calculate intron length, sequence begins with intron.
+		my $entry = join(":","NCS","0",$tableRows[0]-1);
+		push(@CDSarray, $entry);
+	}
+	
+	# Extract start and end positions of the exons, put them into array.
+	for( my $i = $tableRowIndex; $i < scalar(@tableRows); $i++){
+		
+		my ($segStart, $segStop); 
+		
+		# Get start number of current exon
 		$segStart = $tableRows[$i];
 		
 		# Increment again to next item
 		$i++;
 		
-		# Extract final stop position 
+		# Extract stop position of exon 
 		$segStop = $tableRows[$i];
 		
-		# String to hold full identfier type of region
-		my $regionCode = '';
-		
-		# Inspect and write string for array entry
-		# Need to decide on exact 'TYPES' for these entries before proceeding
-		
-		if( 'E' eq $segType ){
-			$regionCode = 'EXON:';
-		}elsif( '5' eq $segType ){
-			$regionCode = '5:';
-		}elsif( '3' eq $segType ){
-			$regionCode = '3:';
-		}
-		
-		# Is sequence fragment complementry? 
-		
-		
-		
 		# Write the start/stop information into the string
-		my $codedString = join "", $regionCode, $segStart, ":", $segStop;
-		
-		# Commit this to CDSarray 
-		@CDSarray[$CDSindex] = $codedString;
-		# Increment index in to array by one for next item
-		$CDSindex++;
-		
+		my $entry = join(":","EXON",$segStart,$segStop);
+		push(@CDSarray, $entry);
+	
+		# Find distance between current exon and next and denote as NCS in array.
+		if( defined($tableRows[$i+1]) )
+		{
+			my $ncsEntry = join(":","NCS",$tableRows[$i],$tableRows[$i+1]-1);
+			push(@CDSarray, $ncsEntry);
+		}else{
+			my $ncsEntry = join(":","NCS",$segStop+1,@sequenceLength);
+			push(@CDSarray, $ncsEntry);
+		}
 	}
-	
-	# Load in to array always start with first element as 
-	
-	#foreach my $val (@CDSarray){
-	#	print $val,"\n";
-	#}
 	
 	return @CDSarray;
 }
