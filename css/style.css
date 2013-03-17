@@ -307,8 +307,20 @@ pre {
 	z-index:4;
 	
 }
+#content {
+	display:none;
+}
 .float-left {
 	float:left;
+	padding:5px;
+}
+.error { 
+    background: #F8DBDB;
+    border-color: #E77776;
+}
+#mainSearch input {
+	border:1px solid #333;
+	font-size:11px;
 	padding:5px;
 }
 /* colours */

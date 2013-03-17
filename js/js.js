@@ -1,32 +1,120 @@
 // 	JavaScript 
+$(document).ready(function() {
+// Variables
+	var textBox 	 = $("#searchquery"),
+		submitButton = $("#submitSearch"),
+		searchLive	 = $("#searchTerms"),
+		main		 = $("#main"),
+		mainWrapper	 = $("#main_wrapper"),
+		content		 = $("#content"),
+		help		 = $("#help"),
+		overlay		 = $("#overlay"),
+		loader		 = $("#loader"),
+		radioName	 = $("input[name=searchType]:radio"),
+		radioValue	 = $("input[name=searchType]:checked", "#mainSearch").val(),
+		query 		 = textBox.val(),
+		perpage 	 = $("#perpage").val()
+		;
+	//Ajax
+		$.ajaxSetup({
+			beforeSend: function(xhr, status) {
+				loader.fadeIn("fast");
+				overlay.fadeIn("fast");
+			},
+			success: function(xhr, status) {
+				loader.fadeOut("fast");
+				overlay.fadeOut("fast");
+			},
+			error: function(jqXHR, exception) {
+				alert("Ajax error: " + jqXHR.status +".");
+			},
+			cache:true
+		});
 
-//From -http://www.joelpeterson.com/blog/2010/12/quick-and-easy-windowless-popup-overlay-in-jquery/
-function centerPopup(){  
-    var winw = $(window).width();  
-    var winh = $(window).height();  
-    var popw = $('#help').width();  
-    var poph = $('#help').height();  
-    $("#help").css({  
-        "position" : "absolute",  
-  //      "top" : winh/2-poph/2,  
-        "left" : winw/2-popw/2  
-    }); 
-}
+//-----------
 
-function loadit(url) {
-	$("#main").load(url);
-}
-function closeHelp() {
-	  $("#overlay").fadeOut("fast");
-	  $("#help").slideUp("fast");
-}
-function openHelp() {
-				$("#overlay").fadeIn("fast");
-				$("#help").slideDown("fast");
+	//From -http://www.joelpeterson.com/blog/2010/12/quick-and-easy-windowless-popup-overlay-in-jquery/
+	function centerPopup(){  
+		var winw = $(window).width();  
+		var winh = $(window).height();  
+		var popw = help.width();  
+		var poph = help.height();  
+		help.css({  
+			"position" : "absolute",  
+	  //    "top" : winh/2-poph/2,  
+			"left" : winw/2-popw/2  
+		}); 
+	}
+	//-----------------
+	function loadit(url) {
+		main.load(url);
+	}
+	function closeHelp() {
+		overlay.fadeOut("fast");
+		help.slideUp("fast");
+	}
+	function openHelp() {
+		overlay.fadeIn("fast");
+		help.slideDown("fast");
 
-}
-$(document).ready(function(){ 
-	//Existing 
+	}
+	function showMain () {
+		main.fadeIn("fast");
+	}
+	function hideMain () {
+		main.hide("fast");
+	}
+	function showContent () {
+		content.show();
+	}
+	function hideContent () {
+		content.hide();
+	}
+
+	function createSearchLink (type) {
+		var query = textBox.val();
+		var perpage = $("#perpage").val();
+		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
+		return "#!/search/"+radioValue+"/"+query+"/"+perpage+"/0";
+	}
+
+
+
+
+	//Search Validation
+	function validateSearch () {
+		if (textBox.val().length < 3) {
+			submitButton.removeAttr("href");
+			submitButton.fadeTo("slow", 0.2);
+			textBox.addClass("error");
+			return false;
+		} else {
+			var searchLink = createSearchLink("link");
+			submitButton.attr("href", searchLink);
+			submitButton.fadeTo("fast", 1);
+			textBox.removeClass("error");
+			return true;
+		} 
+	}
+	function showSearch (){
+		var query = textBox.val();
+		var perpage = $("#perpage").val();
+		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
+		searchLive.html("<p>You are searching for: "+query+" using a "+radioVal+" search.</p>");	
+	}
+
+	//blur
+	textBox.blur(validateSearch);
+	textBox.blur(showSearch);
+	radioName.blur(showSearch);
+	//keypress
+	textBox.keyup(validateSearch);
+	textBox.keyup(showSearch);
+	radioName.keyup(showSearch);
+	//Change
+	radioName.change(showSearch);
+
+	//Toggles 
 	$("#show1").click(function() { 
 		$("#SequenceDNA").slideToggle("fast");
 	});
@@ -52,51 +140,39 @@ $(document).ready(function(){
 		centerPopup();  
 	}); 
 //---------------------------------//
-	//clone the main
-	var cloned = $("#main").clone();
-	//Ajax
-	$.ajaxSetup({
-        beforeSend: function(xhr, status) {
-            $("#loader").fadeIn("fast");
-			$("#overlay").fadeIn("fast");
-        },
-		success: function(xhr, status) {
-			$("#loader").fadeOut("fast");
-			$("#overlay").fadeOut("fast");
-		},
-		error: function(jqXHR, exception) {
-			alert("Ajax error: " + jqXHR.status +".");
-		},
-		cache:true
-	});
-	//set up address bar
-	$.address.crawlable(true);
-	$.address.init(function(event) {
-		$('a').address(function() {
-			return $(this).attr('href').replace(location.pathname, '');
 
-		});
-	})
-	.change (function(event) {
-		//$("#main").load($('[rel=address:' + event.value+ ']').attr('href'));
-		//alert(""+event.value+"");
-		//loadit($(this).attr('href'));
-		switch (true) {
-			case(event.value == undefined):
+	submitButton.removeAttr("href");
+	submitButton.fadeTo("slow", 0.2);
+
+	submitButton.click(function () {
+		//alert ("click");
+	});
+
+	$.History.bind(function(state) {
+//	alert(state);
+	switch (true) {
+			case(state == undefined):
 				alert("error");
-			case(event.value == "/"):
-				closeHelp();
-				$("#main").html(cloned);
 				break;
-			case(event.value == "/help"):
+			case(state == "!/" || state == ""):
+				closeHelp();
+				showMain();
+				hideContent();
+				break;
+			case(state == "!/help"):
 				openHelp();
 				centerPopup();
 				break;
-			case(event.value == "/submit"):
+			case(state == "!/search"):
+				//var url = event.value;
+				content.load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
+				hideMain();
 				closeHelp();
+				showContent();
 				//alert($('#mainSearch').serialize());
-				$("#main").load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
+				
 				break;
 		}
-		});
+			
+	});
 });
