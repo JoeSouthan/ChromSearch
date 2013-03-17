@@ -294,7 +294,7 @@ sub buildCodingSeq{
 	if( 1 == $tableRows[0] ){
 	
 		# If yes, then sequecne starts with exon.
-		my $entry = join(":","EXON",$tableRows[0],$tableRows[1]);
+		my $entry = join("","EXON;",$tableRows[0],":",$tableRows[1]);
 		push(@CDSarray, $entry);
 		
 		# Offset the beginning of the array for the coming loop.
@@ -302,16 +302,16 @@ sub buildCodingSeq{
 		
 		if(defined($tableRows[2])){
 			# Set the segement follwing as an NCS
-			my $ncsEntry = join(":","NCS",$tableRows[1]+1,$tableRows[2]-1);
+			my $ncsEntry = join("","NCS;",$tableRows[1]+1,":",$tableRows[2]-1);
 			push(@CDSarray, $ncsEntry);
 		}else{
-			my $ncsEntry = join(":","NCS",$tableRows[1]+1,@sequenceLength);
+			my $ncsEntry = join("","NCS;",$tableRows[1]+1,":",@sequenceLength);
 			push(@CDSarray, $ncsEntry);
 		}
 		
 	}else{
 		# If no then infer an intron and calculate intron length, sequence begins with intron.
-		my $entry = join(":","NCS","0",$tableRows[0]-1);
+		my $entry = join("","NCS","0",":",$tableRows[0]-1);
 		push(@CDSarray, $entry);
 	}
 	
@@ -330,16 +330,16 @@ sub buildCodingSeq{
 		$segStop = $tableRows[$i];
 		
 		# Write the start/stop information into the string
-		my $entry = join(":","EXON",$segStart,$segStop);
+		my $entry = join("","EXON;",$segStart,":",$segStop);
 		push(@CDSarray, $entry);
 	
 		# Find distance between current exon and next and denote as NCS in array.
 		if( defined($tableRows[$i+1]) )
 		{
-			my $ncsEntry = join(":","NCS",$tableRows[$i],$tableRows[$i+1]-1);
+			my $ncsEntry = join("","NCS;",$tableRows[$i],":",$tableRows[$i+1]-1);
 			push(@CDSarray, $ncsEntry);
 		}else{
-			my $ncsEntry = join(":","NCS",$segStop+1,@sequenceLength);
+			my $ncsEntry = join("","NCS;",$segStop+1,":",@sequenceLength);
 			push(@CDSarray, $ncsEntry);
 		}
 	}
