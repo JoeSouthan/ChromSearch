@@ -24,6 +24,7 @@ $(document).ready(function() {
 		success: function(xhr, status) {
 			loader.slideUp("fast");
 			overlay.fadeOut("fast");
+			ajaxLinks();
 			//google.setOnLoadCallback(drawChart(xhr));                                                   
 		},
 		error: function(jqXHR, exception) {
@@ -83,7 +84,16 @@ $(document).ready(function() {
 		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
 		return "#!/search/"+radioValue+"/"+query+"/"+perpage+"/0";
 	}
-
+	function ajaxLinks () {
+		$("a").each (function() {
+			var href = $(this).attr("href");
+			if ($(this).is('[href^=#!/]')){
+				//do nothing
+			} else {
+				$(this).attr("href", "#!/" + href);
+			}
+		});
+	}
 
 
 
@@ -149,10 +159,7 @@ $(document).ready(function() {
 
 	submitButton.removeAttr("href");
 	submitButton.fadeTo("slow", 0.2);
-	$("a").each(function () {
-		var href = $(this).attr("href");
-		$(this).attr("href", "#!/" + href);
-	});
+	ajaxLinks();
 	$("#no-js").hide();
 	$("#submitSearch").show();
 	
