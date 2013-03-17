@@ -79,6 +79,10 @@ pre {
 .center {
 	text-align:center;
 }
+.centerdivs {
+	margin:0 auto;
+	display:block;
+}
 .left {
 	float:left;
 	display:inline;
@@ -298,16 +302,7 @@ pre {
 }
 #loader {
 	display:none;
-	position:absolute;
-	top:20px;
-	left:37%;
-	background:#fff;
-	border:3px solid rgba(51, 51, 51, 0.7);
-	padding:15px;
-	border-radius:5px;
-	z-index:4;
-	width:400px;
-	
+	border:1px solid rgba(0, 0, 0, 0.7);
 }
 #content {
 	display:none;
@@ -323,10 +318,27 @@ pre {
     background: #F8DBDB;
     border-color: #E77776;
 }
+#errorbox {
+	display:none;
+	border:1px solid #E77776;
+	top:130px;
+	box-shadow:0 5px 50px rgba(255, 255, 255, 1);
+}
 #mainSearch input {
 	border:1px solid #333;
 	font-size:11px;
 	padding:5px;
+}
+.boxes {
+	position:absolute;
+	top:20px;
+	left:37%;
+	background:#fff;
+	padding:15px;
+	border-radius:5px;
+	z-index:4;
+	width:400px;
+	box-shadow:0 5px 50px rgba(0, 0, 0, 0.5);
 }
 /* colours */
 .red {
