@@ -16,20 +16,24 @@ $(document).ready(function() {
 		perpage 	 = $("#perpage").val()
 		;
 	//Ajax
-		$.ajaxSetup({
-			beforeSend: function(xhr, status) {
-				loader.slideDown("fast");
-				overlay.fadeIn("fast");
-			},
-			success: function(xhr, status) {
-				loader.slideUp("fast");
-				overlay.fadeOut("fast");
-			},
-			error: function(jqXHR, exception) {
-				alert("Ajax error: " + jqXHR.status +".");
-			},
-			cache:true
-		});
+	$.ajaxSetup({
+		beforeSend: function(xhr, status) {
+			loader.slideDown("fast");
+			overlay.fadeIn("fast");
+		},
+		success: function(xhr, status) {
+			loader.slideUp("fast");
+			overlay.fadeOut("fast");
+			//google.setOnLoadCallback(drawChart(xhr));                                                   
+		},
+		error: function(jqXHR, exception) {
+			alert("Ajax error: " + jqXHR.status +".");
+			loader.slideUp("fast");
+			overlay.fadeOut("fast");
+			main.show("fast");
+		},
+		cache:true
+	});
 
 //-----------
 
@@ -50,8 +54,10 @@ $(document).ready(function() {
 		main.load(url);
 	}
 	function closeHelp() {
-		overlay.fadeOut("fast");
-		help.slideUp("fast");
+		if (help.is(":visible")) {
+			overlay.fadeOut("fast");
+			help.slideUp("fast");
+		}
 	}
 	function openHelp() {
 		overlay.fadeIn("fast");
@@ -143,36 +149,43 @@ $(document).ready(function() {
 
 	submitButton.removeAttr("href");
 	submitButton.fadeTo("slow", 0.2);
-
+	$("a").each(function () {
+		var href = $(this).attr("href");
+		$(this).attr("href", "#!/" + href);
+	});
+	$("#no-js").hide();
+	$("#submitSearch").show();
+	
+	
 	submitButton.click(function () {
 		//alert ("click");
 	});
 
 	$.History.bind(function(state) {
-//	alert(state);
-	switch (true) {
-			case(state == undefined):
-				alert("error");
-				break;
-			case(state == "!/" || state == ""):
-				closeHelp();
-				showMain();
-				hideContent();
-				break;
-			case(state == "!/help"):
-				openHelp();
-				centerPopup();
-				break;
-			case(state == "!/search"):
-				//var url = event.value;
-				content.load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
-				hideMain();
-				//closeHelp();
-				showContent();
-				//alert($('#mainSearch').serialize());
+		urlState = state.split(/\//g);
+	//	alert(urlState[1]);
+	//	alert(state);
+		switch (true) {
+				case(state == undefined):
+					alert("error");
+					break;
+				case(urlState[1] == "/" || urlState[1] == ""):
+					closeHelp();
+					showMain();
+					hideContent();
+					break;
+				case(urlState[1] == "help"):
+					openHelp();
+					centerPopup();
+					break;
+				case(urlState[1] == "search"):
+					content.load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
+					hideMain();
+					closeHelp();
+					showContent();
+					//alert($('#mainSearch').serialize());
+					break;
+			}
 				
-				break;
-		}
-			
-	});
+		});
 });

@@ -36,16 +36,16 @@
 		<span class="subheader">Chromosome 12 Analysis Tool</span>
 		<div class="navbar">
 					<div class="item">
-						<a href="#!/">Home</a>
+						<a href="">Home</a>
 					</div>
 					<div class="item">
 						<a href="cgi-bin/enz_cutter.pl">EnzCutter</a>
 					</div>
 					<div class="item">
-						<a href="#!/help" id="showhelp">Help</a>
+						<a href="help" id="showhelp">Help</a>
 					</div>
 					<div class="item">
-						<a href="#">Contact </a>
+						<a href="contact">Contact </a>
 					</div>
 				</div>
 	</div>
@@ -57,7 +57,7 @@
 		<div class="searchform">
 					<div class="left"><img src="img/clippy.gif" alt="Clippy" width="94" height="87" /></div>
 					<h2 class="center">It looks like you're about to search.</h2>
-			<form method="post" action="DummyResults/dummyresults.html" id="mainSearch">
+			<form method="post" action="cgi-bin/search_results.pl" id="mainSearch">
 				<div class="search_wrapper">
 					<span>Search Query:</span><input type="text" name="query" id="searchquery" autofocus="autofocus" size="60" placeholder="Enter your search"/>
 					<br />
@@ -73,7 +73,11 @@
 						<span>Number of results per page</span><input id="perpage" type="text" name="perpage" value="10" size="2" />
 					</div>
 					<div id="searchTerms"></div>
-					<a href="/search" id="submitSearch">Submit</a>
+					<a href="" id="submitSearch">Submit</a>
+					<div id="no-js">
+						<input type="submit" value="Submit" />
+						<input type="reset" value="Reset" />
+					</div>
 				</div>
 			</form>
 		</div>

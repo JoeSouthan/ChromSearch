@@ -312,6 +312,9 @@ pre {
 #content {
 	display:none;
 }
+#submitSearch {
+	display:none;
+}
 .float-left {
 	float:left;
 	padding:5px;
