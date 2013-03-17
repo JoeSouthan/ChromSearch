@@ -16,8 +16,19 @@ $(document).ready(function() {
 		perpage 	 = $("#perpage").val(),
 		document     = $(document),
 		error		 = $("#errorbox"),
-		errordiv	 = $("#errordiv");
+		errordiv	 = $("#errordiv")
 		;
+	
+	function ajaxLinks () {
+		$("a").each (function() {
+			var href = $(this).attr("href");
+			if ($(this).is('[href^=#!/]')){
+				//do nothing
+			} else {
+				$(this).attr("href", "#!/" + href);
+			}
+		});
+	}
 	//Ajax
 	$.ajaxSetup({
 		beforeSend: function(xhr, status) {
@@ -30,17 +41,27 @@ $(document).ready(function() {
 			//google.setOnLoadCallback(drawChart(xhr));                                                   
 		},
 		error: function(jqXHR, exception) {
-			//alert("Ajax error: " + jqXHR.status +".");
 			loader.slideUp("fast");
 			errordiv.html("Ajax error: "+jqXHR.status+".");
 			showError();
 		},
 		cache:true
 	});
-	$(document).ajaxComplete( function() {
+	$("#content").ajaxComplete( function() {
 		ajaxLinks();
 	});
-//-----------
+	$(document).ready(function () {
+		$("a").each (function() {
+			var href = $(this).attr("href");
+			if ($(this).is('[href^=#!/]')){
+				//do nothing
+			} else {
+				$(this).attr("href", "#!/" + href);
+			}
+		});
+
+	});
+	//-----------
 
 	//From -http://www.joelpeterson.com/blog/2010/12/quick-and-easy-windowless-popup-overlay-in-jquery/
 	function centerPopup(){  
@@ -96,16 +117,7 @@ $(document).ready(function() {
 		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
 		return "#!/search/"+radioValue+"/"+query+"/"+perpage+"/0";
 	}
-	function ajaxLinks () {
-		$("a").each (function() {
-			var href = $(this).attr("href");
-			if ($(this).is('[href^=#!/]')){
-				//do nothing
-			} else {
-				$(this).attr("href", "#!/" + href);
-			}
-		});
-	}
+
 
 
 	//Search Validation
@@ -134,7 +146,7 @@ $(document).ready(function() {
 	textBox.blur(validateSearch);
 	textBox.blur(showSearch);
 	radioName.blur(showSearch);
-	$("a").hover(ajaxLinks);
+	//$("a").hover(ajaxLinks);
 	//keypress
 	textBox.keyup(validateSearch);
 	textBox.keyup(showSearch);
@@ -173,13 +185,16 @@ $(document).ready(function() {
 	submitButton.fadeTo("slow", 0.2);
 	ajaxLinks();
 	$("#no-js").hide();
-	$("#submitSearch").show();
+	$("#no-js-alert").hide();
+	$("#searchLink").show();
 	
 	
 	submitButton.click(function () {
 		//alert ("click");
 	});
-
+	//reject browsers
+	
+	
 	$.History.bind(function(state) {
 		urlState = state.split(/\//g);
 	//	alert(urlState[1]);
@@ -199,7 +214,7 @@ $(document).ready(function() {
 					break;
 				case(urlState[1] == "search"):
 					content.load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
-					//content.load("DummyResults/dummyresults.html");
+					//content.load("DummyResults/dummyresults.html#wrapper");
 					hideMain();
 					closeHelp();
 					showContent();
@@ -209,4 +224,5 @@ $(document).ready(function() {
 			}
 				
 		});
+		
 });

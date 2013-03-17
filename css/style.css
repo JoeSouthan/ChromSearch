@@ -307,8 +307,16 @@ pre {
 #content {
 	display:none;
 }
-#submitSearch {
+
+#searchLink {
 	display:none;
+}
+#no-js-alert {
+	z-index:5;
+	top:-10px;
+	left:35%;
+	border:1px solid #E77776;
+
 }
 .float-left {
 	float:left;
