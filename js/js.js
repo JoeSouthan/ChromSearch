@@ -22,10 +22,23 @@ $(document).ready(function() {
 	function ajaxLinks () {
 		$("a").each (function() {
 			var href = $(this).attr("href");
-			if ($(this).is('[href^=#!/]')){
-				//do nothing
+			if (href) {
+				var href = $(this).attr("href");
+				var urlSplit = href.split("?")[1];
+				//alert(urlSplit);
+				if ($(this).is('[href^=#!/]')){
+					//do nothing
+				} else {
+					if (urlSplit) {
+						if (urlSplit.match(/^gene=/)) {
+							var singleID = urlSplit.split("=")[1];
+							$(this).attr("href", "#!/single/" +singleID );
+						}
+					} else {
+						$(this).attr("href", "#!/" + href);
+					}
+				}
 			} else {
-				$(this).attr("href", "#!/" + href);
 			}
 		});
 	}
@@ -49,17 +62,6 @@ $(document).ready(function() {
 	});
 	$("#content").ajaxComplete( function() {
 		ajaxLinks();
-	});
-	$(document).ready(function () {
-		$("a").each (function() {
-			var href = $(this).attr("href");
-			if ($(this).is('[href^=#!/]')){
-				//do nothing
-			} else {
-				$(this).attr("href", "#!/" + href);
-			}
-		});
-
 	});
 	//-----------
 
@@ -188,6 +190,8 @@ $(document).ready(function() {
 	$("#no-js-alert").hide();
 	$("#searchLink").show();
 	
+	//jQueryUi
+	$("#searchType").buttonset();
 	
 	submitButton.click(function () {
 		//alert ("click");
@@ -220,6 +224,11 @@ $(document).ready(function() {
 					showContent();
 					ajaxLinks();
 					//alert($('#mainSearch').serialize());
+					break;
+				case(urlState[1] == "single"):
+					content.load("cgi-bin/return_single.pl?id="+urlState[2]);
+					closeHelp();
+					ajaxLinks();
 					break;
 			}
 				

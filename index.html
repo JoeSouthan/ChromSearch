@@ -4,8 +4,9 @@
 	<meta charset="utf-8">
 	<title>12Chrom - Chromosome 12 Analysis Tool</title>
 	<link href="css/style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/smoothness/jquery-ui.css">
 	<link rel="icon" type="image/png" href="img/favicon.png" />
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
 	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 	<script language="javascript" type="text/javascript" src="js/js.js"></script>
 	<script language="javascript" type="text/javascript" src="https://www.google.com/jsapi"></script>
@@ -72,10 +73,12 @@
 					<span>Search Query:</span><input type="text" name="query" id="searchquery" autofocus="autofocus" size="60" placeholder="Enter your search"/>
 					<br />
 					<br />
-					<span>Gene Identifier</span><input type="radio" id="r1" name="searchType" value="GeneID" checked="checked"/>
-					<span>Protein Product</span><input type="radio" id="r2" name="searchType" value="ProteinProduct" />
-					<span>GenBank Accession</span><input type="radio"  id="r3" name="searchType" value="AccessionNumber" />
-					<span>Chromosomal Location</span><input type="radio" id="r4" name="searchType" value="ChromosomeLocation" />
+					<div id="searchType">
+					<input type="radio" id="r1" name="searchType" value="GeneID" checked="checked"/><label for="r1">Gene Identifier</label>
+					<input type="radio" id="r2" name="searchType" value="ProteinProduct" /><label for="r2">Protein Product</label>
+					<input type="radio"  id="r3" name="searchType" value="AccessionNumber" /><label for="r3">GenBank Accession</label>
+					<input type="radio" id="r4" name="searchType" value="ChromosomeLocation" /><label for="r4">Chromosomal Location</label>
+					</div>
 					<br />
 					<br />
 					<p class="right"><a href="#" id="showadvanced">Advanced search options</a></p>
