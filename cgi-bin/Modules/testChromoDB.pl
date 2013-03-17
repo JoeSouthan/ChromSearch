@@ -56,22 +56,26 @@ ok( $results eq 'ERROR:ZERO_LENGTH_ARGUMENT', "with no parameters");
 # CONDITION: Correct parameters of 2780780 (assumes this dummy data is in DB) and GeneID
 
 my $results = getSearchResults("2780780","GeneID");
-ok( $results eq '2780780', "with '2780780' and 'GeneID' as parameters");
+ok( $results eq 'AB002805:2780780', "with '2780780' and 'GeneID' as parameters");
+#print $results;
 
 # CONDITION: Correct parameters of DUSP6 (assumes this dummy data is in DB) and ProteinProduct
 
 my $results = getSearchResults("DUSP6","ProteinProduct");
-ok( $results eq '60683881', "with 'DNA primase 1' and 'ProteinProduct' as parameters");
+ok( $results eq 'AB013601:60683881', "with 'DNA primase 1' and 'ProteinProduct' as parameters");
+#print $results;
 
 # CONDITION: Correct parameters of AB002805 (assumes this dummy data is in DB) and AccessionNumber
 
 my $results = getSearchResults("AB002805","AccessionNumber");
-ok( $results eq '2780780', "with 'AB002805' and 'AccessionNumber' as parameters");
+ok( $results eq 'AB002805:2780780', "with 'AB002805' and 'AccessionNumber' as parameters");
+#print $results;
 
 # CONDITION: Correct parameters of q13 (assumes this dummy data is in DB) and ChromosomeLocation
 
 my $results = getSearchResults("q13","ChromosomeLocation");
 ok( length($results), "with 'q13' and 'ChromosomeLocation' as parameters");
+print $results;
 
 # CONDITION: Correct parameters of but not in DB
 
@@ -109,4 +113,12 @@ ok( $results eq 'ERROR:ZERO_LENGTH_ARGUMENT', "with no parameters");
 
 my $results = showCodingSeq('AB002805');
 ok( length($results), "with valid arguments");
+
+
+################################ TEST: 'misc' ################################
+
+my %rarray = returnArray();
+foreach my $val (@rarray){
+	print $val;
+}
 

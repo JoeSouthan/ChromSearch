@@ -67,13 +67,15 @@ sub getSearchResults{
 	}
 	
 	# Send a search query to the DB
-	my $queryResult = DBinterface::querySearch($searchString, $id);
+	my @queryResult = DBinterface::querySearch($searchString, $id);
+	
+	# need to include
 	
 	# If string not empty return the string containing the matches from querySearch
-	if(defined($queryResult)){
-		return $queryResult;
-	}
-	else{
+	if(defined(@queryResult)){
+		my $searchResults = join(",",@queryResult);
+		return $searchResults;
+	}else{
 		# If is null return null string or error code
 		return "ERROR:NO_DB_MATCHES"; # Ask Joe what he would like back if there are no matches
 	}
@@ -162,6 +164,11 @@ sub getGeneSummaryData{
 	# Get coding data for it.
 	
 	# Package in to hash and send back
+}
+
+sub returnArray(){
+	my @array = {"one","two","three","four"};
+	return @array;
 }
 
 

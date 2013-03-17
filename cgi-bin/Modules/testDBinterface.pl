@@ -1,7 +1,7 @@
 #! /usr/bin/perl 
 
 use strict;
-use Test::Simple tests => 19;
+use Test::Simple tests => 21;
 use DBinterface;
 
 ################################ TEST: 'databaseConnect'###############################
@@ -38,9 +38,25 @@ print "\n************************** TEST : 'queryColumn' ***********************
 
 # CONDITION: Valid function arguments
 
-my $id = DBinterface::queryColumn('geneID');
-ok( length($id) ne 0, "Testing 'queryColumn' with valid function arguments" );
+my @id = DBinterface::queryColumn('geneId');
+ok( @id, "Testing 'queryColumn' with geneId as argument" );
+#print $id,"\n";
+foreach my $entry (@id){
+	#print $entry,"\n";
+}
 
+my @id = DBinterface::queryColumn('accessionNo');
+ok( @id, "Testing 'queryColumn' with accessionNo as argument" );
+#print $id,"\n";
+foreach my $entry (@id){
+	#print $entry,"\n";
+}
+
+my @id = DBinterface::queryColumn('proteinName');
+ok( @id, "Testing 'queryColumn' with proteinName as argument" );
+foreach my $entry (@id){
+	#print $entry,"\n";
+}
 
 ################################ TEST 'querySearch' ###############################
 
@@ -48,29 +64,39 @@ print "\n************************** TEST: 'querySearch' ************************
 
 # CONDITION: Valid parameters for geneId
 
-my $results = DBinterface::querySearch("2780780","geneId");
-ok($results eq '2780780', 
+my @results = DBinterface::querySearch("2780780","geneId");
+ok(@results[0] eq 'AB002805:2780780', 
 "with valid parameters '2780780' as search string and 'geneId' as identifier type" );
+foreach my $entry (@results){
+	#print $entry,"\n";
+}
 
 # CONDITION: Valid parameters for proteinName
 
-my $results = DBinterface::querySearch("DUSP6","proteinName");
-ok( $results eq '60683881', 
+my @results = DBinterface::querySearch("DUSP6","proteinName");
+ok( @results[0] eq 'AB013601:60683881', 
 "with valid parameters 'DUSP1' as search string and 'proteinName' as type");
+foreach my $entry (@results){
+	#print $entry,"\n";
+}
 
 # CONDITION: Valid parameters for Accession number
 
-my $results = DBinterface::querySearch("AB002805","accessionNo");
-ok( $results eq '2780780',
+my @results = DBinterface::querySearch("AB002805","accessionNo");
+ok( @results[0] eq 'AB002805:2780780',
 "with valid parameters 'AB002805' as search string and 'accessionNo' as type");
-	
+foreach my $entry (@results){
+	#print $entry,"\n";
+}
 
 # CONDITION: Valid parameters for chromosome location
 
-my $results = DBinterface::querySearch("12q13","chromLoc");
-ok( length($results),
+my @results = DBinterface::querySearch("12q13","chromLoc");
+ok( length(@results),
 "with valid parameters '12q13' as search string and 'chromLoc' as type" );
-
+foreach my $entry (@results){
+	#print $entry,"\n";
+}
 	
 # CONDITION: Valid parameters but not in DB
 
@@ -84,7 +110,7 @@ print "\n************************** TEST: 'getIdentifier' **********************
 # CONDITION: Valid parameters
 
 my $identifier = DBinterface::getIdentifier("GeneID");
-ok($identifier eq 'geneID', "with valid parameter 'GeneID'");
+ok($identifier eq 'geneId', "with valid parameter 'GeneID'");
 
 # CONDITION: Incorrect parameters
 
@@ -142,5 +168,9 @@ print "\n************************** TEST: 'buildCodingSeq' *********************
 
 my @seq = DBinterface::buildCodingSeq('AB002805');
 ok( @seq, "with valid argument accession number 'AB002805'");
+
+
+
+
 
 

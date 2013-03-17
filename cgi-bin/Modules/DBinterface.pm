@@ -74,7 +74,7 @@ sub getIdentifier{
 	
 	# Attempt to match the input name to the a column id
 	if( $id eq "GeneID" ) {
-		$idType = "geneID";
+		$idType = "geneId";
 	}elsif($id eq "ProteinProduct"){
 		$idType = "proteinName";
 	}elsif($id eq "AccessionNumber"){
@@ -105,7 +105,7 @@ sub querySearch{
 	my ($searchString, $idType) = @_;
 	
 	# Run search query **$searchstring must be in quotes***
-	my $sqlQuery = "SELECT geneId FROM gene WHERE $idType='$searchString'";
+	my $sqlQuery = "SELECT accessionNo, geneId FROM gene WHERE $idType='$searchString'";
 	
 	# Run query
 	my @id = DBinterface::queryRun($sqlQuery);
@@ -119,9 +119,22 @@ sub querySearch{
 	}
 	
 	# Create comma separated string
-	my $string = join(",",@id);
+	#my $string = join(",",@id);
 	
-	return $string;
+	my @validEntries;
+	
+	for(my $i = 0; $i < scalar(@id); $i++ ){
+		# Concatenate and copy into new array
+		my $entry = join(":",$id[$i],$id[$i+1]);
+				
+		# Enter valid entry in to new array
+		push(@validEntries, $entry);
+				
+		# Increment past the next array entry 
+		$i++; 
+	}
+	
+	return @validEntries;
 	
 }  
 ##########################################################################################################
@@ -137,7 +150,7 @@ sub queryColumn{
 	my $columnId = $_[0];
 	
 	# Define query for specified colum
-	my $sqlQuery = "SELECT $columnId FROM gene";
+	my $sqlQuery = "SELECT accessionNo, $columnId FROM gene";
 	
 	# Run query
 	my @id = DBinterface::queryRun($sqlQuery);
@@ -151,11 +164,35 @@ sub queryColumn{
 	if(@id[0] eq 'NO_DATA'){
 		return 'ERROR:DB_COLUMN_EMPTY';
 	}else{
+		# Array to hold the valid entries from the DB
+		my @validEntries;
+	
+		# Step through array and copy over only valid entries
+		for(my $i = 0; $i < scalar(@id); $i++){
+		
+			# Check that the next entry is not blank
+			if(0 != length($id[$i+1]) ){
+				# Concatenate and copy into new array
+				my $entry = join(":",$id[$i],$id[$i+1]);
+				
+				# Enter valid entry in to new array
+				push(@validEntries, $entry);
+				
+				# Increment past the next array entry 
+				$i++; 
+			}
+			else{
+				# Skip over current entry and next
+				# as the accession has no corresponding entry
+				$i++;
+			}
+		}
+	
 		# Create comma separated string
-		my $string = join(",",@id);
+		#my $string = join(",",@validEntries);
 		
 		# Pass back string
-		return $string;
+		return @validEntries;
 	}
 }
 ###############################################################################################
@@ -365,6 +402,12 @@ sub isArrayEmpty{
 	# All item were zero length or N/A return true
 	return TRUE;
 }
+
+sub returnArray(){
+	my @array = {"one","two","three","four"};
+	return @array;
+}
+
 
 
 # Constants
