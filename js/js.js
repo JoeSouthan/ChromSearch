@@ -18,11 +18,11 @@ $(document).ready(function() {
 	//Ajax
 		$.ajaxSetup({
 			beforeSend: function(xhr, status) {
-				loader.fadeIn("fast");
+				loader.slideDown("fast");
 				overlay.fadeIn("fast");
 			},
 			success: function(xhr, status) {
-				loader.fadeOut("fast");
+				loader.slideUp("fast");
 				overlay.fadeOut("fast");
 			},
 			error: function(jqXHR, exception) {
@@ -167,7 +167,7 @@ $(document).ready(function() {
 				//var url = event.value;
 				content.load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
 				hideMain();
-				closeHelp();
+				//closeHelp();
 				showContent();
 				//alert($('#mainSearch').serialize());
 				

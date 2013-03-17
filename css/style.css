@@ -67,6 +67,7 @@ pre {
 	overflow:auto;
 	position:relative;
 	top:30px;
+	min-height:310px;
 
 }
 .header {
@@ -298,13 +299,14 @@ pre {
 #loader {
 	display:none;
 	position:absolute;
-	top:60px;
-	left:39%;
+	top:20px;
+	left:37%;
 	background:#fff;
 	border:3px solid rgba(51, 51, 51, 0.7);
 	padding:15px;
 	border-radius:5px;
 	z-index:4;
+	width:400px;
 	
 }
 #content {
