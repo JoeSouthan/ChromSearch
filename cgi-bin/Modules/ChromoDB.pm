@@ -18,11 +18,11 @@ sub sayHello {
 sub showAllIdentifiers{
 	
 	# Get the second input, first is the SOAP class variable
-	my ($class, $identifer) = @_;
-	#my $id = $_[1];
+	#my ($class, $identifer) = @_;
+	my $id = $_[1];
 	
 	# Check for blank input, return error is zero length
-	if( 0 == length($identifier)){
+	if( 0 == length($id)){
 		return 'ERROR:ZERO_LENGTH_ARGUMENT';
 	}
 
@@ -67,16 +67,26 @@ sub getSearchResults{
 	}
 	
 	# Send a search query to the DB
-	my $queryResult = DBinterface::querySearch($searchString, $id);
+	my @queryResult = DBinterface::querySearch($searchString, $id);
 	
-	# If string not empty return the string containing the matches from querySearch
-	if(defined($queryResult)){
-		return $queryResult;
-	}
-	else{
+	# If string return an no matches
+	if(!defined(@queryResult)){
 		# If is null return null string or error code
 		return "ERROR:NO_DB_MATCHES"; # Ask Joe what he would like back if there are no matches
 	}
+	
+	# Retrieve coding data for each gene in the list of results.
+	for(my $i = 0; $i < scalar(@queryResult); $i++){
+		my $searchEntry = $queryResult[$i];
+		$searchEntry =~ /(\w+)/;
+		my @sequence = DBinterface::buildCodingSeq($1);
+		my $concatSeq = join(",",@sequence);
+		$queryResult[$i] .= "|$concatSeq";
+	}
+
+	my $searchResults = join(">",@queryResult);
+	
+	return $searchResults;
 }
 
 ##########################################################################################################
@@ -153,7 +163,7 @@ sub getGeneSummaryData{
 	my %geneData;
 	
 	# Get gene name , if unnamed set to unnamed.
-	my $geneName = 
+	my $geneName = 0;
 	
 	# Get gene ID
 	
@@ -162,6 +172,11 @@ sub getGeneSummaryData{
 	# Get coding data for it.
 	
 	# Package in to hash and send back
+}
+
+sub returnArray(){
+	my @array = {"one","two","three","four"};
+	return @array;
 }
 
 
