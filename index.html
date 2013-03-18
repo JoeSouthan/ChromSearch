@@ -2,13 +2,23 @@
 <html>
 <head>
 	<meta charset="utf-8">
-	<title>Chromosome 12 Search Engine (Name subject to change - any ideas?)</title>
+	<title>12Chrom - Chromosome 12 Analysis Tool</title>
 	<link href="css/style.css" rel="stylesheet" type="text/css">
-	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/smoothness/jquery-ui.css">
+	<link rel="icon" type="image/png" href="img/favicon.png" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
 	<script language="javascript" type="text/javascript" src="js/js.js"></script>
+	<script language="javascript" type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script language="javascript" type="text/javascript" src="js/jquery.history.min.js"></script>
+	
 </head>
 
 <body>
+<div class="boxes" id="no-js-alert">
+	<h3>Reduced functionality</h3>
+	<p>This site requires JavaScript. Please enable it.</p>
+</div>
 <div id="help">
 	<a id="closepopup">x</a>
 	<div class="float-left">
@@ -19,50 +29,78 @@
 	</div>
 </div>
 <div id="overlay"></div>
+<div class="boxes" id="loader">
+	<h2 class="center">Please Wait...</h2>
+	<span class="centerdiv"><img src="img/bars.gif" width="160" height"20" alt="Loading" / ></span>
+</div>
+<div class="boxes" id="errorbox">
+	<h2 class="center">There was an error...</h2>
+	<p id="errordiv"></p>
+</div>
+<div class="navbar-wrapper">
+	<div class="navbar-inner-wrapper">
+		<div class="header">
+			<h1>12Chrom</h1>
+	         
+		</div>
+		<span class="subheader">Chromosome 12 Analysis Tool</span>
+		<div class="navbar">
+					<div class="item">
+						<a href="">Home</a>
+					</div>
+					<div class="item">
+						<a href="cgi-bin/enz_cutter.pl">EnzCutter</a>
+					</div>
+					<div class="item">
+						<a href="help" id="showhelp">Help</a>
+					</div>
+					<div class="item">
+						<a href="contact">Contact </a>
+					</div>
+					
+		</div>
+	</div>
+</div>
 <div class="wrapper">
-	<div class="header">
-    	<h1>12Chrom</h1>
-        <span class="subheader">Chromosome 12 Analysis Tool</span>
-        <div class="navbar">
-			<div class="item">
-				<a href="#">Home</a>
-			</div>
-			<div class="item">
-				<a href="cgi-bin/enz_cutter.pl">EnzCutter</a>
-			</div>
-			<div class="item">
-				<a href="#" id="showhelp">Help</a>
-			</div>
-			<div class="item">
-				<a href="#">Contact </a>
-			</div>
-        </div>
-    </div>
-    <div class="searchform">
-    			<div class="left"><img src="img/clippy.gif" alt="Clippy" width="94" height="87" /></div>
-                <h2 class="center">It looks like you're about to search.</h2>
-    	<form method="post" action="cgi-bin/search_results.pl">
-        	<div class="search_wrapper">
-            	<span>Search Query:</span><input type="text" name="query" autofocus="autofocus" size="60" placeholder="Enter your search"/>
-                <br />
-				<br />
-                <span>Gene Identifier</span><input type="radio" name="searchType" value="GeneID" checked="checked"/>
-                <span>Protein Product</span><input type="radio" name="searchType" value="ProteinProduct" />
-                <span>GenBank Accession</span><input type="radio" name="searchType" value="AccessionNumber" />
-                <span>Chromosomal Location</span><input type="radio" name="searchType" value="ChromosomeLocation" />
-                <br />
-				<br />
-				<p class="right"><a href="#" id="showadvanced">Advanced search options</a></p>
-				<div id="advanced">
-					<span>Number of results per page</span><input type="text" name="perpage" value="10" size="2" />
-				</div>
-                <input type="submit" value="Submit" />
-                <input type="reset" value="Reset" />
-            </div>
-        </form>
-    </div>
-    <div class="footer">Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
 
+
+	<div id="main">
+		<div class="searchform">
+					<div class="left"><img src="img/clippy.gif" alt="Clippy" width="94" height="87" /></div>
+					<h2 class="center">It looks like you're about to search.</h2>
+			<form method="post" action="cgi-bin/search_results.pl" id="mainSearch">
+				<div class="search_wrapper">
+					<span>Search Query:</span><input type="text" name="query" id="searchquery" autofocus="autofocus" size="60" placeholder="Enter your search"/>
+					<br />
+					<br />
+					<div id="searchType">
+					<input type="radio" id="r1" name="searchType" value="GeneID" checked="checked"/><label for="r1">Gene Identifier</label>
+					<input type="radio" id="r2" name="searchType" value="ProteinProduct" /><label for="r2">Protein Product</label>
+					<input type="radio"  id="r3" name="searchType" value="AccessionNumber" /><label for="r3">GenBank Accession</label>
+					<input type="radio" id="r4" name="searchType" value="ChromosomeLocation" /><label for="r4">Chromosomal Location</label>
+					</div>
+					<br />
+					<br />
+					<p class="right"><a href="#" id="showadvanced">Advanced search options</a></p>
+					<div id="advanced">
+						<span>Number of results per page</span><input id="perpage" type="text" name="perpage" value="10" size="2" />
+					</div>
+					<div id="searchTerms"></div>
+					<div id="searchLink">
+						<a href="" id="submitSearch">Submit</a>
+					</div>
+					<div id="no-js">
+						<input type="submit" value="Submit" />
+						<input type="reset" value="Reset" />
+					</div>
+				</div>
+			</form>
+		</div>
+		<div class="footer">Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
+
+	</div>
+<div id="content">
+</div>
 </div>
 </body>
 </html>

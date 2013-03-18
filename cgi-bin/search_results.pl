@@ -10,7 +10,7 @@ use WebHTML;
 my $timestart = time();
 my $cgi = new CGI;
 my @params= $cgi->param();
-my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/proxy.pl');
+my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin/proxy.pl');
 
 
 #Do search, Take post
@@ -42,8 +42,8 @@ unless (defined($perpage)) {
 #Do Results				
 #Subroutine to call from the package
 #Debug
-#$query = "2780780";
-#$type = "GeneID";
+$query = "2780780";
+$type = "GeneID";
 my $returnSearch = $soap->getSearchResults($query,$type)->result;
 
 #Parse the result to array

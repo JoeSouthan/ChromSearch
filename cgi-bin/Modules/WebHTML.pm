@@ -28,8 +28,8 @@ sub htmlOut {
 	my $counter = 0;
 
 	#Print HTML
-	htmlHeader($cgi,$resultRef);
-	
+	#htmlHeader($cgi,$resultRef);
+	genChartJS($resultRef);
 	print "<h2 class=\"center\">$resultCount Result(s) for: <i>$query</i>.</h2>";
 	#Loop it!
 
