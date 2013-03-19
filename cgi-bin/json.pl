@@ -4,10 +4,12 @@
 #
 use strict;
 use JSON;
-use GenJSON;
 use CGI;
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser); 
 use Data::Dumper;#Debug
+use lib 'Modules';
+use GenJSON;
+
 my $cgi = new CGI;
 my $json = JSON->new;
 my @params= $cgi->param();
@@ -35,19 +37,26 @@ foreach my $params (@params) {
 print $cgi->header('application/json');
 
 #Time for logic!
-unless (defined ($selector) or defined ($query) or defined ($selector) or defined ($type)) {
-	print GenJSON::error();
+#Search
+unless (defined ($selector)) {
+	print GenJSON::error("No selector chosen");
 } else {
-	#User wants a search
-	if ( $selector eq "search") {
-		print GenJSON::testJSONSearch();
-		#my $result = GenJSON::doSearch($query,$type);
-	#User Wants a single gene
-	} elsif ($selector eq "single") {
-		print GenJSON::testJSONSingle();
-	#Catch all
+	unless (defined ($query)) {
+		print GenJSON::error("No query selected");
 	} else {
-		print GenJSON::error();
+		if ( $selector eq "search") {
+			unless (defined ($type)) {
+				print GenJSON::error("No type selected");
+			} else {
+				print GenJSON::testJSONSearch();
+				#my $result = GenJSON::doSearch($query,$type);
+			}
+		} elsif ($selector eq "single") {
+			print GenJSON::testJSONSingle();
+		} else {
+			print GenJSON::error("Invalid selector");
+		}
 	}
-
+	
 }
+

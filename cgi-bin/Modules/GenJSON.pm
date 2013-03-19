@@ -67,7 +67,7 @@ sub doSingle {
 sub error {
 	my $json = JSON->new;
 	my %error = (
-		"error" => "There was an error"
+		"error" => "$_[0]"
 	);
 	return $json->encode(\%error);
 }
