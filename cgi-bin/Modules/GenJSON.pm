@@ -42,10 +42,13 @@ sub testJSONSingle {
 	my $json = JSON->new;
 	my @array = qw( test appples cake cats );
 	my %data = ( 
-		"gene1" => {
-				"accession" => "Test",
+		#accession
+		"12345" => {
+				"name" => "Test",
 				"length"=> 123,
-				"sequencefeatures" => [@array]
+				"sequencefeatures" => [@array],
+				"aasequence" => "ANONVAVAFIROEIRW",
+				"dnasequence" => "ATGCATGC"
 			}
 	);
 	return $json->encode(\%data);
