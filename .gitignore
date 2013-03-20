@@ -1,3 +1,9 @@
+#####
+# Mine
+#####
+
+*.json
+cgi-bin/TESTING/
 #################
 ## Eclipse
 #################
@@ -27,7 +33,6 @@ local.properties
 
 # PDT-specific
 .buildpath
-
 
 #################
 ## Visual Studio

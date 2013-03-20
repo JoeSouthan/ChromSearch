@@ -1,4 +1,5 @@
 // 	JavaScript 
+	google.load("visualization", "1", {packages:["corechart"]});
 $(document).ready(function() {
 // Variables
 	var textBox 	 = $("#searchquery"),
@@ -14,10 +15,20 @@ $(document).ready(function() {
 		radioValue	 = $("input[name=searchType]:checked", "#mainSearch").val(),
 		query 		 = textBox.val(),
 		perpage 	 = $("#perpage").val(),
-		document     = $(document),
 		error		 = $("#errorbox"),
 		errordiv	 = $("#errordiv")
 		;
+	//Google Charts API
+
+	var options = {
+		isStacked: true,
+		hAxis : {},
+		legend: {},
+		chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'},
+		width: 650,
+		height: 50
+	};
+	
 	
 	function ajaxLinks () {
 		$("a").each (function() {
@@ -143,6 +154,48 @@ $(document).ready(function() {
 		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
 		searchLive.html("<p>You are searching for: "+query+" using a "+radioVal+" search.</p>");	
 	}
+	
+	function doSearch (searchterms) {
+		// eg !,search,GeneID,123p,10,0
+		$.ajax ({
+			url:"json.json",
+			type: "GET",
+			dataType: "json",
+			data: {selector: searchterms[1], searchType: searchterms[2], query:searchterms[3]},
+			success: function (data) {
+				var counter = 0;
+				content.html('<h2>Results</h2>');
+				$.each(data, function(i, val) {
+					var features = val["sequencefeatures"];
+					content.append('<div class="result"><div class="genename">'+val["name"]+'</div><div class="diagram" id="chart_div'+counter+'"></div><div class="link"><a href="return_single.pl?gene='+val["name"]+'">More &raquo;</a></div></div>');
+				    google.setOnLoadCallback(drawChart(features,counter));
+					counter++;
+				});
+				console.log(data);
+			//	alert(data["test"]["length"]);			
+				loader.slideUp("fast");
+				overlay.fadeOut("fast");
+				//return [data, counter];
+			},
+		
+		});
+	}
+	function drawChart (features, counter) {
+		var feats = ["Gene"];
+		var numbers = ["Gene"];
+		$.each(features,function() {
+			var f1 = this.split(":");
+			feats.push(f1[0]);
+			numbers.push(parseInt(f1[1]));
+		});
+		var data1 = google.visualization.arrayToDataTable([
+			feats,
+			numbers
+		]);
+		var chart = new google.visualization.BarChart(document.getElementById('chart_div'+counter));
+		chart.draw(data1, options);	
+	}
+	
 
 	//blur
 	textBox.blur(validateSearch);
@@ -217,8 +270,9 @@ $(document).ready(function() {
 					centerPopup();
 					break;
 				case(urlState[1] == "search"):
-					content.load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
+					//content.load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
 					//content.load("DummyResults/dummyresults.html#wrapper");
+					doSearch(urlState);
 					hideMain();
 					closeHelp();
 					showContent();
