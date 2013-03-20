@@ -155,24 +155,16 @@ $(document).ready(function() {
 		searchLive.html("<p>You are searching for: "+query+" using a "+radioVal+" search.</p>");	
 	}
 	
+	//Do a JSON search
 	function doSearch (searchterms) {
 		// eg !,search,GeneID,123p,10,0
-		$.ajax ({
-			url:"json.json",
+		var result = $.ajax ({
+			url:"cgi-bin/json.pl?",
 			type: "GET",
 			dataType: "json",
 			data: {selector: searchterms[1], searchType: searchterms[2], query:searchterms[3]},
 			success: function (data) {
-				var counter = 0;
-				content.html('<h2>Results</h2>');
-				$.each(data, function(i, val) {
-					var features = val["sequencefeatures"];
-					content.append('<div class="result"><div class="genename">'+val["name"]+'</div><div class="diagram" id="chart_div'+counter+'"></div><div class="link"><a href="return_single.pl?gene='+val["name"]+'">More &raquo;</a></div></div>');
-				    google.setOnLoadCallback(drawChart(features,counter));
-					counter++;
-				});
-				console.log(data);
-			//	alert(data["test"]["length"]);			
+				outputSearchHTML(data);		
 				loader.slideUp("fast");
 				overlay.fadeOut("fast");
 				//return [data, counter];
@@ -180,6 +172,23 @@ $(document).ready(function() {
 		
 		});
 	}
+	//Output JSON to HTML
+	function outputSearchHTML (data) {
+		var counter = 0;
+		content.html('<h2>Results</h2>');
+		$.each(data, function(i,val) {
+			//alert(i+","+val["name"]);
+			console.log(i,val);
+			var features = val["sequencefeatures"];
+			content.append('<div class="result"><div class="genename">'+i+'</div><div class="diagram" id="chart_div'+counter+'"></div><div class="link"><a href="return_single.pl?gene='+val["name"]+'">More &raquo;</a></div></div>');
+			google.setOnLoadCallback(drawChart(features,counter));
+			counter++;
+		});
+	
+	
+	}
+	
+	//Draw charts
 	function drawChart (features, counter) {
 		var feats = ["Gene"];
 		var numbers = ["Gene"];
@@ -272,6 +281,7 @@ $(document).ready(function() {
 				case(urlState[1] == "search"):
 					//content.load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
 					//content.load("DummyResults/dummyresults.html#wrapper");
+					//Do the search
 					doSearch(urlState);
 					hideMain();
 					closeHelp();
