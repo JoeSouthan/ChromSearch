@@ -16,19 +16,12 @@ $(document).ready(function() {
 		query 		 = textBox.val(),
 		perpage 	 = $("#perpage").val(),
 		error		 = $("#errorbox"),
-		errordiv	 = $("#errordiv")
+		errordiv	 = $("#errordiv"),
+		ColNCS 		 = "#1668F5",
+		ColEXON		 = "#F0ED3C",
+		ColINTRON	 = "#CEF5CF"
 		;
-	//Google Charts API
 
-	var options = {
-		isStacked: true,
-		hAxis : {},
-		legend: {},
-		chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'},
-		width: 650,
-		height: 50
-	};
-	
 	
 	function ajaxLinks () {
 		$("a").each (function() {
@@ -159,7 +152,7 @@ $(document).ready(function() {
 	function doSearch (searchterms) {
 		// eg !,search,GeneID,123p,10,0
 		var result = $.ajax ({
-			url:"cgi-bin/json.pl?",
+			url:"json.json",
 			type: "GET",
 			dataType: "json",
 			data: {selector: searchterms[1], searchType: searchterms[2], query:searchterms[3]},
@@ -178,7 +171,7 @@ $(document).ready(function() {
 		content.html('<h2>Results</h2>');
 		$.each(data, function(i,val) {
 			//alert(i+","+val["name"]);
-			console.log(i,val);
+		//	console.log(i,val);
 			var features = val["sequencefeatures"];
 			content.append('<div class="result"><div class="genename">'+i+'</div><div class="diagram" id="chart_div'+counter+'"></div><div class="link"><a href="return_single.pl?gene='+val["name"]+'">More &raquo;</a></div></div>');
 			google.setOnLoadCallback(drawChart(features,counter));
@@ -187,9 +180,11 @@ $(document).ready(function() {
 	
 	
 	}
-	
+
+	//Google Charts API
 	//Draw charts
 	function drawChart (features, counter) {
+		//Split up features array strings into separate arrays
 		var feats = ["Gene"];
 		var numbers = ["Gene"];
 		$.each(features,function() {
@@ -197,12 +192,34 @@ $(document).ready(function() {
 			feats.push(f1[0]);
 			numbers.push(parseInt(f1[1]));
 		});
+		//Set the colours based on the sequence feature
+		var colours = [];
+		$.each(feats, function () {
+			if (this == "NCS"){
+				colours.push(ColNCS);
+			} else if (this == "EXON") {
+				colours.push(ColEXON);
+			} else if (this == "INTRON") {
+				colours.push(ColINTRON);
+			} 
+		});
+		
+		var options = {
+			isStacked: true,
+			hAxis : {},
+			legend: {},
+			chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'},
+			width: 650,
+			height: 50,
+			colors: colours,
+		};
+	
 		var data1 = google.visualization.arrayToDataTable([
 			feats,
 			numbers
 		]);
 		var chart = new google.visualization.BarChart(document.getElementById('chart_div'+counter));
-		chart.draw(data1, options);	
+		chart.draw(data1, options );	
 	}
 	
 
@@ -246,7 +263,7 @@ $(document).ready(function() {
 //---------------------------------//
 
 	submitButton.removeAttr("href");
-	submitButton.fadeTo("slow", 0.2);
+	submitButton.fadeTo("fast", 0.2);
 	ajaxLinks();
 	$("#no-js").hide();
 	$("#no-js-alert").hide();
