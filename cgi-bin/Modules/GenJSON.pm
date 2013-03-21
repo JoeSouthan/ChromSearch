@@ -35,6 +35,34 @@ sub testJSONSearch {
 				"sequencefeatures" => [@array3],
 				"aasequence" => "ANONVAVAFIROEIRW",
 				"dnasequence" => "ATGCATGC"
+			},
+		"gene4" => {
+				"name" => "Test3",
+				"length"=> 123,
+				"sequencefeatures" => [@array3],
+				"aasequence" => "ANONVAVAFIROEIRW",
+				"dnasequence" => "ATGCATGC"
+			},		
+		"gene5" => {
+				"name" => "Test3",
+				"length"=> 123,
+				"sequencefeatures" => [@array3],
+				"aasequence" => "ANONVAVAFIROEIRW",
+				"dnasequence" => "ATGCATGC"
+			},		
+		"gene6" => {
+				"name" => "Test3",
+				"length"=> 123,
+				"sequencefeatures" => [@array3],
+				"aasequence" => "ANONVAVAFIROEIRW",
+				"dnasequence" => "ATGCATGC"
+			},
+		"gene7" => {
+				"name" => "Test3",
+				"length"=> 123,
+				"sequencefeatures" => [@array3],
+				"aasequence" => "ANONVAVAFIROEIRW",
+				"dnasequence" => "ATGCATGC"
 			}
 	);
 	

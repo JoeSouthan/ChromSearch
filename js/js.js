@@ -151,16 +151,31 @@ $(document).ready(function() {
 	//Do a JSON search
 	function doSearch (searchterms) {
 		// eg !,search,GeneID,123p,10,0
+		var dataStructure = {}
+		if (searchterms[1] == "search"){
+			dataStructure = {selector: searchterms[1], searchType: searchterms[2], query:searchterms[3] };
+		} else if (searchterms[1] == "single"){ 
+			dataStructure = {selector: searchterms[1], query:searchterms[2] };
+		}
 		var result = $.ajax ({
-			url:"json.json",
+			//url:"json.json",
+			url:"cgi-bin/json.pl?",
 			type: "GET",
 			dataType: "json",
-			data: {selector: searchterms[1], searchType: searchterms[2], query:searchterms[3]},
+			data: dataStructure,
 			success: function (data) {
-				outputSearchHTML(data);		
-				loader.slideUp("fast");
-				overlay.fadeOut("fast");
-				//return [data, counter];
+				if (searchterms[1] == "search") {
+					outputSearchHTML(data);		
+					loader.slideUp("fast");
+					overlay.fadeOut("fast");
+					//return [data, counter];
+				} else if (searchterms[1] == "single") {
+					outputSingleHTML(data);		
+					loader.slideUp("fast");
+					overlay.fadeOut("fast");
+				} else {
+					alert(searchterms[1]);
+				}
 			},
 		
 		});
@@ -173,12 +188,17 @@ $(document).ready(function() {
 			//alert(i+","+val["name"]);
 		//	console.log(i,val);
 			var features = val["sequencefeatures"];
-			content.append('<div class="result"><div class="genename">'+i+'</div><div class="diagram" id="chart_div'+counter+'"></div><div class="link"><a href="return_single.pl?gene='+val["name"]+'">More &raquo;</a></div></div>');
+			content.append('<div class="result"><div class="genename">'+val["name"]+'</div><div class="diagram" id="chart_div'+counter+'"></div><div class="link"><a href="return_single.pl?gene='+i+'">More &raquo;</a></div></div>');
 			google.setOnLoadCallback(drawChart(features,counter));
 			counter++;
 		});
 	
 	
+	}
+	function outputSingleHTML (data) {
+		$.each(data, function (i, val) {
+			content.html('<h2>This is the single results page for '+i+'.</h2>');	
+		});
 	}
 
 	//Google Charts API
@@ -307,8 +327,11 @@ $(document).ready(function() {
 					//alert($('#mainSearch').serialize());
 					break;
 				case(urlState[1] == "single"):
-					content.load("cgi-bin/return_single.pl?id="+urlState[2]);
+					//content.load("cgi-bin/return_single.pl?id="+urlState[2]);
+					doSearch(urlState);
+					hideMain();
 					closeHelp();
+					showContent();
 					ajaxLinks();
 					break;
 			}

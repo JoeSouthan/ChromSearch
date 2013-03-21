@@ -79,7 +79,7 @@ pre {
 .center {
 	text-align:center;
 }
-.centerdivs {
+.centerdiv {
 	margin:0 auto;
 	display:block;
 }
@@ -338,7 +338,7 @@ pre {
 	padding:5px;
 }
 .boxes {
-	position:absolute;
+	position:fixed;
 	top:20px;
 	left:37%;
 	background:#fff;
