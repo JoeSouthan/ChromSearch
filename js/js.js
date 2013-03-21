@@ -17,6 +17,7 @@ $(document).ready(function() {
 		perpage 	 = $("#perpage").val(),
 		error		 = $("#errorbox"),
 		errordiv	 = $("#errordiv"),
+		breadcrumbs  = $("#breadcrumbs-wrapper"),
 		ColNCS 		 = "#1668F5",
 		ColEXON		 = "#F0ED3C",
 		ColINTRON	 = "#CEF5CF"
@@ -43,22 +44,27 @@ $(document).ready(function() {
 					}
 				}
 			} else {
+				if ($(this).is('[href^=#!/]')){
+					//do nothing
+				} else {
+					$(this).attr("href", "#!/" + href);	
+				}
 			}
 		});
 	}
 	//Ajax
 	$.ajaxSetup({
 		beforeSend: function(xhr, status) {
-			loader.slideDown("fast");
+			loader.fadeIn("fast");
 			overlay.fadeIn("fast");
 		},
 		success: function(xhr, status) {
-			loader.slideUp("fast");
+			loader.fadeOut("fast");
 			overlay.fadeOut("fast");
 			//google.setOnLoadCallback(drawChart(xhr));                                                   
 		},
 		error: function(jqXHR, exception) {
-			loader.slideUp("fast");
+			loader.fadeOut("fast");
 			errordiv.html("Ajax error: "+jqXHR.status+".");
 			showError();
 		},
@@ -125,7 +131,6 @@ $(document).ready(function() {
 	}
 
 
-
 	//Search Validation
 	function validateSearch () {
 		if (textBox.val().length < 3) {
@@ -158,20 +163,20 @@ $(document).ready(function() {
 			dataStructure = {selector: searchterms[1], query:searchterms[2] };
 		}
 		var result = $.ajax ({
-			//url:"json.json",
-			url:"cgi-bin/json.pl?",
+			url:"json.json",
+			//url:"cgi-bin/json.pl?",
 			type: "GET",
 			dataType: "json",
 			data: dataStructure,
 			success: function (data) {
 				if (searchterms[1] == "search") {
 					outputSearchHTML(data);		
-					loader.slideUp("fast");
+					loader.fadeOut("fast");
 					overlay.fadeOut("fast");
 					//return [data, counter];
 				} else if (searchterms[1] == "single") {
 					outputSingleHTML(data);		
-					loader.slideUp("fast");
+					loader.fadeOut("fast");
 					overlay.fadeOut("fast");
 				} else {
 					alert(searchterms[1]);
@@ -183,12 +188,17 @@ $(document).ready(function() {
 	//Output JSON to HTML
 	function outputSearchHTML (data) {
 		var counter = 0;
-		content.html('<h2>Results</h2>');
+		content.html('<div class="center"><h2>Results</h2></div>');
 		$.each(data, function(i,val) {
 			//alert(i+","+val["name"]);
 		//	console.log(i,val);
 			var features = val["sequencefeatures"];
-			content.append('<div class="result"><div class="genename">'+val["name"]+'</div><div class="diagram" id="chart_div'+counter+'"></div><div class="link"><a href="return_single.pl?gene='+i+'">More &raquo;</a></div></div>');
+			content.append('\
+				<div class="result">\
+					<div class="genename">'+val["name"]+'</div> \
+					<div class="diagram" id="chart_div'+counter+'"></div> \
+					<div class="link"><a href="return_single.pl?gene='+i+'">More &raquo;</a></div> \
+				</div>');
 			google.setOnLoadCallback(drawChart(features,counter));
 			counter++;
 		});
@@ -196,8 +206,59 @@ $(document).ready(function() {
 	
 	}
 	function outputSingleHTML (data) {
-		$.each(data, function (i, val) {
-			content.html('<h2>This is the single results page for '+i+'.</h2>');	
+		var counter = 0;
+		$.each(data, function (i,val) {
+			var features = val["sequencefeatures"];
+			content.html(' \
+    <div class="searchform"> \
+    	<h2 class="center">Single result for: '+i+'.</h2> \
+        <div class="singleresult"> \
+        	<div class="info"> \
+            	<span>Name: '+val["name"]+' | Genbank Accession: '+i+' | Chromosomal Location: '+val["location"]+'</span> \
+            </div> \
+            <div class="single-wide"> \
+            	<h2>Protein Product</h2>\
+            	<p>Some Product</p>\
+            	<h2>Sequence Characteristics</h2> \
+            	<h3>Gene Layout</h3> \
+                <div class="diagram centerdiv" id="chart_div0"></div>\
+                <h3>Codon Usage</h3> \
+				<div class="center"> \
+					<img src="img/test.png" alt="Codon Usage"/> \
+				</div> \
+                <h2>Common Restriction Sites</h2> \
+                <h3>EcoR1</h3> \
+                <p>Some Text</p> \
+                <h3>BamH1</h3> \
+                <h3>BsuMI</h3> \
+                <p id="cutter-text">Would you like to <a href="#cutter" id="show4">cut your own?</a></p> \
+				<div id="spinner"> \
+					<img src="../img/ajaxloader.gif" alt="Loading" width="24" height="24" /> \
+				</div> \
+                <div id="cutter"> \
+                </div> \
+            </div> \
+            <div class="clearfix"></div> \
+            <div class="single-wide"> \
+            	<h2>Sequences</h2> \
+            	<a href="#SequenceDNA" id="show1">Click to reveal DNA Sequence</a> \
+            	<div id="SequenceDNA"> \
+					<span>'+val["dnasequence"]+'</span> \
+				</div> \
+                <br /> \
+                <a href="#SequenceAA" id="show2">Click to reveal Translated Amino Acid Sequence</a> \
+                <div id="SequenceAA"> \
+					<span>'+val["aasequence"]+'</span> \
+				</div> \
+				<br /> \
+				<a href="#codonusage" id="show3">Codon usage</a> \
+				<div id="codonusage"> \
+					<span>'+val["codons"]+'</span> \
+				</div> \
+            </div> \
+        </div> \
+    </div>');
+		google.setOnLoadCallback(drawChart(features,counter));
 		});
 	}
 
@@ -241,7 +302,24 @@ $(document).ready(function() {
 		var chart = new google.visualization.BarChart(document.getElementById('chart_div'+counter));
 		chart.draw(data1, options );	
 	}
-	
+	function setBreadcrumbs (urlState) {
+		// eg !,search,GeneID,123p,10,0
+		var selector;
+		var location;
+		if (urlState[1] == "search") {
+			selector = "Search Result";
+			location = urlState[3];
+			breadcrumbs.html('<a href="">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
+		} else if (urlState[1] == "single"){
+			location = urlState[2];
+			selector = "Single Result";
+			breadcrumbs.html('<a href="/">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
+		} else {
+			breadcrumbs.html("");
+
+		}
+
+	}	
 
 	//blur
 	textBox.blur(validateSearch);
@@ -297,7 +375,6 @@ $(document).ready(function() {
 	});
 	//reject browsers
 	
-	
 	$.History.bind(function(state) {
 		urlState = state.split(/\//g);
 	//	alert(urlState[1]);
@@ -310,6 +387,7 @@ $(document).ready(function() {
 					closeHelp();
 					showMain();
 					hideContent();
+					setBreadcrumbs(urlState);
 					break;
 				case(urlState[1] == "help"):
 					openHelp();
@@ -320,6 +398,7 @@ $(document).ready(function() {
 					//content.load("DummyResults/dummyresults.html#wrapper");
 					//Do the search
 					doSearch(urlState);
+					setBreadcrumbs(urlState);
 					hideMain();
 					closeHelp();
 					showContent();
@@ -329,6 +408,7 @@ $(document).ready(function() {
 				case(urlState[1] == "single"):
 					//content.load("cgi-bin/return_single.pl?id="+urlState[2]);
 					doSearch(urlState);
+					setBreadcrumbs(urlState);
 					hideMain();
 					closeHelp();
 					showContent();
