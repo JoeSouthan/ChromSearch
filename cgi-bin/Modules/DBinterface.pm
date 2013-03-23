@@ -1,11 +1,8 @@
 package DBinterface;
 
-use DBI; # Comment out for SOAP Testing
-
+use DBI; 
 
 # Subroutines
-
-
 
 # Database facing
 
@@ -47,7 +44,7 @@ sub queryRun{
 		}
 		$hDb->disconnect();
 		
-		if(isArrayEmpty(@rowData) eq TRUE){
+		if(isArrayEmpty(@rowData) eq 0){
 			return 'NO_DATA';
 		}else{
 			# Return data in raw array form, let caller extract the required information
@@ -98,7 +95,7 @@ sub DoQuery( $ ){
 		# Use isArrayFunction to check for 'empty' array.  The MySQL entries will
 		# always have something as their value, here if the array is full of 
 		# N/A then return custom message indicating no data.
-		if( isArrayEmpty( @rowData ) eq TRUE ){
+		if( isArrayEmpty( @rowData ) eq 0 ){
 			return 'NO_DATA';
 		}else{
 			# Return data in raw array form, let caller extract the required information
@@ -158,16 +155,16 @@ sub querySearch{
 	# Run query
 	my @searchResults = DBinterface::DoQuery($sqlQuery);
 	
-	if(@searchResults eq undef){
-		return 'ERROR:NO_DB_CONNECTION';
+	unless(@searchResults){
+		if($searchResults[0] eq 'NO_DATA'){
+			return @searchResults; #'ERROR:NO_DB_MATCHES';
+		}
+		
+		return @searchResults;
+		
+	}else{
+		return @searchResults; #'ERROR:NO_DB_CONNECTION';
 	}
-	
-	if(@searchResults[0] eq 'NO_DATA'){
-		return 'ERROR:NO_DB_MATCHES';
-	}
-	
-	return @searchResults;
-	
 }  
 ##########################################################################################################
 #
@@ -193,7 +190,7 @@ sub queryColumn{
 	}	
 	
 	# If elements in the array are valid
-	if(@columnData[0] eq 'NO_DATA'){
+	if($columnData[0] eq 'NO_DATA'){
 		return 'ERROR:DB_COLUMN_EMPTY';
 	}else{
 		# Array to hold the valid entries from the DB
@@ -225,11 +222,11 @@ sub querySequence{
 	
 	# Run query and handle empty data
 	my @seq = DBinterface::queryRun($sqlQuery);
-	if( @seq[0] eq 'NO_DATA'){
+	if( $seq[0] eq 'NO_DATA'){
 		return 'ERROR:DB_COLUMN_EMPTY';
 	}else{
 		# Copy data to string
-		my $string = @seq[0];
+		my $string = $seq[0];
 		# Pass back data as string
 		return $string;
 	}
@@ -419,11 +416,11 @@ sub isArrayEmpty{
 		# At least one item was found in the returned array.
 		if((length($array[$i])) && ($array[$i] ne 'N/A') )
 		{
-			return FALSE; # Has length or is equal to N/A
+			return 1; # Has length or is equal to N/A
 		}
 	}
 	# All item were zero length or N/A, array was empty, return true
-	return TRUE;
+	return 0;
 }
 
 sub returnArrayRef(){
