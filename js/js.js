@@ -127,7 +127,7 @@ $(document).ready(function() {
 		var query = textBox.val();
 		var perpage = $("#perpage").val();
 		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
-		return "#!/search/"+radioValue+"/"+query+"/"+perpage+"/0";
+		return "#!/search/"+radioVal+"/"+query+"/"+perpage+"/0";
 	}
 
 
@@ -150,6 +150,8 @@ $(document).ready(function() {
 		var query = textBox.val();
 		var perpage = $("#perpage").val();
 		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
+		var searchLink = createSearchLink("link");
+		submitButton.attr("href", searchLink);
 		searchLive.html("<p>You are searching for: "+query+" using a "+radioVal+" search.</p>");	
 	}
 	
@@ -192,10 +194,10 @@ $(document).ready(function() {
 		$.each(data, function(i,val) {
 			//alert(i+","+val["name"]);
 		//	console.log(i,val);
-			var features = val["sequencefeatures"];
+			var features = val["SeqFeat"];
 			content.append('\
 				<div class="result">\
-					<div class="genename">'+val["name"]+'</div> \
+					<div class="genename">'+val["GeneName"]+'</div> \
 					<div class="diagram" id="chart_div'+counter+'"></div> \
 					<div class="link"><a href="return_single.pl?gene='+i+'">More &raquo;</a></div> \
 				</div>');
@@ -208,13 +210,13 @@ $(document).ready(function() {
 	function outputSingleHTML (data) {
 		var counter = 0;
 		$.each(data, function (i,val) {
-			var features = val["sequencefeatures"];
+			var features = val["SeqFeat"];
 			content.html(' \
     <div class="searchform"> \
     	<h2 class="center">Single result for: '+i+'.</h2> \
         <div class="singleresult"> \
         	<div class="info"> \
-            	<span>Name: '+val["name"]+' | Genbank Accession: '+i+' | Chromosomal Location: '+val["location"]+'</span> \
+            	<span>Name: '+val["GeneName"]+' | Genbank Accession: '+i+' | Chromosomal Location: '+val["GeneLength"]+'</span> \
             </div> \
             <div class="single-wide"> \
             	<h2>Protein Product</h2>\
@@ -243,17 +245,17 @@ $(document).ready(function() {
             	<h2>Sequences</h2> \
             	<a href="#SequenceDNA" id="show1">Click to reveal DNA Sequence</a> \
             	<div id="SequenceDNA"> \
-					<span>'+val["dnasequence"]+'</span> \
+					<span></span> \
 				</div> \
                 <br /> \
                 <a href="#SequenceAA" id="show2">Click to reveal Translated Amino Acid Sequence</a> \
                 <div id="SequenceAA"> \
-					<span>'+val["aasequence"]+'</span> \
+					<span></span> \
 				</div> \
 				<br /> \
 				<a href="#codonusage" id="show3">Codon usage</a> \
 				<div id="codonusage"> \
-					<span>'+val["codons"]+'</span> \
+					<span></span> \
 				</div> \
             </div> \
         </div> \
@@ -269,9 +271,12 @@ $(document).ready(function() {
 		var feats = ["Gene"];
 		var numbers = ["Gene"];
 		$.each(features,function() {
-			var f1 = this.split(":");
+			var f1 = this.split(";");
 			feats.push(f1[0]);
-			numbers.push(parseInt(f1[1]));
+			var difference = f1[1].split(":");
+			var glength = Math.abs(parseInt(difference[0])-parseInt(difference[1]));
+			console.log(glength);
+			numbers.push(glength);
 		});
 		//Set the colours based on the sequence feature
 		var colours = [];
