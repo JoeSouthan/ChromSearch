@@ -163,8 +163,8 @@ $(document).ready(function() {
 			dataStructure = {selector: searchterms[1], query:searchterms[2] };
 		}
 		var result = $.ajax ({
-			url:"json.json",
-			//url:"cgi-bin/json.pl?",
+			//url:"json.json",
+			url:"cgi-bin/json.pl?",
 			type: "GET",
 			dataType: "json",
 			data: dataStructure,
