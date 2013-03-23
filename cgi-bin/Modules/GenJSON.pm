@@ -2,7 +2,7 @@
 package GenJSON;
 use strict;
 use JSON;
-#use ChromoDB;
+use ChromoDB;
 use Exporter;
 use Data::Dumper;
 our @ISA = qw(Exporter);

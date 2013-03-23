@@ -48,8 +48,8 @@ unless (defined ($selector)) {
 			unless (defined ($type)) {
 				print GenJSON::error("No type selected");
 			} else {
-				print GenJSON::testJSONSearch();
-				#my $result = GenJSON::doSearch($query,$type);
+				#print GenJSON::testJSONSearch();
+				my $result = GenJSON::doSearch($query,$type);
 			}
 		} elsif ($selector eq "single") {
 			print GenJSON::testJSONSingle();
