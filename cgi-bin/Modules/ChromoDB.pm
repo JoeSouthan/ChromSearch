@@ -80,20 +80,20 @@ sub getSearchResults{
 	my $resultNumber = 0;
 	
 	foreach my $result (@queryResult){
-		$searchResults{$resultNumber}{'Accession'} = $queryResult[0]->[0];
+		
+		$resultNumber = $queryResult[0]->[0];
+
 		$searchResults{$resultNumber}{'GeneName'} = $queryResult[0]->[1];
 		$searchResults{$resultNumber}{'GeneLength'} = $queryResult[0]->[2];
 		
 		my @sequence = DBinterface::buildCodingSeq($queryResult[0]->[0]);
 		$searchResults{$resultNumber}{'SeqFeat'} = [@sequence];
 		
-		$resultNumber++;
+		#print $resultNumber;
+		#print $searchResults{$resultNumber}{'GeneName'},"\n";
+		#print $searchResults{$resultNumber}{'GeneLength'},"\n";
 		
-		#print $searchResults{'0'}{'Accession'},"\n";
-		#print $searchResults{'0'}{'GeneName'},"\n";
-		#print $searchResults{'0'}{'GeneLength'},"\n";
-		
-		#foreach my $CDS (@{$searchResults{'0'}{'SeqFeat'}})
+		#foreach my $CDS (@{$searchResults{$resultNumber}{'SeqFeat'}})
 		#{
 		#	print $CDS,"\n";
 		#}

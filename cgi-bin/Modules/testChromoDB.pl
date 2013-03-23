@@ -57,20 +57,20 @@ ok( $results eq 'ERROR:ZERO_LENGTH_ARGUMENT', "with no parameters");
 # CONDITION: Correct parameters of 2780780 (assumes this dummy data is in DB) and GeneID
 
 my %results = ChromoDB::getSearchResults("2780780","GeneID");
-ok( $results{'0'}{'GeneName'} eq '2780780', "with '2780780' and 'GeneID' as parameters");
-#print $results{'0'}{'GeneName'},"\n";
+ok( $results{'AB002805'}{'GeneName'} eq '2780780', "with '2780780' and 'GeneID' as parameters");
+#print $results{'AB002805'}{'GeneName'},"\n";
 
 # CONDITION: Correct parameters of DUSP6 (assumes this dummy data is in DB) and ProteinProduct
 
 my %results = ChromoDB::getSearchResults("DUSP6","ProteinProduct");
-ok( $results{'0'}{'GeneName'} eq '60683881', "with 'DUSP6' and 'ProteinProduct' as parameters");
+ok( $results{'AB013601'}{'GeneName'} eq '60683881', "with 'DUSP6' and 'ProteinProduct' as parameters");
 #print $results{'0'}{'GeneName'},"\n";
 
 # CONDITION: Correct parameters of AB002805 (assumes this dummy data is in DB) and AccessionNumber
 
 my %results = ChromoDB::getSearchResults("AB002805","AccessionNumber");
-ok( $results{'0'}{'GeneName'} eq '2780780', "with '2780780' and 'AccessionNumber' as parameters");
-#print $results{'0'}{'GeneName'},"\n";
+ok( $results{'AB002805'}{'GeneName'} eq '2780780', "with '2780780' and 'AccessionNumber' as parameters");
+#print $results{'AB002805'}{'GeneName'},"\n";
 
 # CONDITION: Correct parameters of q13 (assumes this dummy data is in DB) and ChromosomeLocation
 
