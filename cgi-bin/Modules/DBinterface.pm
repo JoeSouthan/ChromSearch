@@ -21,7 +21,7 @@ sub queryRun{
 	
 	# Attempt to connect to database 
 	my $hDb = DBinterface::databaseConnect();
-	if( undef eq $hDb ){
+	unless( $hDb ){
 		# Could not connect return undefind
 		return undef;
 	}
@@ -260,6 +260,9 @@ sub buildCodingSeq{
 	
 	# Fetch the exon coding sequence information from DB, array will progress as 
 	# Type, start, stop then repeat for next item.
+	
+	
+	##  CHNAGE TO USE DoQuery AND NOT SEND ERROR MESSAGE TO CALLER##
 	my @tableRows = DBinterface::queryRun($sqlQuery);
 	if (@tableRows eq 'NO_DATA'){
 		return 'ERROR:DB_COLUMN_EMPTY';
@@ -269,6 +272,7 @@ sub buildCodingSeq{
 	# Specify query includes start position and end position of exons from give accessionNo.
 	my $sqlQuerySeqlength = "SELECT geneSeqLen FROM gene WHERE accessionNo='$accessionNo'";
 	
+	##  CHNAGE TO USE DoQuery AND NOT SEND ERROR MESSAGE TO CALLER ##
 	my @sequenceLength = DBinterface::queryRun($sqlQuerySeqlength);
 	if (@sequenceLength eq 'NO_DATA'){
 		return 'ERROR:DB_COLUMN_EMPTY';
@@ -303,7 +307,7 @@ sub buildCodingSeq{
 	# every iteration of the loop below.
 	
 	# Is first entry an exon? If so, does it start at one? 
-	if( 1 == $tableRows[0] ){
+	if( '1' == $tableRows[0] ){
 	
 		# If yes, then sequecne starts with exon.
 		my $entry = join("","EXON;",$tableRows[0],":",$tableRows[1]);

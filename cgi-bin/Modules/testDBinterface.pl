@@ -122,15 +122,15 @@ print "\n************************** TEST: 'querySearch' ************************
 	my @results = DBinterface::querySearch("12q13","chromLoc");
 	ok( length(@results),
 	"with valid parameters '12q13' as search string and 'chromLoc' as type" );
-	foreach my $entry (@results){
-		print $entry->[0],"\n";
-	}
+	#foreach my $entry (@results){
+	#	print $entry->[0],"\n";
+	#}
 }
 	
 # CONDITION: Valid parameters but not in DB
 {
-	my $results = DBinterface::querySearch("HEX5","proteinName");
-	ok( $results eq 'ERROR:NO_DB_MATCHES',"Testing 'querySearch' with valid parameters but not in DB");
+	my @results = DBinterface::querySearch("HEX5","proteinName");
+	ok( @results eq undef,"Testing 'querySearch' with valid parameters but not in DB");
 }
 ################################ TEST 'getIdentifier' ###############################
 
@@ -155,35 +155,35 @@ print "\n************************** TEST: 'isArrayEmpty' ***********************
 {
 	my @items = ( ["one","two","three"], ["four","five","six"] );
 	my $result = DBinterface::isArrayEmpty( @items );
-	ok($result eq 'FALSE', "with valid filled out array" );
+	ok($result eq '1', "with valid filled out array" );
 }
 
 # CONDITION: Array with blank entries
 {
 	my @items = ('','','','');
 	my $result = DBinterface::isArrayEmpty( @items );
-	ok($result eq 'TRUE', "with blank array elements");
+	ok($result eq '0', "with blank array elements");
 }
 
 # CONDITION: Array with 'N/A' as array elements 
 {
 	my @items = ('N/A','N/A','N/A','N/A');
 	my $result = DBinterface::isArrayEmpty( @items );
-	ok($result eq 'TRUE', "with 'N/A' array elements");
+	ok($result eq '0', "with 'N/A' array elements");
 }
 
 # CONDITION: Array with mixed blank and 'N/A' as array elements 
 {
 	my @items = ('N/A','','N/A','');
 	my $result = DBinterface::isArrayEmpty( @items );
-	ok($result eq 'TRUE', "with mixed blank and 'N/A' array elements");
+	ok($result eq '0', "with mixed blank and 'N/A' array elements");
 }
 
 # CONDITION: Array with one of the elements as valid
 {
 	my @items = ('N/A','','N/A','Hello','' );
 	my $result = DBinterface::isArrayEmpty( @items );
-	ok($result eq 'FALSE',"with one of the elements as valid");
+	ok($result eq '1',"with one of the elements as valid");
 }
 
 ################################ TEST : 'querySeqDNA' ################################
@@ -207,20 +207,20 @@ print "\n************************** TEST: 'buildCodingSeq' *********************
 my @seq = DBinterface::buildCodingSeq('AB002805');
 ok( @seq, "with valid argument accession number 'AB002805' with one exon");
 foreach my $entry (@seq){
-	#print $entry,"\n";
+	print $entry,"\n";
 }
 
 @seq = DBinterface::buildCodingSeq('AB005990');
 ok( @seq, "with valid argument accession number 'AB005990' with more than one exon");
 foreach my $entry (@seq){
-	#print $entry,"\n";
+	print $entry,"\n";
 }
 
 # PRODUCES  A BUG returns -1 on the last NCS
 @seq = DBinterface::buildCodingSeq('GU994024');
 ok( @seq, "with valid argument accession number 'GU994024' with more than one exon");
 foreach my $entry (@seq){
-	#print $entry,"\n";
+	print $entry,"\n";
 }
 
-DBinterface::hashing();
+#DBinterface::hashing();
