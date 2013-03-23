@@ -40,7 +40,7 @@ sub queryRun{
 			$hDb->errstr;
 			return 'ERROR:DB_QUERY';
 		}else{
-			# Fetch all available rows from DB
+			# Fetch all available rows from DB and store in an array to be passed back
 			while(my @data = $queryRows->fetchrow_array){
 				push(@rowData, @data);
 			}	
@@ -58,8 +58,56 @@ sub queryRun{
 
 
 # sanSearch - Takes as search string and returns a sanitized search string
-sub sanSearch( $ ){
-	return 1;
+sub DoQuery( $ ){
+
+	# Get query string from function argument
+	my $sqlQuery = $_[0];
+	
+	# Attempt to connect to database 
+	my $hDb = DBinterface::databaseConnect();
+	if( $hDb ){
+		
+		# Array to hold output
+		my @rowData;
+		
+		# Get a handle to the executing statement
+		my $queryRows = $hDb->prepare( $sqlQuery );
+	
+		# Run query
+		if($queryRows->execute)
+		{
+			# Check query went ok
+			if ( !$queryRows )
+			{
+				# If an error occured passback custom error message.
+				$hDb->errstr;
+				return 'ERROR:DB_QUERY';
+			}else{
+				# Store a reference to an array of references for each row in the DB
+				while( my @data = $queryRows->fetchrow_array() ){
+					# Create 2D array to hold data for each row.
+					push @rowData, [ @data ];
+					#print $rowData[0]->[0],"\n";
+				}	
+			}
+				
+		}
+		# Finished using database disconnect
+		$hDb->disconnect();
+		
+		# Use isArrayFunction to check for 'empty' array.  The MySQL entries will
+		# always have something as their value, here if the array is full of 
+		# N/A then return custom message indicating no data.
+		if( isArrayEmpty( @rowData ) eq TRUE ){
+			return 'NO_DATA';
+		}else{
+			# Return data in raw array form, let caller extract the required information
+			return @rowData if wantarray;
+		}
+	}else{
+		# Could not connect to database return undefind
+		return undef;
+	}
 }
 
 ##########################################################################################################
@@ -105,36 +153,20 @@ sub querySearch{
 	my ($searchString, $idType) = @_;
 	
 	# Run search query **$searchstring must be in quotes***
-	my $sqlQuery = "SELECT accessionNo, geneId FROM gene WHERE $idType='$searchString'";
+	my $sqlQuery = "SELECT accessionNo, geneId, geneSeqLen FROM gene WHERE $idType='$searchString'";
 	
 	# Run query
-	my @id = DBinterface::queryRun($sqlQuery);
+	my @searchResults = DBinterface::DoQuery($sqlQuery);
 	
-	if(@id eq undef){
+	if(@searchResults eq undef){
 		return 'ERROR:NO_DB_CONNECTION';
 	}
 	
-	if(@id[0] eq 'NO_DATA'){
+	if(@searchResults[0] eq 'NO_DATA'){
 		return 'ERROR:NO_DB_MATCHES';
 	}
 	
-	# Create comma separated string
-	#my $string = join(",",@id);
-	
-	my @validEntries;
-	
-	for(my $i = 0; $i < scalar(@id); $i++ ){
-		# Concatenate and copy into new array
-		my $entry = join(":",$id[$i],$id[$i+1]);
-				
-		# Enter valid entry in to new array
-		push(@validEntries, $entry);
-				
-		# Increment past the next array entry 
-		$i++; 
-	}
-	
-	return @validEntries;
+	return @searchResults;
 	
 }  
 ##########################################################################################################
@@ -153,44 +185,27 @@ sub queryColumn{
 	my $sqlQuery = "SELECT accessionNo, $columnId FROM gene";
 	
 	# Run query
-	my @id = DBinterface::queryRun($sqlQuery);
+	my @columnData = DBinterface::DoQuery($sqlQuery);
 	
 	# Check for empty Db coonection and empty columns
-	if( undef eq @id ){
+	if( undef eq @columnData ){
 		return 'ERROR:NO_DB_CONNECTION';
 	}	
 	
-	# If element in the array are valid
-	if(@id[0] eq 'NO_DATA'){
+	# If elements in the array are valid
+	if(@columnData[0] eq 'NO_DATA'){
 		return 'ERROR:DB_COLUMN_EMPTY';
 	}else{
 		# Array to hold the valid entries from the DB
 		my @validEntries;
-	
-		# Step through array and copy over only valid entries
-		for(my $i = 0; $i < scalar(@id); $i++){
 		
-			# Check that the next entry is not blank
-			if(0 != length($id[$i+1]) ){
-				# Concatenate and copy into new array
-				my $entry = join(":",$id[$i],$id[$i+1]);
-				
-				# Enter valid entry in to new array
-				push(@validEntries, $entry);
-				
-				# Increment past the next array entry 
-				$i++; 
-			}
-			else{
-				# Skip over current entry and next
-				# as the accession has no corresponding entry
-				$i++;
-			}
+		# Take elements of query results and put them into a 1d array in
+		# a convenient string format of 'accessionNumber:column entry'
+		foreach my $entry (@columnData){
+			my $dataString = join(":", $entry->[0], $entry->[1]);
+			push( @validEntries, $dataString );
 		}
 	
-		# Create comma separated string
-		#my $string = join(",",@validEntries);
-		
 		# Pass back string
 		return @validEntries;
 	}
@@ -311,7 +326,7 @@ sub buildCodingSeq{
 		
 	}else{
 		# If no then infer an intron and calculate intron length, sequence begins with intron.
-		my $entry = join("","NCS","0",":",$tableRows[0]-1);
+		my $entry = join("","NCS;","0",":",$tableRows[0]-1);
 		push(@CDSarray, $entry);
 	}
 	
@@ -396,22 +411,41 @@ sub isArrayEmpty{
 	# Get length of array loop through array and test if each entry is valid of empty
 	# If all are empty then the coloumn is effectively empty.
 	my @array = @_;
-	my $arraySize = scalar(@array);
+	
+	# Should use foreach here
 	
 	for(my $i = 0; $i < scalar(@array); $i++){
 		# If not zero length or is not equal to N/A trigger return
+		# At least one item was found in the returned array.
 		if((length($array[$i])) && ($array[$i] ne 'N/A') )
 		{
 			return FALSE; # Has length or is equal to N/A
 		}
 	}
-	# All item were zero length or N/A return true
+	# All item were zero length or N/A, array was empty, return true
 	return TRUE;
 }
 
-sub returnArray(){
-	my @array = {"one","two","three","four"};
-	return @array;
+sub returnArrayRef(){
+	my @array = ("one","two","three","four");
+	return \@array;
+}
+
+sub hashing(){
+
+	
+	my %hash = (
+		"gene1"=> {
+			"AccessionNo" => "AB0006678"
+		}
+	);
+	
+	my $gene_name = "FOX1";
+	
+	$hash{$gene_name}{'AccessionNo'} = "test_works";
+	
+	print $hash{'gene1'}{'AccessionNo'},"\n";
+	print $hash{'FOX1'}{'AccessionNo'},"\n";
 }
 
 
