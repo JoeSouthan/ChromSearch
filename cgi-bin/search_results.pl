@@ -1,17 +1,15 @@
 #! /usr/bin/perl -w
 use strict;
-use SOAP::Lite;
 use CGI;
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser); 
 use Time::HiRes qw ( time );
 use Data::Dumper;
 use lib 'Modules';
+use ChromoDB;
 use WebHTML;
 my $timestart = time();
 my $cgi = new CGI;
 my @params= $cgi->param();
-my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://joes-pi.dyndns.org/cgi-bin/proxy.pl');
-
 
 #Do search, Take post
 #Declaring variables for search
@@ -44,7 +42,12 @@ unless (defined($perpage)) {
 #Debug
 $query = "2780780";
 $type = "GeneID";
-my $returnSearch = $soap->getSearchResults($query,$type)->result;
+
+#Now a hash reference
+my $returnSearch = ChromoDB::getSearchResults ($query, $type);
+
+print Dumper $returnSearch;
+die;
 
 #Parse the result to array
 my %results;

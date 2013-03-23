@@ -1,6 +1,5 @@
 #! /usr/bin/perl -w
 package WebHTML;
-use GenJS;
 use HelpText;
 use strict;
 use Exporter;
@@ -29,7 +28,6 @@ sub htmlOut {
 
 	#Print HTML
 	#htmlHeader($cgi,$resultRef);
-	genChartJS($resultRef);
 	print "<h2 class=\"center\">$resultCount Result(s) for: <i>$query</i>.</h2>";
 	#Loop it!
 
@@ -77,25 +75,13 @@ sub htmlHeader {
 	<link href="../css/style.css" rel="stylesheet" type="text/css">
 	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.0/jquery.min.js"></script>
 	<script language="javascript" type="text/javascript" src="../js/js.js"></script>
-__EOF
-	if (defined ($_[1])) {
-		#Check if its the result hash
-		if (ref($_[1]) eq "HASH") {
-			genChartJS($_[1]);
-		} else {
-		#It's got to be result_single
-			genResultJS($_[1]);
-		
-		}
-	}
-	print <<__JSOUTPUT;
 </head>
 
 	<body>
 	<div id="help">
 	<a id="closepopup">x</a>
 	<div class="float-left">
-__JSOUTPUT
+__EOF
 		&helpTextError();
 print <<__NAVPRINT
 	</div>
@@ -156,7 +142,7 @@ sub htmlError {
 	if (ref($_[2]) eq "ARRAY") {
 		@faultSub = @{$_[2]};
 	} else {
-		 @faultSub = prettyErrors($_[0]);
+		@faultSub = prettyErrors($_[0]);
 	}
 	#Print the Header
 	htmlHeader($cgi);
