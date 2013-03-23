@@ -3,10 +3,10 @@ use strict;
 use DBinterface;
 
 # Small test function to make sure SOAP is working
-sub sayHello {
-   my($class, $user) = @_;
-    return "Hello $user from the SOAP server";
-}
+#sub sayHello {
+#   my($class, $user) = @_;
+#    return "Hello $user from the SOAP server";
+##}
 
 #CALLED FROM WEBSITE
 
@@ -18,8 +18,8 @@ sub sayHello {
 sub showAllIdentifiers{
 	
 	# Get the second input, first is the SOAP class variable
-	#my ($class, $identifer) = @_;
-	my $id = $_[1];
+	
+	my $id = $_[0];
 	
 	# Check for blank input, return error is zero length
 	if( 0 == length($id)){
@@ -53,7 +53,7 @@ sub showAllIdentifiers{
 sub getSearchResults{
 	
 	# Get and store the input arguments, $class because of SOAP calling it.
-	my ($class, $searchString, $idType) = @_;
+	my ($searchString, $idType) = @_;
 	
 	# Check for blank arguments passed in
 	if(($searchString eq '') || ($idType eq '')){
@@ -75,18 +75,33 @@ sub getSearchResults{
 		return "ERROR:NO_DB_MATCHES"; # Ask Joe what he would like back if there are no matches
 	}
 	
-	# Retrieve coding data for each gene in the list of results.
-	for(my $i = 0; $i < scalar(@queryResult); $i++){
-		my $searchEntry = $queryResult[$i];
-		$searchEntry =~ /(\w+)/;
-		my @sequence = DBinterface::buildCodingSeq($1);
-		my $concatSeq = join(",",@sequence);
-		$queryResult[$i] .= "|$concatSeq";
-	}
+	my %searchResults;
 
-	my $searchResults = join(">",@queryResult);
+	my $resultNumber = 0;
 	
-	return $searchResults;
+	foreach my $result (@queryResult){
+		
+		$resultNumber = $queryResult[0]->[0];
+
+		$searchResults{$resultNumber}{'GeneName'} = $queryResult[0]->[1];
+		$searchResults{$resultNumber}{'GeneLength'} = $queryResult[0]->[2];
+		
+		my @sequence = DBinterface::buildCodingSeq($queryResult[0]->[0]);
+		$searchResults{$resultNumber}{'SeqFeat'} = [@sequence];
+		
+		#print $resultNumber;
+		#print $searchResults{$resultNumber}{'GeneName'},"\n";
+		#print $searchResults{$resultNumber}{'GeneLength'},"\n";
+		
+		#foreach my $CDS (@{$searchResults{$resultNumber}{'SeqFeat'}})
+		#{
+		#	print $CDS,"\n";
+		#}
+		
+	}
+	 
+	
+	return %searchResults;
 }
 
 ##########################################################################################################
@@ -97,7 +112,7 @@ sub getSearchResults{
 sub getSequence{
 	
 	# Get and store the input arguments, $class because of SOAP calling it.
-	my ($class, $accessionNo, $seqType) = @_;
+	my ($accessionNo, $seqType) = @_;
 	
 	# Check for blank arguments passed in
 	if($accessionNo eq ''){
@@ -124,10 +139,10 @@ sub getSupportedRES(){
 # showCodingSeq - Takes an identifier and returns an array of the introns and exons sequentially ordered
 #
 ##########################################################################################################
-sub showCodingSeq(){
+sub showCodingSeq{
 
 	# Get and store the input arguments, $class because of SOAP calling it.
-	my ($class, $accessionNo) = @_;
+	my ( $accessionNo ) = @_;
 	
 	# Check for blank arguments passed in
 	if($accessionNo eq ''){
