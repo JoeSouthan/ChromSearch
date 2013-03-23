@@ -1,12 +1,7 @@
 package ChromoDB;
-use strict;
+
 use DBinterface;
 
-# Small test function to make sure SOAP is working
-#sub sayHello {
-#   my($class, $user) = @_;
-#    return "Hello $user from the SOAP server";
-##}
 
 #CALLED FROM WEBSITE
 
@@ -55,53 +50,55 @@ sub getSearchResults{
 	# Get and store the input arguments, $class because of SOAP calling it.
 	my ($searchString, $idType) = @_;
 	
+	my %error;
+	
 	# Check for blank arguments passed in
 	if(($searchString eq '') || ($idType eq '')){
-		return 'ERROR:ZERO_LENGTH_ARGUMENT';
+		return $error{'error'} = "ERROR:ZERO_LENGTH_ARGUMENT";
 	}
 	
 	# Convert requested identifier type to a DB column name
 	my $id = DBinterface::getIdentifier($idType);
 	if($id eq 'ERROR:UNRECOGNIZED_ID'){
-		return 'ERROR:UNRECOGNIZED_ID';
+		return $error{'error'} = "ERROR:UNRECOGNIZED_ID";
 	}
 	
 	# Send a search query to the DB
 	my @queryResult = DBinterface::querySearch($searchString, $id);
 	
-	# If string return an no matches
-	if(!defined(@queryResult)){
+	# String must contain matches to return
+	unless( @queryResult ){
 		# If is null return null string or error code
-		return "ERROR:NO_DB_MATCHES"; # Ask Joe what he would like back if there are no matches
+		
+		return $error{'error'} = "NO_DB_MATCHES"; 	
+		
+	}else{
+		my $resultNumber = 0;
+	
+		my %searchResults;
+	
+		foreach my $result (@queryResult){
+			$resultNumber = $queryResult[0]->[0];
+
+			$searchResults{$resultNumber}{'GeneName'} = $queryResult[0]->[1];
+			$searchResults{$resultNumber}{'GeneLength'} = $queryResult[0]->[2];
+		
+			my @sequence = DBinterface::buildCodingSeq($queryResult[0]->[0]);
+			$searchResults{$resultNumber}{'SeqFeat'} = [@sequence];
+		
+			#print $resultNumber;
+			#print $searchResults{$resultNumber}{'GeneName'},"\n";
+			#print $searchResults{$resultNumber}{'GeneLength'},"\n";
+		
+			#foreach my $CDS (@{$searchResults{$resultNumber}{'SeqFeat'}})
+			#{
+			#	print $CDS,"\n";
+			#}
+			
+			return %searchResults;
+		}
 	}
 	
-	my %searchResults;
-
-	my $resultNumber = 0;
-	
-	foreach my $result (@queryResult){
-		
-		$resultNumber = $queryResult[0]->[0];
-
-		$searchResults{$resultNumber}{'GeneName'} = $queryResult[0]->[1];
-		$searchResults{$resultNumber}{'GeneLength'} = $queryResult[0]->[2];
-		
-		my @sequence = DBinterface::buildCodingSeq($queryResult[0]->[0]);
-		$searchResults{$resultNumber}{'SeqFeat'} = [@sequence];
-		
-		#print $resultNumber;
-		#print $searchResults{$resultNumber}{'GeneName'},"\n";
-		#print $searchResults{$resultNumber}{'GeneLength'},"\n";
-		
-		#foreach my $CDS (@{$searchResults{$resultNumber}{'SeqFeat'}})
-		#{
-		#	print $CDS,"\n";
-		#}
-		
-	}
-	 
-	
-	return %searchResults;
 }
 
 ##########################################################################################################
