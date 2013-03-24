@@ -2,8 +2,9 @@
 
 use strict;
 use warnings;
+use Data::Dumper;
 
-use Test::Simple tests => 24;
+use Test::Simple tests => 25;
 use DBinterface;
 
 ################################ TEST: 'databaseConnect'###############################
@@ -13,7 +14,7 @@ print "\n************************** TEST : 'databaseConnect' *******************
 # CONDITION: Just run function
 {
 	my $dbhandle = DBinterface::databaseConnect();
-	ok( $dbhandle ne undef,'Test DB connection' );
+	ok( $dbhandle, 'Test DB connection' );
 }
 
 ################################ TEST: 'DoQuery'###############################
@@ -34,52 +35,40 @@ print "\n************************** TEST : 'DoQuery' **************************\
 	my $sqlQuery = "SELECT geneId FROM gene";
 	my @queryData = DBinterface::DoQuery( $sqlQuery );
 	ok(@queryData, "Testing 'DoQuery' with valid string for single column with many rows");
-	foreach my $entry (@queryData){
-		#print $entry->[0],"\n";
-	}	
+	#print Dumper(@queryData);
 }
 
 # CONDITION: Valid string with multiple columns 'SELECT accessionNo, geneId FROM gene'
 {
 	my $sqlQuery = "SELECT accessionNo, geneId FROM gene";
 	my @queryData = DBinterface::DoQuery( $sqlQuery );
-	ok(@queryData, "Testing 'DoQuery' with multiple columns");
-	foreach my $entry (@queryData){
-		#print $entry->[0],":",$entry->[1],"\n";
-	}
+	ok( @queryData, "Testing 'DoQuery' with multiple columns" );
+	#print Dumper(@queryData);
 }
 
 ################################ TEST: 'queryColumn'###############################
 
 print "\n************************** TEST : 'queryColumn' **************************\n";
 
-# CONDITION: Valid function arguments
+# CONDITION: geneId as argument
 {
-	my @id = DBinterface::queryColumn( 'geneId' );
-	ok( @id, "Testing 'queryColumn' with geneId as argument" );
-	foreach my $entry (@id){
-		#print $entry,"\n";
-	}
+	my @columnData = DBinterface::QueryColumn( 'geneId' );
+	ok( @columnData, "Testing 'queryColumn' with geneId as argument" );
+	#print Dumper( @columnData );
 }
 
-
-
+# CONDITION: accessionNo as argument
 {
-	my @id = DBinterface::queryColumn( 'accessionNo' );
-	ok( @id, "Testing 'queryColumn' with accessionNo as argument" );
-	foreach my $entry (@id){
-		#print $entry,"\n";
-	}
+	my @columnData = DBinterface::QueryColumn( 'accessionNo' );
+	ok( @columnData, "Testing 'queryColumn' with accessionNo as argument" );
+	#print Dumper( @columnData );
 }
 
-
-
+# CONDITION: proteinName as argument
 {
-	my @id = DBinterface::queryColumn( 'proteinName' );
-	ok( @id, "Testing 'queryColumn' with proteinName as argument" );
-	foreach my $entry (@id){
-		#print $entry,"\n";
-	}
+	my @columnData = DBinterface::QueryColumn( 'proteinName' );
+	ok( @columnData, "Testing 'queryColumn' with proteinName as argument" );
+	#print Dumper( @columnData );
 }
 
 ################################ TEST 'querySearch' ###############################
@@ -89,48 +78,36 @@ print "\n************************** TEST: 'querySearch' ************************
 # CONDITION: Valid parameters for geneId
 {
 	my @results = DBinterface::querySearch("2780780","geneId");
-	ok($results[0]->[0] eq 'AB002805', 
-	"with valid parameters '2780780' as search string and 'geneId' as identifier type" );
-	foreach my $entry (@results){
-		print $entry->[0],"\n";
-	}
+	ok(@results, "with valid parameters '2780780' as search string and 'geneId' as identifier type" );
+	#print Dumper( @results );
 }
 
 # CONDITION: Valid parameters for proteinName
 {
 	my @results = DBinterface::querySearch("DUSP6","proteinName");
-	ok( $results[0]->[0] eq 'AB013601', 
-	"with valid parameters 'DUSP1' as search string and 'proteinName' as type");
-	foreach my $entry (@results){
-		print $entry->[0],"\n";
-	}
+	ok( @results, "with valid parameters 'DUSP1' as search string and 'proteinName' as type");
+	#print Dumper( @results );
 }
 
-
-# CONDITION: Valid parameters for Accession number
+# CONDITION: Valid parameters for accessionNo
 {
 	my @results = DBinterface::querySearch("AB002805","accessionNo");
-	ok( $results[0]->[0] eq 'AB002805',
-	"with valid parameters 'AB002805' as search string and 'accessionNo' as type");
-	foreach my $entry (@results){
-		print $entry->[0],"\n";
-	}
+	ok( @results, "with valid parameters 'AB002805' as search string and 'accessionNo' as type");
+	#print Dumper( @results );
 }
 
 # CONDITION: Valid parameters for chromosome location
 {
 	my @results = DBinterface::querySearch("12q13","chromLoc");
-	ok( length(@results),
-	"with valid parameters '12q13' as search string and 'chromLoc' as type" );
-	#foreach my $entry (@results){
-	#	print $entry->[0],"\n";
-	#}
+	ok( @results, "with valid parameters '12q13' as search string and 'chromLoc' as type" );
+	#print Dumper( @results );
 }
 	
 # CONDITION: Valid parameters but not in DB
 {
 	my @results = DBinterface::querySearch("HEX5","proteinName");
-	ok( @results eq undef,"Testing 'querySearch' with valid parameters but not in DB");
+	ok( @results, "Testing 'querySearch' with valid parameters but not in DB");
+	#print Dumper( @results );
 }
 ################################ TEST 'getIdentifier' ###############################
 
@@ -145,43 +122,43 @@ print "\n************************** TEST: 'getIdentifier' **********************
 # CONDITION: Incorrect parameters
 {
 	my $identifier = DBinterface::getIdentifier("geneindentifier");
-	ok($identifier eq 'ERROR:UNRECOGNIZED_ID', "with incorrect parameter 'geneidentifier'");
+	ok( !defined($identifier), "with incorrect parameter 'geneidentifier'");
 }
 ################################ TEST : 'isArrayEmpty' ################################ 
 
 print "\n************************** TEST: 'isArrayEmpty' **************************\n";
 
-# CONDITION: Array with items in
+# CONDITION: 2D array with items in
 {
 	my @items = ( ["one","two","three"], ["four","five","six"] );
 	my $result = DBinterface::isArrayEmpty( @items );
 	ok($result eq '1', "with valid filled out array" );
 }
 
-# CONDITION: Array with blank entries
+# CONDITION: 2d array with blank entries
 {
-	my @items = ('','','','');
+	my @items = (['','','',''], ['','',''], ['','','']);
 	my $result = DBinterface::isArrayEmpty( @items );
 	ok($result eq '0', "with blank array elements");
 }
 
-# CONDITION: Array with 'N/A' as array elements 
+# CONDITION: 2d array with 'N/A' as array elements 
 {
-	my @items = ('N/A','N/A','N/A','N/A');
+	my @items = (['N/A','N/A','N/A','N/A'], ['N/A','N/A','N/A','N/A']);
 	my $result = DBinterface::isArrayEmpty( @items );
 	ok($result eq '0', "with 'N/A' array elements");
 }
 
 # CONDITION: Array with mixed blank and 'N/A' as array elements 
 {
-	my @items = ('N/A','','N/A','');
+	my @items = (['N/A','','N/A',''], ['N/A','','N/A','']);
 	my $result = DBinterface::isArrayEmpty( @items );
 	ok($result eq '0', "with mixed blank and 'N/A' array elements");
 }
 
 # CONDITION: Array with one of the elements as valid
 {
-	my @items = ('N/A','','N/A','Hello','' );
+	my @items = (['N/A','','N/A','ValidElement',''], ['N/A','','N/A','N/A',''] );
 	my $result = DBinterface::isArrayEmpty( @items );
 	ok($result eq '1',"with one of the elements as valid");
 }
@@ -189,14 +166,17 @@ print "\n************************** TEST: 'isArrayEmpty' ***********************
 ################################ TEST : 'querySeqDNA' ################################
 
 print "\n************************** TEST: 'querySequence' **************************\n";
+
+# CONDITION: valid entry with no sequence data
 {
 	my $seq = DBinterface::querySequence('232322', 'ProteinSeq');
-	ok( $seq eq 'ERROR:DB_COLUMN_EMPTY',"with no sequence data");
+	ok( !defined($seq) ,"with no sequence data");
 }
 
+# CONDITION: valid entry with sequence data
 {
 	my $seq = DBinterface::querySequence('AB002805', 'GeneSeq');
-	ok( length($seq), "with valid argument accession number 'AB002805'");
+	ok( $seq, "with valid argument accession number 'AB002805'");
 	#print $seq,"\n";
 }
 
@@ -204,23 +184,35 @@ print "\n************************** TEST: 'querySequence' **********************
 
 print "\n************************** TEST: 'buildCodingSeq' **************************\n";
 
-my @seq = DBinterface::buildCodingSeq('AB002805');
-ok( @seq, "with valid argument accession number 'AB002805' with one exon");
-foreach my $entry (@seq){
-	print $entry,"\n";
+{
+	my @seq = DBinterface::buildCodingSeq('AB002805');
+	ok( @seq, "with valid argument accession number 'AB002805' with one exon");
+	#print Dumper(@seq);
 }
 
-@seq = DBinterface::buildCodingSeq('AB005990');
-ok( @seq, "with valid argument accession number 'AB005990' with more than one exon");
-foreach my $entry (@seq){
-	print $entry,"\n";
+
+{
+	my @seq = DBinterface::buildCodingSeq('AB005990');
+	ok( @seq, "with valid argument accession number 'AB005990' with more than one exon");
+	#print Dumper(@seq);
 }
 
-# PRODUCES  A BUG returns -1 on the last NCS
-@seq = DBinterface::buildCodingSeq('GU994024');
-ok( @seq, "with valid argument accession number 'GU994024' with more than one exon");
-foreach my $entry (@seq){
-	print $entry,"\n";
+
+{
+	my @seq = DBinterface::buildCodingSeq('GU994024');
+	ok( @seq, "with valid argument accession number 'GU994024' with more than one exon");
+	#print Dumper(@seq);
 }
 
-#DBinterface::hashing();
+################################ TEST : 'Set/Get error messages' ################################
+
+
+print "\n************************** TEST: 'Set/Get error messages' **************************\n";
+
+DBinterface::SetLastErrorMessage('NO_DATA');
+my $errorMessage = DBinterface::GetLastErrorMessage();
+ok( $errorMessage eq 'NO_DATA', "get last error message");
+
+
+
+

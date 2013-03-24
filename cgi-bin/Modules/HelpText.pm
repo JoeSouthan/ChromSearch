@@ -23,10 +23,16 @@ sub helpTextError {
 		$help{$sectionName} = [@filearray];
 	}
 	
+	#Index of help
+	print "--Index--\n";
 	for my $keys (sort keys %help) {
-		print "$keys @{$help{$keys}} ";
+		print "$keys\n";
 	}
-	
+	print "--End--\n";
+	#Help itself
+	for my $keys (sort keys %help) {
+		print "$keys\n@{$help{$keys}} ";
+	}
 	
 }
 sub helpText {

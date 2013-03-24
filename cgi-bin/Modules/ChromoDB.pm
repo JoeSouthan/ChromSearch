@@ -1,5 +1,5 @@
 package ChromoDB;
-
+use Data::Dumper;
 use DBinterface;
 
 
@@ -7,36 +7,48 @@ use DBinterface;
 
 ##########################################################################################################
 #
-# showAllIdentifiers - Takes handle to the database returns an array containing any items in the requested 
+# ShowAllIdentifiers - Takes handle to the database returns an array containing any items in the requested 
 #
 ##########################################################################################################
-sub showAllIdentifiers{
+sub ShowAllIdentifiers( $ ){
 	
 	# Get the second input, first is the SOAP class variable
-	
 	my $id = $_[0];
-	
+	my %error = ();
 	# Check for blank input, return error is zero length
-	if( 0 == length($id)){
-		return 'ERROR:ZERO_LENGTH_ARGUMENT';
+	unless( $id ){
+		$error{'error'} = 'ERROR:ZERO_LENGTH_ARGUMENT';
+		return %error;
 	}
 
 	# Decide what type of identifier has been passed in and put it 
 	# into a variable that will correspond to a column in the DB
 	my $idType = DBinterface::getIdentifier( $id );
-	if( $idType eq 'ERROR:UNRECOGNIZED_ID'){
-		return 'ERROR:UNRECOGNIZED_ID';
+	unless( $idType ){
+		$error{'error'} = DBinterface::GetLastErrorMessage();
+		return %error;
 	}
 	
 	# Run query in DB and check that actual data was returned.  
-	my $identifiers = DBinterface::queryColumn($idType);
-	if($identifiers eq 'ERROR:DB_COLUMN_EMPTY'){
-		# Return data was empty, return error 
-		return 'ERROR:NO_DB_MATCHES';
+	my @columnData = DBinterface::QueryColumn( $idType );
+	unless( @columnData ){
+		$error{'error'} = DBinterface::GetLastErrorMessage();
+		return %error;
+	}
+	
+	# Hash for the accession number and identifier
+	my %columnIdentifiers = ();
+	
+	# Iterate over returned array for column and fill out hash
+	# NOTE: Some accession numbers have no a chromosome locations
+	# for now pass back everything.
+	for($i = 0; $i < @columnData; $i++){
+		$columnIdentifiers{$i}{'accession'} = $columnData[$i][0];
+		$columnIdentifiers{$i}{'identifier'} = $columnData[$i][1];
 	}
 		
 	# Return the list of identifiers
-	return $identifiers;
+	return %columnIdentifiers;
 }
 
 
@@ -50,17 +62,19 @@ sub getSearchResults{
 	# Get and store the input arguments, $class because of SOAP calling it.
 	my ($searchString, $idType) = @_;
 	
-	my %error;
+	my %error = ();
 	
 	# Check for blank arguments passed in
 	if(($searchString eq '') || ($idType eq '')){
-		return $error{'error'} = "ERROR:ZERO_LENGTH_ARGUMENT";
+		$error{'error'} = 'ERROR:ZERO_LENGTH_ARGUMENT';
+		return %error;
 	}
 	
 	# Convert requested identifier type to a DB column name
 	my $id = DBinterface::getIdentifier($idType);
-	if($id eq 'ERROR:UNRECOGNIZED_ID'){
-		return $error{'error'} = "ERROR:UNRECOGNIZED_ID";
+	unless( $id ){
+		$error{'error'} = DBinterface::GetLastErrorMessage();
+		return %error;
 	}
 	
 	# Send a search query to the DB
@@ -68,35 +82,36 @@ sub getSearchResults{
 	
 	# String must contain matches to return
 	unless( @queryResult ){
+	
 		# If is null return null string or error code
-		
-		return $error{'error'} = "NO_DB_MATCHES"; 	
+		$error{'error'} = DBinterface::GetLastErrorMessage();
+		return %error; 	
 		
 	}else{
-		my $resultNumber = 0;
-	
+		# Hash to hold the data associated with each search results accessionNo
 		my %searchResults;
 	
-		for(my $i = 0; $i <  @queryResult; $i++{
-			$resultNumber = $queryResult[0]->[0];
-
-			$searchResults{$resultNumber}{'GeneName'} = $queryResult[0]->[1];
-			$searchResults{$resultNumber}{'GeneLength'} = $queryResult[0]->[2];
-		
-			my @sequence = DBinterface::buildCodingSeq($queryResult[0]->[0]);
-			$searchResults{$resultNumber}{'SeqFeat'} = [@sequence];
-		
-			#print $resultNumber;
-			#print $searchResults{$resultNumber}{'GeneName'},"\n";
-			#print $searchResults{$resultNumber}{'GeneLength'},"\n";
-		
-			#foreach my $CDS (@{$searchResults{$resultNumber}{'SeqFeat'}})
-			#{
-			#	print $CDS,"\n";
-			#}
+		for(my $i = 0; $i < @queryResult; $i++){
+			# Name each entry by accession number
+			$accessionNumber = $queryResult[$i]->[0];
 			
-			return %searchResults;
+			# Fill out the hash entry with all the data associated with the accessionNo
+			$searchResults{$accessionNumber}{'GeneName'} = $queryResult[$i]->[1];
+			$searchResults{$accessionNumber}{'ChromosomeLocation'} = $queryResult[$i]->[2];
+			$searchResults{$accessionNumber}{'ProteinName'} = $queryResult[$i]->[3];
+			$searchResults{$accessionNumber}{'ProteinId'} = $queryResult[$i]->[4];
+			$searchResults{$accessionNumber}{'GeneLength'} = $queryResult[$i]->[5];
+			
+			# Retrieve coding sequence data for given accession number
+			# Need error checking for below and a messge to indicate if there
+			# is no data.
+			my @sequence = DBinterface::buildCodingSeq($queryResult[$i]->[0]);
+			$searchResults{$accessionNumber}{'SeqFeat'} = [@sequence];
 		}
+
+		# Return the hash to JSON
+		return %searchResults;
+
 	}
 	
 }

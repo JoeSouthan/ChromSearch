@@ -1,60 +1,15 @@
 package DBinterface;
-
 use DBI; 
-
+use Data::Dumper;
 # Subroutines
 
 # Database facing
 
 ##########################################################################################################
 #
-# queryRun - Takes a MySQL search string, returns the result from the query in an array
+# DoQuery - Takes a MySQL search string, returns the result from the query in an array
 #
 ##########################################################################################################
-sub queryRun{
-
-	# Get query string from function argument
-	my $sqlQuery = $_[0];
-	
-	# Array to hold output
-	my @rowData;
-	
-	# Attempt to connect to database 
-	my $hDb = DBinterface::databaseConnect();
-	unless( $hDb ){
-		# Could not connect return undefind
-		return undef;
-	}
-	
-	# Get a handle to the executing statement
-	my $queryRows = $hDb->prepare($sqlQuery);
-	
-	# Run query
-	if($queryRows->execute)
-	{
-		if (!$queryRows )
-		{
-			$hDb->errstr;
-			return 'ERROR:DB_QUERY';
-		}else{
-			# Fetch all available rows from DB and store in an array to be passed back
-			while(my @data = $queryRows->fetchrow_array){
-				push(@rowData, @data);
-			}	
-		}
-		$hDb->disconnect();
-		
-		if(isArrayEmpty(@rowData) eq 0){
-			return 'NO_DATA';
-		}else{
-			# Return data in raw array form, let caller extract the required information
-			return @rowData if wantarray;
-		}
-	}
-}
-
-
-# sanSearch - Takes as search string and returns a sanitized search string
 sub DoQuery( $ ){
 
 	# Get query string from function argument
@@ -76,15 +31,16 @@ sub DoQuery( $ ){
 			# Check query went ok
 			if ( !$queryRows )
 			{
-				# If an error occured passback custom error message.
 				$hDb->errstr;
-				return 'ERROR:DB_QUERY';
+				
+				# If an error occured passback custom error message and exit.
+				SetLastErrorMessage('ERROR:DB_QUERY');
+				return undef;
 			}else{
 				# Store a reference to an array of references for each row in the DB
 				while( my @data = $queryRows->fetchrow_array() ){
 					# Create 2D array to hold data for each row.
 					push @rowData, [ @data ];
-					#print $rowData[0]->[0],"\n";
 				}	
 			}
 				
@@ -94,15 +50,17 @@ sub DoQuery( $ ){
 		
 		# Use isArrayFunction to check for 'empty' array.  The MySQL entries will
 		# always have something as their value, here if the array is full of 
-		# N/A then return custom message indicating no data.
+		# N/A entries then return custom message indicating no data and exit.
 		if( isArrayEmpty( @rowData ) eq 0 ){
-			return 'NO_DATA';
+			SetLastErrorMessage('DB_RETURNED_NO_MATCHES');
+			return undef;
 		}else{
 			# Return data in raw array form, let caller extract the required information
-			return @rowData if wantarray;
+			return @rowData;
 		}
 	}else{
-		# Could not connect to database return undefind
+		# Could not connect to database,s et error and return undefined
+		SetLastErrorMessage('ERROR:NO_DB_CONNECTION');
 		return undef;
 	}
 }
@@ -131,8 +89,9 @@ sub getIdentifier{
 	}elsif($id eq "ProteinSeq"){
 		$idType = "proteinSeq";
 	}else{
-		# If nothing matched return error
-		return 'ERROR:UNRECOGNIZED_ID';
+		# If nothing matched set error and return undefined
+		SetLastErrorMessage('ERROR:UNRECOGNIZED_ID');
+		return undef;
 	}
 	
 	# If a match is found then this will return the match.
@@ -150,20 +109,18 @@ sub querySearch{
 	my ($searchString, $idType) = @_;
 	
 	# Run search query **$searchstring must be in quotes***
-	my $sqlQuery = "SELECT accessionNo, geneId, geneSeqLen FROM gene WHERE $idType='$searchString'";
+	my $sqlQuery = "SELECT accessionNo, geneId, chromLoc, proteinName, ProteinId, geneSeqLen FROM gene WHERE $idType='$searchString'";
 	
 	# Run query
 	my @searchResults = DBinterface::DoQuery($sqlQuery);
 	
-	unless(@searchResults){
-		if($searchResults[0] eq 'NO_DATA'){
-			return @searchResults; #'ERROR:NO_DB_MATCHES';
-		}
-		
-		return @searchResults;
-		
+	unless( @searchResults ){
+		# If the array is not defined an error occured, return undef
+		# to signal to caller to check the last error.
+		return undef;
 	}else{
-		return @searchResults; #'ERROR:NO_DB_CONNECTION';
+		# Array was defined return the results.
+		return @searchResults;
 	}
 }  
 ##########################################################################################################
@@ -171,7 +128,7 @@ sub querySearch{
 # queryColumn - Takes a column id and returns elements of a single column
 #
 ##########################################################################################################
-sub queryColumn{
+sub QueryColumn{
 
 	# Assumes the identifer passed will be in the correct form as this should only every be called from code
 	# so no need to check it.
@@ -184,27 +141,11 @@ sub queryColumn{
 	# Run query
 	my @columnData = DBinterface::DoQuery($sqlQuery);
 	
-	# Check for empty Db coonection and empty columns
-	if( undef eq @columnData ){
-		return 'ERROR:NO_DB_CONNECTION';
-	}	
-	
-	# If elements in the array are valid
-	if($columnData[0] eq 'NO_DATA'){
-		return 'ERROR:DB_COLUMN_EMPTY';
-	}else{
-		# Array to hold the valid entries from the DB
-		my @validEntries;
-		
-		# Take elements of query results and put them into a 1d array in
-		# a convenient string format of 'accessionNumber:column entry'
-		foreach my $entry (@columnData){
-			my $dataString = join(":", $entry->[0], $entry->[1]);
-			push( @validEntries, $dataString );
-		}
-	
-		# Pass back string
-		return @validEntries;
+	# If there is no data in array return error andlet caller get the reason
+	unless( @columnData ){
+		return undef;
+	}else{	
+		return @columnData;
 	}
 }
 ###############################################################################################
@@ -221,14 +162,12 @@ sub querySequence{
 	my $sqlQuery = "SELECT $seqType FROM gene WHERE accessionNo='$accessionNo'";
 	
 	# Run query and handle empty data
-	my @seq = DBinterface::queryRun($sqlQuery);
-	if( $seq[0] eq 'NO_DATA'){
-		return 'ERROR:DB_COLUMN_EMPTY';
+	my @seq = DBinterface::DoQuery($sqlQuery);
+	unless( @seq ){
+		return undef;
 	}else{
-		# Copy data to string
-		my $string = $seq[0];
-		# Pass back data as string
-		return $string;
+		# Return sequence data
+		return $seq[0][0];
 	}
 }
 
@@ -260,38 +199,28 @@ sub buildCodingSeq{
 	
 	# Fetch the exon coding sequence information from DB, array will progress as 
 	# Type, start, stop then repeat for next item.
-	
-	
-	##  CHNAGE TO USE DoQuery AND NOT SEND ERROR MESSAGE TO CALLER##
-	my @tableRows = DBinterface::queryRun($sqlQuery);
-	if (@tableRows eq 'NO_DATA'){
-		return 'ERROR:DB_COLUMN_EMPTY';
+	my @tableRows = DBinterface::DoQuery($sqlQuery);
+	unless( @tableRows ){
+		SetLastErrorMessage('ERROR:DB_COLUMN_EMPTY');
+		return undef;
 	}
 	
 	# Get the length of the sequence
 	# Specify query includes start position and end position of exons from give accessionNo.
 	my $sqlQuerySeqlength = "SELECT geneSeqLen FROM gene WHERE accessionNo='$accessionNo'";
 	
-	##  CHNAGE TO USE DoQuery AND NOT SEND ERROR MESSAGE TO CALLER ##
-	my @sequenceLength = DBinterface::queryRun($sqlQuerySeqlength);
-	if (@sequenceLength eq 'NO_DATA'){
-		return 'ERROR:DB_COLUMN_EMPTY';
+	
+	my @sequenceLength = DBinterface::DoQuery($sqlQuerySeqlength);
+	unless( @sequenceLength ){
+		SetLastErrorMessage('ERROR:DB_COLUMN_EMPTY');
+		return undef;
 	}
-	#print @sequenceLength;
 	
-	#foreach my $entry (@tableRows){
-	#	print $entry,"\n";
-	#}
-	
-	
-	# Create comma separated string only for devlop purposes
-	my $string = join(",",@tableRows);
-	
-	#print $string,"\n";
+	#print Dumper(@tableRows);
+	#print $sequenceLength[0][0],"\n";
 	
 	# Read array and cut the sequence up according to the start stop sequence features,
-	# assumes that MySQL has put items in correct order.  
-	# If not may have to implement sort function
+	# let MySQL query string do the ordering
 	
 	# Array to hold final data that is passed back to caller
 	my @CDSarray;
@@ -307,27 +236,27 @@ sub buildCodingSeq{
 	# every iteration of the loop below.
 	
 	# Is first entry an exon? If so, does it start at one? 
-	if( '1' == $tableRows[0] ){
+	if( '1' == $tableRows[0][0] ){
 	
 		# If yes, then sequecne starts with exon.
-		my $entry = join("","EXON;",$tableRows[0],":",$tableRows[1]);
+		# Get first and second numbers of first entry and fomrat them into a string
+		my $entry = join("","EXON;",$tableRows[0][0],":",$tableRows[0][1]);
 		push(@CDSarray, $entry);
 		
-		# Offset the beginning of the array for the coming loop.
-		$tableRowIndex = 2; 
-		
+		# In the event that the first entry is the only entry
 		if(defined($tableRows[2])){
 			# Set the segement follwing as an NCS
-			my $ncsEntry = join("","NCS;",$tableRows[1]+1,":",$tableRows[2]-1);
+			my $ncsEntry = join("","NCS;",$tableRows[0][1]+1,":",$tableRows[1][0]-1);
 			push(@CDSarray, $ncsEntry);
 		}else{
-			my $ncsEntry = join("","NCS;",$tableRows[1]+1,":",@sequenceLength);
+			# This is the only entry so set rest of sequecne as NCS.
+			my $ncsEntry = join("","NCS;",$tableRows[0][1]+1,":",$sequenceLength[0][0]);
 			push(@CDSarray, $ncsEntry);
 		}
 		
 	}else{
 		# If no then infer an intron and calculate intron length, sequence begins with intron.
-		my $entry = join("","NCS;","0",":",$tableRows[0]-1);
+		my $entry = join("","NCS;","0",":",$tableRows[0][0]-1);
 		push(@CDSarray, $entry);
 	}
 	
@@ -337,13 +266,10 @@ sub buildCodingSeq{
 		my ($segStart, $segStop); 
 		
 		# Get start number of current exon
-		$segStart = $tableRows[$i];
-		
-		# Increment again to next item
-		$i++;
+		$segStart = $tableRows[$i][0];
 		
 		# Extract stop position of exon 
-		$segStop = $tableRows[$i];
+		$segStop = $tableRows[$i][1];
 		
 		# Write the start/stop information into the string
 		my $entry = join("","EXON;",$segStart,":",$segStop);
@@ -352,10 +278,10 @@ sub buildCodingSeq{
 		# Find distance between current exon and next and denote as NCS in array.
 		if( defined($tableRows[$i+1]) )
 		{
-			my $ncsEntry = join("","NCS;",$tableRows[$i],":",$tableRows[$i+1]-1);
+			my $ncsEntry = join("","NCS;",$tableRows[$i][1]+1,":",$tableRows[$i+1][0]-1);
 			push(@CDSarray, $ncsEntry);
 		}else{
-			my $ncsEntry = join("","NCS;",$segStop+1,":",@sequenceLength);
+			my $ncsEntry = join("","NCS;",$segStop+1,":",$sequenceLength[0][0]);
 			push(@CDSarray, $ncsEntry);
 		}
 	}
@@ -371,16 +297,16 @@ sub buildCodingSeq{
 ##########################################################################################################
 sub databaseConnect{
 	
-	# Defined the connection details to the database
+	#Defined the connection details to the database
 	my $dbname = 'scouls01'; 
 	my $user = 'scouls01';
 	my $password = 'iwr8sh8vb'; 
 	my $dbserver = 'localhost';
 	
-	#my $dbname = 'biocomp2'; 
-	#my $user = 'c2';
-	#my $password = 'coursework123'; 
-	#my $dbserver = 'joes-pi.dyndns.org';
+	# my $dbname = 'biocomp2'; 
+	# my $user = 'c2';
+	# my $password = 'coursework123'; 
+	# my $dbserver = 'localhost';
 	
 	# Specify the location and name of the database
 	my $datasource = "dbi:mysql:database=$dbname;host=$dbserver;";
@@ -408,54 +334,44 @@ sub databaseConnect{
 # isArrayEmpty - Takes an array as input and returns true if it is empty or false if not empty
 #
 ##########################################################################################################
-sub isArrayEmpty{
-	# Get length of array loop through array and test if each entry is valid of empty
-	# If all are empty then the coloumn is effectively empty.
+sub isArrayEmpty( @ ){
+	
+	# Get copy of passed in array
 	my @array = @_;
 	
-	# Should use foreach here
-	
-	for(my $i = 0; $i < scalar(@array); $i++){
-		# If not zero length or is not equal to N/A trigger return
-		# At least one item was found in the returned array.
-		if((length($array[$i])) && ($array[$i] ne 'N/A') )
-		{
-			return 1; # Has length or is equal to N/A
+	# Get length of array, loop through array and test if each entry is valid or 'N/A'
+	# If all are 'N/A' then the coloumn is effectively empty.
+	for( my $i = 0; $i < @array; $i++ ){
+		
+		for( my $j = 0; $j < $#{$array[$i]}+1; $j++ ){
+		
+			# If not zero length or is not equal to N/A trigger return
+			# At least one item was found in the returned array.
+			
+			if( ( length($array[$i][$j]) ) && ($array[$i][$j] ne 'N/A') )
+			{
+				return 1; # Has length or is equal to N/A
+			}
 		}
 	}
-	# All item were zero length or N/A, array was empty, return true
+	# All item were zero length or N/A, array was empty, return 0 for success or has data
 	return 0;
 }
 
-sub returnArrayRef(){
-	my @array = ("one","two","three","four");
-	return \@array;
+sub GetLastErrorMessage{
+	return $lastErrorMessage;
 }
 
-sub hashing(){
-
-	
-	my %hash = (
-		"gene1"=> {
-			"AccessionNo" => "AB0006678"
-		}
-	);
-	
-	my $gene_name = "FOX1";
-	
-	$hash{$gene_name}{'AccessionNo'} = "test_works";
-	
-	print $hash{'gene1'}{'AccessionNo'},"\n";
-	print $hash{'FOX1'}{'AccessionNo'},"\n";
+sub SetLastErrorMessage( $ ){
+	$lastErrorMessage = $_[0];
 }
-
-
-
 # Constants
 
 use constant FALSE => 1;
 use constant TRUE => 0;
 
 # Global variables
+
+my $lastErrorMessage = '';
 
 1;
