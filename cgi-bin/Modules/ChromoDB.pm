@@ -1,5 +1,5 @@
 package ChromoDB;
-
+use Data::Dumper;
 use DBinterface;
 
 
@@ -77,13 +77,12 @@ sub getSearchResults{
 	
 		my %searchResults;
 	
-		foreach my $result (@queryResult){
-			$resultNumber = $queryResult[0]->[0];
-
-			$searchResults{$resultNumber}{'GeneName'} = $queryResult[0]->[1];
-			$searchResults{$resultNumber}{'GeneLength'} = $queryResult[0]->[2];
+		for(my $i = 0; $i< @queryResult ; $i++){
+			$resultNumber = $queryResult[$i]->[0];
+			$searchResults{$resultNumber}{'GeneName'} = $queryResult[$i]->[1];
+			$searchResults{$resultNumber}{'GeneLength'} = $queryResult[$i]->[2];
 		
-			my @sequence = DBinterface::buildCodingSeq($queryResult[0]->[0]);
+			my @sequence = DBinterface::buildCodingSeq($queryResult[$i]->[0]);
 			$searchResults{$resultNumber}{'SeqFeat'} = [@sequence];
 		
 			#print $resultNumber;
@@ -94,9 +93,11 @@ sub getSearchResults{
 			#{
 			#	print $CDS,"\n";
 			#}
-			
-			return %searchResults;
 		}
+			#print Dumper %searchResults;
+
+		return %searchResults;
+
 	}
 	
 }

@@ -21,7 +21,7 @@ sub queryRun{
 	
 	# Attempt to connect to database 
 	my $hDb = DBinterface::databaseConnect();
-	if( undef eq $hDb ){
+	unless( $hDb ){
 		# Could not connect return undefind
 		return undef;
 	}
