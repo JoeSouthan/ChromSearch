@@ -28,9 +28,9 @@ foreach my $params (@params) {
 
 
 #Debug
-# $query = "2780780";
-# $type = "GeneID";
-# $selector = "search";
+ # $query = "q13";
+ # $type = "ChromosomeLocation";
+ # $selector = "search";
 
 
 #Print the JSON header

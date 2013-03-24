@@ -100,7 +100,7 @@ sub doSearch {
 sub doSingle {
 	my $json = JSON->new;
 	my ($query)= @_;
-	my %result = ChromoDB::shwoSingle($query);
+	my %result = ChromoDB::getSearchResults($query);
 	return $json->pretty->encode(\%result);
 
 }

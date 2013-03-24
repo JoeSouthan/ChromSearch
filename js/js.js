@@ -150,8 +150,7 @@ $(document).ready(function() {
 		var query = textBox.val();
 		var perpage = $("#perpage").val();
 		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
-		var searchLink = createSearchLink("link");
-		submitButton.attr("href", searchLink);
+
 		searchLive.html("<p>You are searching for: "+query+" using a "+radioVal+" search.</p>");	
 	}
 	
@@ -209,6 +208,7 @@ $(document).ready(function() {
 	}
 	function outputSingleHTML (data) {
 		var counter = 0;
+		console.log(data);
 		$.each(data, function (i,val) {
 			var features = val["SeqFeat"];
 			content.html(' \
@@ -337,6 +337,7 @@ $(document).ready(function() {
 	radioName.keyup(showSearch);
 	//Change
 	radioName.change(showSearch);
+	radioName.change(validateSearch);
 
 	//Toggles 
 	$("#show1").click(function() { 
