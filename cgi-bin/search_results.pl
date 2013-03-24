@@ -40,14 +40,13 @@ unless (defined($perpage)) {
 #Do Results				
 #Subroutine to call from the package
 #Debug
-$query = "2780780";
-$type = "GeneID";
+# $query = "2780780";
+# $type = "GeneID";
 
 #Now a hash reference
 my $returnSearch = ChromoDB::getSearchResults ($query, $type);
 
-print Dumper $returnSearch;
-die;
+#print Dumper $returnSearch;
 
 #Parse the result to array
 my %results;
