@@ -77,7 +77,7 @@ sub getSearchResults{
 	
 		my %searchResults;
 	
-		foreach my $result (@queryResult){
+		for(my $i = 0; $i <  @queryResult; $i++{
 			$resultNumber = $queryResult[0]->[0];
 
 			$searchResults{$resultNumber}{'GeneName'} = $queryResult[0]->[1];
