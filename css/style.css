@@ -1,6 +1,9 @@
 @charset "utf-8";
 /* CSS Document */
 /* Main Tags */
+html {
+	overflow-y: scroll;	
+}
 body{
 	font:14px Tahoma, Geneva, sans-serif;
 	color:#333333;
@@ -95,62 +98,44 @@ pre {
 }
 .searchform {
 }
-.result {
+#result-wrapper {
 	float:left;
 	width:100%;
 	background-color:#779399;
-	height:55px;
-	padding:5px 0;
+	padding: 0 0 5px;
 }
-/*
-.result div {
-	background:#FFF;
-	padding:10px;
-	float:left;
-	margin:0 5px;
-*/
-
-/*
-.genename {
-	font-weight:bold;
-	width:10%;
-	background:#FFF;
-	padding:17px 10px;
-	float:left;
-	margin:0 5px;	
-	overflow:hidden;
-	height:16px;}
-*/
-
-.genename {
-	font-weight:bold;
-	width:100px;
+.result {
+	float: left;
+	width: 100%;
+	height: 55px;
+	padding: 5px 0;
+	overflow: hidden;
+}
+.result-div {
 	background:#FFF;
 	padding:20px 0 0 5px;
 	float:left;
-	margin:0 5px;	
 	overflow:hidden;
 	height:35px;
 	text-align:center;
+	margin:0 2px;
+	height: 55px;
+}
+.acc {
+	font-weight:bold;
+	width:100px;
+	margin:0 2px 0 5px !important;	
+}
+.product{
+	width:302px;
 }
 .diagram {
-	width:655px;
-	height:55px;
-	float:left;
-	background:#FFF;
-	float:left;
-	padding:0 !important;
-	margin:0 !important;
-	overflow:hidden;
+	width:345px;
+	padding:0 0 5px !important;
 }
 .link {
-	width:100px;
-	overflow:hidden;
-	background:#FFF;
-	padding:19px 10px;
-	float:left;
-	margin:0 5px;
-	height:17px;
+	width:38px;
+	padding:19px 10px !important;
 }
 .footer {
 	float:right;
@@ -158,8 +143,40 @@ pre {
 	color:#999;
 	text-align:right;
 }
+.titles {
+	width: 921px;
+	color: #fff;
+	background-color:#000;
+	background-image:linear-gradient(to bottom,#4c4c4c, #000000); 
+	padding: 5px 0;
+	margin:0 0 0 -10px;
+	float: left;
+	position: fixed;
+	z-index: 4;
+	top: 103px;
+}
+.title {
+	float: left;
+	text-align: center;
+	padding: 0 10px;
+	text-decoration: underline;
+}
+.title-acc {
 
-
+	width: 100px;
+}
+.title-product{
+	width: 302px;
+}
+.title-diagram{
+	width: 318px;
+}
+.title-loc{ 
+	width: 38px;
+}
+.result-spacer {
+	padding-bottom: 20px;
+}
 .singleresult {
 	float:left;
 	width:100%;
@@ -369,6 +386,7 @@ pre {
 	left: 5px;
 
 }
+
 /* colours */
 .red {
 	color:#763227;

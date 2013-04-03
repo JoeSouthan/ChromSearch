@@ -1,7 +1,8 @@
 // 	JavaScript 
+	//Load in Google Graphs API
 	google.load("visualization", "1", {packages:["corechart"]});
 $(document).ready(function() {
-// Variables
+	// Variables
 	var textBox 	 = $("#searchquery"),
 		submitButton = $("#submitSearch"),
 		searchLive	 = $("#searchTerms"),
@@ -18,12 +19,12 @@ $(document).ready(function() {
 		error		 = $("#errorbox"),
 		errordiv	 = $("#errordiv"),
 		breadcrumbs  = $("#breadcrumbs-wrapper"),
-		ColNCS 		 = "#1668F5",
-		ColEXON		 = "#F0ED3C",
-		ColINTRON	 = "#CEF5CF"
+		titles		 = $("#titles"),
+		ColNCS 		 = "#5C6E7C",
+		ColEXON		 = "#AAC1D2",
+		ColINTRON	 = "#A65534"
 		;
-
-	
+	//Scans the page for links and adds "#!/"" to it
 	function ajaxLinks () {
 		$("a").each (function() {
 			var href = $(this).attr("href");
@@ -52,7 +53,11 @@ $(document).ready(function() {
 			}
 		});
 	}
-	//Ajax
+	//Clears the #content div
+	function clearContent () {
+		content.html("");
+	}
+	//Ajax call setup
 	$.ajaxSetup({
 		beforeSend: function(xhr, status) {
 			loader.fadeIn("fast");
@@ -70,11 +75,12 @@ $(document).ready(function() {
 		},
 		cache:true
 	});
+	//Run the Ajax links when loaded in
 	$("#content").ajaxComplete( function() {
 		ajaxLinks();
 	});
-	//-----------
 
+	//Function to centre a popup
 	//From -http://www.joelpeterson.com/blog/2010/12/quick-and-easy-windowless-popup-overlay-in-jquery/
 	function centerPopup(){  
 		var winw = $(window).width();  
@@ -87,10 +93,8 @@ $(document).ready(function() {
 			"left" : winw/2-popw/2  
 		}); 
 	}
-	//-----------------
-	function loadit(url) {
-		main.load(url);
-	}
+
+	//Help Functions
 	function closeHelp() {
 		if (help.is(":visible")) {
 			overlay.fadeOut("fast");
@@ -102,27 +106,32 @@ $(document).ready(function() {
 		help.slideDown("fast");
 
 	}
+
+	//Main Functions
 	function showMain () {
 		main.show();
 	}
 	function hideMain () {
 		main.hide();
 	}
+
+	//Content Functions
 	function showContent () {
 		content.show();
 	}
 	function hideContent () {
 		content.hide();
 	}
+
+	//Error Functions
 	function showError () {
 		error.fadeIn("fast").delay(6000).fadeOut("fast");
 		main.show();
 		$.History.go('!/');
 		overlay.delay(6000).fadeOut("fast");
-	}
-
+	}	
 	
-	
+	//Creates the main search link
 	function createSearchLink (type) {
 		var query = textBox.val();
 		var perpage = $("#perpage").val();
@@ -154,7 +163,7 @@ $(document).ready(function() {
 		searchLive.html("<p>You are searching for: "+query+" using a "+radioVal+" search.</p>");	
 	}
 	
-	//Do a JSON search
+	//Do a JSON search based on URL recieved by history.js
 	function doSearch (searchterms) {
 		// eg !,search,GeneID,123p,10,0
 		var dataStructure = {}
@@ -164,8 +173,8 @@ $(document).ready(function() {
 			dataStructure = {selector: searchterms[1], query:searchterms[2] };
 		}
 		var result = $.ajax ({
-			//url:"json.json",
-			url:"cgi-bin/json.pl?",
+			url:"json.json",
+			//url:"cgi-bin/json.pl?",
 			type: "GET",
 			dataType: "json",
 			data: dataStructure,
@@ -174,7 +183,6 @@ $(document).ready(function() {
 					outputSearchHTML(data);		
 					loader.fadeOut("fast");
 					overlay.fadeOut("fast");
-					//return [data, counter];
 				} else if (searchterms[1] == "single") {
 					outputSingleHTML(data);		
 					loader.fadeOut("fast");
@@ -189,28 +197,35 @@ $(document).ready(function() {
 	//Output JSON to HTML
 	function outputSearchHTML (data) {
 		var counter = 0;
-		content.html('<div class="center"><h2>Results</h2></div>');
+		content.html('<div class="center result-spacer"><h2>Results</h2></div>');
+		content.append('<div class="titles" id="titles"><div class="title title-acc" id="namesort">Accession</div><div class="title title-product" id="productsort">Protein Product</div><div class="title title-diagram">Gene Layout</div><div class="title title-loc" id="lengthsort">Length</div><div class="title title-loc" id="locationsort">Location</div>');
 		$.each(data, function(i,val) {
 			//alert(i+","+val["name"]);
 		//	console.log(i,val);
 			var features = val["SeqFeat"];
+			var name = i;
 			content.append('\
-				<div class="result">\
-					<div class="genename">'+val["GeneName"]+'</div> \
-					<div class="diagram" id="chart_div'+counter+'"></div> \
-					<div class="link"><a href="return_single.pl?gene='+i+'">More &raquo;</a></div> \
+				<div class="result" id="'+i+'">\
+					<div class="result-div acc"><span id="acc"><a href="return_single.pl?gene='+val["GeneName"]+'">'+i+'</a></span></div> \
+					<div class="result-div product"><span id="product">Protein Product</span></div> \
+					<div class="result-div diagram" id="chart_div'+counter+'"></div> \
+					<div class="result-div link"><span id="length">'+val["GeneLength"]+'</span></div> \
+					<div class="result-div link"><span id="location">24.q13</span></div> \
 				</div>');
-			google.setOnLoadCallback(drawChart(features,counter));
+			google.setOnLoadCallback(drawChart(features,counter, name));
 			counter++;
 		});
+		$(".result").wrapAll('<div id="result-wrapper"/>');
 	
 	
 	}
+	//Outputs the Single page HTML
 	function outputSingleHTML (data) {
 		var counter = 0;
-		console.log(data);
+		//console.log(data);
 		$.each(data, function (i,val) {
 			var features = val["SeqFeat"];
+			var name = i;
 			content.html(' \
     <div class="searchform"> \
     	<h2 class="center">Single result for: '+i+'.</h2> \
@@ -260,22 +275,22 @@ $(document).ready(function() {
             </div> \
         </div> \
     </div>');
-		google.setOnLoadCallback(drawChart(features,counter));
+		google.setOnLoadCallback(drawChart(features,counter, name));
 		});
 	}
 
 	//Google Charts API
 	//Draw charts
-	function drawChart (features, counter) {
+	function drawChart (features, counter, name) {
 		//Split up features array strings into separate arrays
-		var feats = ["Gene"];
-		var numbers = ["Gene"];
+		var feats = [name];
+		var numbers = [name];
 		$.each(features,function() {
 			var f1 = this.split(";");
 			feats.push(f1[0]);
 			var difference = f1[1].split(":");
 			var glength = Math.abs(parseInt(difference[0])-parseInt(difference[1]));
-			console.log(glength);
+			//console.log(glength);
 			numbers.push(glength);
 		});
 		//Set the colours based on the sequence feature
@@ -293,9 +308,9 @@ $(document).ready(function() {
 		var options = {
 			isStacked: true,
 			hAxis : {},
-			legend: {},
+			legend: { position: 'none'},
 			chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'},
-			width: 650,
+			width: 420,
 			height: 50,
 			colors: colours,
 		};
@@ -307,6 +322,8 @@ $(document).ready(function() {
 		var chart = new google.visualization.BarChart(document.getElementById('chart_div'+counter));
 		chart.draw(data1, options );	
 	}
+
+	//Breadcrumbs function eg Home>>Search>>"query"
 	function setBreadcrumbs (urlState) {
 		// eg !,search,GeneID,123p,10,0
 		var selector;
@@ -321,78 +338,149 @@ $(document).ready(function() {
 			breadcrumbs.html('<a href="/">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
 		} else {
 			breadcrumbs.html("");
-
 		}
+	}
 
-	}	
+	//Sorts the results
+	//Adapted from: http://stackoverflow.com/questions/7831712/jquery-sort-divs-by-innerhtml-of-children
+	function sortIt(parent, childSelector, keySelector, mode, sortid, type) {
+		var up = type + " &#9650;";
+		var down = type + " &#9660;";
+//		alert(sortid);
+	   	if (sortid.hasClass("desc") || sortid.text() == type ) {
+			//sort asc
+			sortid.html(up).text();
+			sortid.removeClass("desc");
+			sortid.addClass("asc");
+		} else if (sortid.hasClass("asc")) {
+			//sort desc
+			sortid.html(down).text();
+			sortid.removeClass("asc");
+			sortid.addClass("desc");
+		}
+	    var items = parent.children(childSelector).sort(function(a, b) {
+	    if (keySelector == "span#length" || keySelector == "span#location") {
+	    	var vA = parseInt($(keySelector, a).text());
+        	var vB = parseInt($(keySelector, b).text());
+	    } else {
+        	var vA = $(keySelector, a).text();
+        	var vB = $(keySelector, b).text();
+    	}
 
-	//blur
-	textBox.blur(validateSearch);
-	textBox.blur(showSearch);
-	radioName.blur(showSearch);
-	//$("a").hover(ajaxLinks);
-	//keypress
-	textBox.keyup(validateSearch);
-	textBox.keyup(showSearch);
-	radioName.keyup(showSearch);
-	//Change
-	radioName.change(showSearch);
-	radioName.change(validateSearch);
 
-	//Toggles 
-	$("#show1").click(function() { 
-		$("#SequenceDNA").slideToggle("fast");
+    	if (mode == "desc"){
+        	return (vA > vB) ? -1 : (vA < vB) ? 1 : 0;
+    	} else if (mode == "asc") {
+        	return (vA < vB) ? -1 : (vA > vB) ? 1 : 0;
+    	}
+    	});
+   		parent.append(items);
+	}
+	$('#namesort').live("click", function() {
+		if ($(this).hasClass("desc") || $(this).text() == "Accession" ) {
+			sortIt($('#result-wrapper'), "div", "span#acc", "asc", $("#namesort"), "Accession");
+		} else {
+			sortIt($('#result-wrapper'), "div", "span#acc", "desc", $("#namesort"), "Accession");
+		}
 	});
-	$("#show2").click(function() { 
-		$("#SequenceAA").slideToggle("fast");
+	$('#productsort').live("click", function() {
+		if ($(this).hasClass("desc") || $(this).text() == "Accession" ) {
+			sortIt($('#result-wrapper'), "div", "span#product", "asc", $("#productsort"), "Protein Product");
+		} else {
+			sortIt($('#result-wrapper'), "div", "span#product", "desc", $("#productsort"), "Protein Product");
+		}
 	});
-	$("#show3").click(function() { 
-		$("#codonusage").slideToggle("fast");
+	$('#lengthsort').live("click", function() {
+		if ($(this).hasClass("desc") || $(this).text() == "Accession" ) {
+			sortIt($('#result-wrapper'), "div", "span#length", "asc", $("#lengthsort"), "Length");
+		} else {
+			sortIt($('#result-wrapper'), "div", "span#length", "desc", $("#lengthsort"), "Length");
+		}
 	});
-	// $("#show4").click(function() { 
-		// $("#cutter").slideToggle("fast");
-	// });
-	$("#closepopup").click(function() {
-		closeHelp();
+	$('#locationsort').live("click", function() {
+		if ($(this).hasClass("desc") || $(this).text() == "Accession" ) {
+			sortIt($('#result-wrapper'), "div", "span#location", "asc", $("#locationsort"), "Location");
+		} else {
+			sortIt($('#result-wrapper'), "div", "span#location", "desc", $("#locationsort"), "Location");
+		}
 	});
-	$("#overlay").click(function() {
-		closeHelp();
-	});
-	$(document).on("click", "#showadvanced", function() {
-		$("#advanced").slideToggle("fast");
-	});
-	$(window).resize(function() {  
-		centerPopup();  
-	}); 
-//---------------------------------//
+	//Visual
+		//blur
+		textBox.blur(validateSearch);
+		textBox.blur(showSearch);
+		radioName.blur(showSearch);
+		//$("a").hover(ajaxLinks);
+		//keypress
+		textBox.keyup(validateSearch);
+		textBox.keyup(showSearch);
+		radioName.keyup(showSearch);
+		//Change
+		radioName.change(showSearch);
+		radioName.change(validateSearch);
 
-	submitButton.removeAttr("href");
-	submitButton.fadeTo("fast", 0.2);
-	ajaxLinks();
-	$("#no-js").hide();
-	$("#no-js-alert").hide();
-	$("#searchLink").show();
+		//Toggles 
+		$("#show1").click(function() { 
+			$("#SequenceDNA").slideToggle("fast");
+		});
+		$("#show2").click(function() { 
+			$("#SequenceAA").slideToggle("fast");
+		});
+		$("#show3").click(function() { 
+			$("#codonusage").slideToggle("fast");
+		});
+		// $("#show4").click(function() { 
+			// $("#cutter").slideToggle("fast");
+		// });
+		$("#closepopup").click(function() {
+			closeHelp();
+		});
+		$("#overlay").click(function() {
+			closeHelp();
+		});
+		$(document).on("click", "#showadvanced", function() {
+			$("#advanced").slideToggle("fast");
+		});
+		$(window).resize(function() {  
+			centerPopup();  
+		}); 
+		function moveTitle () {
+			var offset = $(window).scrollTop()+103;
+			if ($(window).scrollTop() > 10) 
+				$("#titles").stop().animate({ top:"50px"},"fast");
+			else 
+				$("#titles").stop().animate({ top:offset},"fast");
+		}
+		$(window).scroll(moveTitle);
+		moveTitle();
+		submitButton.removeAttr("href");
+		submitButton.fadeTo("fast", 0.2);
+		ajaxLinks();
+		$("#no-js").hide();
+		$("#no-js-alert").hide();
+		$("#searchLink").show();
+		
+		//jQueryUi
+		$("#searchType").buttonset();
+		
+		submitButton.click(function () {
+			//alert ("click");
+		});
 	
-	//jQueryUi
-	$("#searchType").buttonset();
-	
-	submitButton.click(function () {
-		//alert ("click");
-	});
-	//reject browsers
-	
+	//jQuery plugin: History.js 
+	//Looks at the url and does operations based on what it gets	
 	$.History.bind(function(state) {
 		urlState = state.split(/\//g);
 	//	alert(urlState[1]);
 	//	alert(state);
 		switch (true) {
-				case(state == undefined):
-					alert("error");
-					break;
-				case(urlState[1] == "/" || urlState[1] == ""):
+				case(urlState[1] == "/" || urlState[1] == "" || urlState == undefined):
+					if (urlState == undefined) {
+						alert("Incorrect url.");
+					}
 					closeHelp();
 					showMain();
 					hideContent();
+					clearContent();
 					setBreadcrumbs(urlState);
 					break;
 				case(urlState[1] == "help"):
@@ -400,19 +488,17 @@ $(document).ready(function() {
 					centerPopup();
 					break;
 				case(urlState[1] == "search"):
-					//content.load("cgi-bin/search_results.pl?"+$('#mainSearch').serialize());
-					//content.load("DummyResults/dummyresults.html#wrapper");
 					//Do the search
+					clearContent();
 					doSearch(urlState);
 					setBreadcrumbs(urlState);
 					hideMain();
 					closeHelp();
 					showContent();
 					ajaxLinks();
-					//alert($('#mainSearch').serialize());
 					break;
 				case(urlState[1] == "single"):
-					//content.load("cgi-bin/return_single.pl?id="+urlState[2]);
+					clearContent();
 					doSearch(urlState);
 					setBreadcrumbs(urlState);
 					hideMain();
