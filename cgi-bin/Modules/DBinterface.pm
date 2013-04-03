@@ -329,6 +329,8 @@ sub databaseConnect{
 	}
 }
 
+
+
 ##########################################################################################################
 #
 # isArrayEmpty - Takes an array as input and returns true if it is empty or false if not empty

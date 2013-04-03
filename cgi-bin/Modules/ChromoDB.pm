@@ -170,35 +170,53 @@ sub showCodingSeq{
 	return @codingSeq;
 }
 
-# getGeneSummaryData - Takes an any of the possible identifers and returns GeneID, Gene Name, and the Seqeuence data annotated
+# GetGeneSummaryData - Takes an accession number and returns GeneID, Gene Name, and the Seqeuence data annotated
 
-sub getGeneSummaryData{
+sub GetGeneSummaryData{
 
 	# ASSUMPTION: identifer used for search is passed in i.e AccessionNumber or GeneName etc. 
 	# Get and store the input arguments 
-	my ($class, $identifier) = @_;
-	
-	# Try to locate the accession number might be more useful to put this in own function
-	my $sqlQuery = 'SELECT FROM gene WHERE ';
-	
-	my $accessionNo = DBinterface::queryRun(); 
+	my $accessionNo = @_;
 	
 	# Function should never be called with blank argument as it will be called when the user select from search
 	# or browse list.
 	
-	# hash to save all data in.
-	my %geneData;
+	my $sqlQuery = "SELECT geneId, chromLoc, proteinName, geneSeq, proteinSeq FROM gene WHERE accessionNo = '$accessionNo'";
+	
+	my @geneInfo = DBinterface::queryRun($sqlQuery);
+	
 	
 	# Get gene name , if unnamed set to unnamed.
 	my $geneName = 0;
 	
-	# Get gene ID
+	#Data to return
+
+	# Codon usage
+	# RES sites
+
+	# Build hash
 	
-	# Perhaps gene location
+	# Hash to save all data in.
+	my %geneData;
 	
-	# Get coding data for it.
+	# Gene name
+	$geneData{$accessionNo}{'GeneName'} = $geneInfo[0]->[0];
 	
-	# Package in to hash and send back
+	# Chomosome location 
+	$geneData{$accessionNo}{'ChromLoc'} = $geneInfo[0]->[1];
+	
+	# Protein product
+	$geneData{$accessionNo}{'ProteinProduct'} = $geneInfo[0]->[2];
+	
+	# DNA sequence
+	$geneData{$accessionNo}{'GeneSeq'} = $geneInfo[0]->[3];
+	
+	# Amino acid sequence
+	$geneData{$accessionNo}{'ProteinSeq'} = $geneInfo[0]->[4]; 
+
+	
+	# Send back hash of data
+	return %geneData;
 }
 
 sub returnArray(){
