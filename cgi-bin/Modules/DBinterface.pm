@@ -70,7 +70,7 @@ sub DoQuery( $ ){
 # getIdentifier - Takes an indentifer and returns an indentifer that complies with the DB column names.
 #
 ##########################################################################################################
-sub getIdentifier{
+sub GetIdentifier{
 	
 	# Assumes that a valid string has been passed (ChromoDB checks this)
 	my ($id, $idType) = $_[0], undef;
@@ -103,7 +103,7 @@ sub getIdentifier{
 # querySearch - Takes a search string and type, returns comma separated list of search results
 #
 ##########################################################################################################
-sub querySearch{
+sub QuerySearch{
 	
 	# Get the function parameters, assumes valid non-zero string and valid identifier input
 	my ($searchString, $idType) = @_;
@@ -153,7 +153,7 @@ sub QueryColumn{
 # querySequence - Takes an accession number and returns the DNA sequence for it from the DB.
 #
 ###############################################################################################
-sub querySequence{
+sub QuerySequence{
 	
 	# Store input accession numbers
 	my ($accessionNo, $seqType) = @_;
@@ -171,10 +171,54 @@ sub querySequence{
 	}
 }
 
-
-# findRES - Takes a RES name and an Id and returns a list of matches within the given identifer sequence.
-sub findRES( $ $ ){
-	return 1;
+###############################################################################################
+#
+# FindRES - Takes a RES string and an accession number and returns a list of matches within the given identifer sequence.
+#
+###############################################################################################
+sub FindRES( $ $ ){
+	
+	# Expecting restriction enzyme sequence in the form of a string and the accession 
+	# nunmber of the sequence. 
+	my ( $RESSeq, $accessionNo ) = @_;
+	
+	# Get the sequence associated with the accession number
+	my $dnaSeq = DBinterface::QuerySequence($accessionNo, 'GeneSeq');
+	
+	# Check that sequence was returned
+	unless( $dnaSeq ){
+		return undef;
+	}
+	
+	# Array to hold potential matches.
+	my @RESMatches;
+	
+	# Counter for tracking position in sequence.
+	my $seqPos = 0;
+	
+	# Hold any starting positions of any matches found.
+	my $match = 0;
+	
+	# Search through the dna sequence for matches to the given RES
+	while( $match > -1){
+		
+		# Attmept to find a match start from the current position.
+		$match = index($dnaSeq, $RESSeq, $seqPos);
+		
+		# If there is a valid match.
+		if( $match > -1 ){
+			# Increment match by one to mark the position where the site starts.
+			$match++;
+			
+			# Add start position to array.
+			push @RESMatches, $match;
+			
+			# Incremnt position by one to stop index finding the same site.
+			$seqPos = $match + 1;
+		}
+	}
+	
+	return @RESMatches;
 }
 
 # addRES - Takes a DNA sequecne and a name for the restriction enzyme. Returns 1 on success 
@@ -185,10 +229,10 @@ sub addRES( $$ ){
 
 ###############################################################################################
 #
-# buildCodingSeq - Takes an Id and returns an array with all the introns and exons in sequence.
+# BuildCodingSeq - Takes an Id and returns an array with all the introns and exons in sequence.
 #
 ###############################################################################################
-sub buildCodingSeq{
+sub BuildCodingSeq{
 
 	# Get accession number for DB lookup
 	my $accessionNo = $_[0];
@@ -346,7 +390,7 @@ sub GetCodonUsage( $ ){
 	
 	my @codonUsage = DBinterface::DoQuery($sqlQuery);
 	
-	print Dumper(@codonUsage);
+	#print Dumper(@codonUsage);
 	 
 }
 

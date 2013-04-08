@@ -136,7 +136,7 @@ print "************************** TEST : 'showCodingSeq' ***********************
 ################################ TEST: 'GetGeneSummaryData' ################################
 
 # TEST 'GetGeneSummaryData'
-print "************************** TEST : 'showCodingSeq' **************************\n";
+print "************************** TEST : 'GetGeneSummaryData' **************************\n";
 
 # CONDITION: No arguments
 {

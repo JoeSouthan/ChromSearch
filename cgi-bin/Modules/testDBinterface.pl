@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use Test::Simple tests => 27;
+use Test::Simple tests => 28;
 use DBinterface;
 
 ################################ TEST: 'databaseConnect'###############################
@@ -77,35 +77,35 @@ print "\n************************** TEST: 'querySearch' ************************
 
 # CONDITION: Valid parameters for geneId
 {
-	my @results = DBinterface::querySearch("2780780","geneId");
+	my @results = DBinterface::QuerySearch("2780780","geneId");
 	ok(@results, "with valid parameters '2780780' as search string and 'geneId' as identifier type" );
 	#print Dumper( @results );
 }
 
 # CONDITION: Valid parameters for proteinName
 {
-	my @results = DBinterface::querySearch("DUSP6","proteinName");
+	my @results = DBinterface::QuerySearch("DUSP6","proteinName");
 	ok( @results, "with valid parameters 'DUSP1' as search string and 'proteinName' as type");
 	#print Dumper( @results );
 }
 
 # CONDITION: Valid parameters for accessionNo
 {
-	my @results = DBinterface::querySearch("AB002805","accessionNo");
+	my @results = DBinterface::QuerySearch("AB002805","accessionNo");
 	ok( @results, "with valid parameters 'AB002805' as search string and 'accessionNo' as type");
 	#print Dumper( @results );
 }
 
 # CONDITION: Valid parameters for chromosome location
 {
-	my @results = DBinterface::querySearch("12q13","chromLoc");
+	my @results = DBinterface::QuerySearch("12q13","chromLoc");
 	ok( @results, "with valid parameters '12q13' as search string and 'chromLoc' as type" );
 	#print Dumper( @results );
 }
 	
 # CONDITION: Valid parameters but not in DB
 {
-	my @results = DBinterface::querySearch("HEX5","proteinName");
+	my @results = DBinterface::QuerySearch("HEX5","proteinName");
 	ok( @results, "Testing 'querySearch' with valid parameters but not in DB");
 	#print Dumper( @results );
 }
@@ -115,13 +115,13 @@ print "\n************************** TEST: 'getIdentifier' **********************
 
 # CONDITION: Valid parameters
 {
-	my $identifier = DBinterface::getIdentifier("GeneID");
+	my $identifier = DBinterface::GetIdentifier("GeneID");
 	ok($identifier eq 'geneId', "with valid parameter 'GeneID'");
 }
 
 # CONDITION: Incorrect parameters
 {
-	my $identifier = DBinterface::getIdentifier("geneindentifier");
+	my $identifier = DBinterface::GetIdentifier("geneindentifier");
 	ok( !defined($identifier), "with incorrect parameter 'geneidentifier'");
 }
 ################################ TEST : 'isArrayEmpty' ################################ 
@@ -163,19 +163,19 @@ print "\n************************** TEST: 'isArrayEmpty' ***********************
 	ok($result eq '1',"with one of the elements as valid");
 }
 
-################################ TEST : 'querySeqDNA' ################################
+################################ TEST : 'querySequence' ################################
 
 print "\n************************** TEST: 'querySequence' **************************\n";
 
 # CONDITION: valid entry with no sequence data
 {
-	my $seq = DBinterface::querySequence('232322', 'ProteinSeq');
+	my $seq = DBinterface::QuerySequence('232322', 'ProteinSeq');
 	ok( !defined($seq) ,"with no sequence data");
 }
 
 # CONDITION: valid entry with sequence data
 {
-	my $seq = DBinterface::querySequence('AB002805', 'GeneSeq');
+	my $seq = DBinterface::QuerySequence('AB002805', 'GeneSeq');
 	ok( $seq, "with valid argument accession number 'AB002805'");
 	#print $seq,"\n";
 }
@@ -185,21 +185,21 @@ print "\n************************** TEST: 'querySequence' **********************
 print "\n************************** TEST: 'buildCodingSeq' **************************\n";
 
 {
-	my @seq = DBinterface::buildCodingSeq('AB002805');
+	my @seq = DBinterface::BuildCodingSeq('AB002805');
 	ok( @seq, "with valid argument accession number 'AB002805' with one exon");
 	#print Dumper(@seq);
 }
 
 
 {
-	my @seq = DBinterface::buildCodingSeq('AB005990');
+	my @seq = DBinterface::BuildCodingSeq('AB005990');
 	ok( @seq, "with valid argument accession number 'AB005990' with more than one exon");
 	#print Dumper(@seq);
 }
 
 
 {
-	my @seq = DBinterface::buildCodingSeq('GU994024');
+	my @seq = DBinterface::BuildCodingSeq('GU994024');
 	ok( @seq, "with valid argument accession number 'GU994024' with more than one exon");
 	#print Dumper(@seq);
 }
@@ -223,7 +223,7 @@ print "************************** TEST : 'BuildSummaryData' ********************
 {
 	my %data = DBinterface::BuildSummaryData('AB002805');
 	ok( %data, "with valid accession number AB002805 as an argument");
-	print Dumper(%data);
+	#print Dumper(%data);
 }
 
 ################################ TEST: 'GetCodonUsage' ################################
@@ -235,8 +235,19 @@ print "************************** TEST : 'GetCodonUsage' ***********************
 {
 	my @codonData = DBinterface::GetCodonUsage('AB002805');
 	ok( @codonData, "with valid accession number AB002805 as an argument");
-	print Dumper(@codonData);
+	#print Dumper(@codonData);
 }
 
+################################ TEST: 'FindRES' ################################
+
+# TEST 'FindRES'
+print "************************** TEST : 'FindRES' **************************\n";
+
+# CONDITION: With valid accession number as argument 
+{
+	my @RESInfo = DBinterface::FindRES('GAATT','AB002805');
+	ok( @RESInfo, "with valid accession number AB002805 as an argument");
+	#print Dumper(@RESInfo);
+}
 
 

@@ -23,7 +23,7 @@ sub ShowAllIdentifiers( $ ){
 
 	# Decide what type of identifier has been passed in and put it 
 	# into a variable that will correspond to a column in the DB
-	my $idType = DBinterface::getIdentifier( $id );
+	my $idType = DBinterface::GetIdentifier( $id );
 	unless( $idType ){
 		$error{'error'} = DBinterface::GetLastErrorMessage();
 		return %error;
@@ -71,14 +71,14 @@ sub getSearchResults{
 	}
 	
 	# Convert requested identifier type to a DB column name
-	my $id = DBinterface::getIdentifier($idType);
+	my $id = DBinterface::GetIdentifier($idType);
 	unless( $id ){
 		$error{'error'} = DBinterface::GetLastErrorMessage();
 		return %error;
 	}
 	
 	# Send a search query to the DB
-	my @queryResult = DBinterface::querySearch($searchString, $id);
+	my @queryResult = DBinterface::QuerySearch($searchString, $id);
 	
 	# String must contain matches to return
 	unless( @queryResult ){
@@ -105,7 +105,7 @@ sub getSearchResults{
 			# Retrieve coding sequence data for given accession number
 			# Need error checking for below and a messge to indicate if there
 			# is no data.
-			my @sequence = DBinterface::buildCodingSeq($queryResult[$i]->[0]);
+			my @sequence = DBinterface::BuildCodingSeq($queryResult[$i]->[0]);
 			$searchResults{$accessionNumber}{'SeqFeat'} = [@sequence];
 		}
 
@@ -132,9 +132,9 @@ sub getSequence{
 	}
 	
 	# Expects either 'GeneSeq' or 'ProteinSeq'
-	my $seqTypeID = DBinterface::getIdentifier($seqType);
+	my $seqTypeID = DBinterface::GetIdentifier($seqType);
 	
-	my $seq = DBinterface::querySequence( $accessionNo, $seqTypeID );
+	my $seq = DBinterface::QuerySequence( $accessionNo, $seqTypeID );
 	if($seq eq 'ERROR:DB_COLUMN_EMPTY'){
 		return 'ERROR:DB_COLUMN_EMPTY';
 	}
@@ -161,7 +161,7 @@ sub showCodingSeq{
 		return 'ERROR:ZERO_LENGTH_ARGUMENT';
 	}
 
-	my @codingSeq = DBinterface::buildCodingSeq($accessionNo);
+	my @codingSeq = DBinterface::BuildCodingSeq($accessionNo);
 	if(@codingSeq eq 'ERROR:DB_COLUMN_EMPTY'){
 		return 'ERROR:DB_COLUMN_EMPTY';
 	}
