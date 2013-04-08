@@ -289,6 +289,68 @@ sub buildCodingSeq{
 	return @CDSarray;
 }
 
+sub BuildSummaryData( $ ){
+
+	# ASSUMPTION: identifer used for search is passed in i.e AccessionNumber or GeneName etc. 
+	# Get and store the input arguments 
+	my $accessionNo = $_[0];
+	
+	# Function should never be called with blank argument as it will be called when the user select from search
+	# or browse list.
+	
+	my $sqlQuery = "SELECT geneId, chromLoc, proteinName, geneSeq, proteinSeq FROM gene WHERE accessionNo = '$accessionNo'";
+	
+	my @geneInfo = DBinterface::DoQuery($sqlQuery);
+	
+	# Get gene name , if unnamed set to unnamed.
+	my $geneName = 0;
+	
+	# Data to return
+
+	# Codon usage
+	# RES sites
+
+	# Build hash
+	
+	# Hash to save all data in.
+	my %geneData;
+	
+	# Gene name
+	$geneData{$accessionNo}{'GeneName'} = $geneInfo[0]->[0];
+	
+	# Chomosome location 
+	$geneData{$accessionNo}{'ChromLoc'} = $geneInfo[0]->[1];
+	
+	# Protein product
+	$geneData{$accessionNo}{'ProteinProduct'} = $geneInfo[0]->[2];
+	
+	# DNA sequence
+	$geneData{$accessionNo}{'GeneSeq'} = $geneInfo[0]->[3];
+	
+	# Amino acid sequence
+	$geneData{$accessionNo}{'ProteinSeq'} = $geneInfo[0]->[4]; 
+
+	
+	# Send back hash of data
+	return %geneData;
+}
+###########################################################################################################
+#
+# GetCodonUsage - Takes an accession number and returns an array with codon usage numbers from DB.
+#
+##########################################################################################################
+sub GetCodonUsage( $ ){
+	my $accessionNo = $_[0];
+	
+	my $sqlQuery = "SELECT codonCount FROM codonBias WHERE accessionNo = '$accessionNo'";
+	
+	my @codonUsage = DBinterface::DoQuery($sqlQuery);
+	
+	print Dumper(@codonUsage);
+	 
+}
+
+
 ##########################################################################################################
 #
 # databaseConnect - Takes database name, username, password and server name, returns handle to DB or undef.

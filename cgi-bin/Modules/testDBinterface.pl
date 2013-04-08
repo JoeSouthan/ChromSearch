@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use Test::Simple tests => 25;
+use Test::Simple tests => 27;
 use DBinterface;
 
 ################################ TEST: 'databaseConnect'###############################
@@ -213,6 +213,30 @@ DBinterface::SetLastErrorMessage('NO_DATA');
 my $errorMessage = DBinterface::GetLastErrorMessage();
 ok( $errorMessage eq 'NO_DATA', "get last error message");
 
+
+################################ TEST: 'BuildSummaryData' ################################
+
+# TEST 'BuildSummaryData'
+print "************************** TEST : 'BuildSummaryData' **************************\n";
+
+# CONDITION: With valid accession number as argument 
+{
+	my %data = DBinterface::BuildSummaryData('AB002805');
+	ok( %data, "with valid accession number AB002805 as an argument");
+	print Dumper(%data);
+}
+
+################################ TEST: 'GetCodonUsage' ################################
+
+# TEST 'GetCodonUsage'
+print "************************** TEST : 'GetCodonUsage' **************************\n";
+
+# CONDITION: With valid accession number as argument 
+{
+	my @codonData = DBinterface::GetCodonUsage('AB002805');
+	ok( @codonData, "with valid accession number AB002805 as an argument");
+	print Dumper(@codonData);
+}
 
 
 

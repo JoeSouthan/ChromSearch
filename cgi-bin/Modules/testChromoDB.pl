@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use Test::Simple tests => 15;
+use Test::Simple tests => 17;
 use Data::Dumper;
 use strict;
 #use warnings;
@@ -126,12 +126,27 @@ print "************************** TEST : 'showCodingSeq' ***********************
 	my $results = ChromoDB::showCodingSeq('');
 	ok( $results eq 'ERROR:ZERO_LENGTH_ARGUMENT', "with no arguments");
 }
-# CONDITION: No arguments
+# CONDITION: With valid accession number as argument 
 {
 	my $results = ChromoDB::showCodingSeq('AB002805');
 	ok( length($results), "with valid accession number AB002805 as an argument");
 	print $results,"\n";
 }
-################################ TEST: 'misc' ################################
 
+################################ TEST: 'GetGeneSummaryData' ################################
+
+# TEST 'GetGeneSummaryData'
+print "************************** TEST : 'showCodingSeq' **************************\n";
+
+# CONDITION: No arguments
+{
+	my %data = ChromoDB::GetGeneSummaryData('');
+	ok( $data{'error'} eq 'ERROR:ZERO_LENGTH_ARGUMENT', "with no arguments");
+}
+# CONDITION: With valid accession number as argument 
+{
+	my %data = ChromoDB::GetGeneSummaryData('AB002805');
+	ok( %data, "with valid accession number AB002805 as an argument");
+	print Dumper(%data);
+}
 

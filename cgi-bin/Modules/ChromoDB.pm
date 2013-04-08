@@ -173,64 +173,19 @@ sub showCodingSeq{
 # GetGeneSummaryData - Takes an accession number and returns GeneID, Gene Name, and the Seqeuence data annotated
 
 sub GetGeneSummaryData{
-
-	# ASSUMPTION: identifer used for search is passed in i.e AccessionNumber or GeneName etc. 
-	# Get and store the input arguments 
-	my $accessionNo = @_;
+	# Get and store the input arguments, $class because of SOAP calling it.
+	my ( $accessionNo ) = $_[0];
 	
-	# Function should never be called with blank argument as it will be called when the user select from search
-	# or browse list.
+	# Check for blank arguments passed in
+	if( ($accessionNo eq '') ){
+		$error{'error'} = 'ERROR:ZERO_LENGTH_ARGUMENT';
+		return %error;
+	}
 	
-	my $sqlQuery = "SELECT geneId, chromLoc, proteinName, geneSeq, proteinSeq FROM gene WHERE accessionNo = '$accessionNo'";
+	my %geneData = DBinterface::BuildSummaryData($accessionNo);
 	
-	my @geneInfo = DBinterface::queryRun($sqlQuery);
-	
-	
-	# Get gene name , if unnamed set to unnamed.
-	my $geneName = 0;
-	
-	#Data to return
-
-	# Codon usage
-	# RES sites
-
-	# Build hash
-	
-	# Hash to save all data in.
-	my %geneData;
-	
-	# Gene name
-	$geneData{$accessionNo}{'GeneName'} = $geneInfo[0]->[0];
-	
-	# Chomosome location 
-	$geneData{$accessionNo}{'ChromLoc'} = $geneInfo[0]->[1];
-	
-	# Protein product
-	$geneData{$accessionNo}{'ProteinProduct'} = $geneInfo[0]->[2];
-	
-	# DNA sequence
-	$geneData{$accessionNo}{'GeneSeq'} = $geneInfo[0]->[3];
-	
-	# Amino acid sequence
-	$geneData{$accessionNo}{'ProteinSeq'} = $geneInfo[0]->[4]; 
-
-	
-	# Send back hash of data
 	return %geneData;
 }
-
-sub returnArray(){
-	my @array = {"one","two","three","four"};
-	return @array;
-}
-
-
-
-
-
-
-
-
 
 
 
