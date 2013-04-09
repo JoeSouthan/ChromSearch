@@ -67,7 +67,7 @@ sub DoQuery( $ ){
 
 ##########################################################################################################
 #
-# getIdentifier - Takes an indentifer and returns an indentifer that complies with the DB column names.
+# GetIdentifier - Takes an indentifer and returns an indentifer that complies with the DB column names.
 #
 ##########################################################################################################
 sub GetIdentifier{
@@ -100,7 +100,7 @@ sub GetIdentifier{
 
 ##########################################################################################################
 #
-# querySearch - Takes a search string and type, returns comma separated list of search results
+# QuerySearch - Takes a search string and type, returns comma separated list of search results
 #
 ##########################################################################################################
 sub QuerySearch{
@@ -125,7 +125,7 @@ sub QuerySearch{
 }  
 ##########################################################################################################
 #
-# queryColumn - Takes a column id and returns elements of a single column
+# QueryColumn - Takes a column id and returns elements of a single column
 #
 ##########################################################################################################
 sub QueryColumn{
@@ -150,7 +150,7 @@ sub QueryColumn{
 }
 ###############################################################################################
 #
-# querySequence - Takes an accession number and returns the DNA sequence for it from the DB.
+# QuerySequence - Takes an accession number and returns the DNA sequence for it from the DB.
 #
 ###############################################################################################
 sub QuerySequence{
@@ -352,7 +352,7 @@ sub BuildSummaryData( $ ){
 	# Data to return
 
 	# Codon usage
-	# RES sites
+	
 
 	# Build hash
 	
@@ -374,23 +374,81 @@ sub BuildSummaryData( $ ){
 	# Amino acid sequence
 	$geneData{$accessionNo}{'ProteinSeq'} = $geneInfo[0]->[4]; 
 
+	# RES sites
+	my @EcoRISites = DBinterface::FindRES('GAATTC', $accessionNo);
+	$geneData{$accessionNo}{'EcoRI'} = [@EcoRISites];
+	
+	
+	my @BamHISites = DBinterface::FindRES('GGATCC', $accessionNo);
+	$geneData{$accessionNo}{'BamHI'} = [@BamHISites];
+	
+	
+	my @BsuMISites = DBinterface::FindRES('CTCGAG', $accessionNo);
+	$geneData{$accessionNo}{'BsuMI'} = [@BsuMISites];
 	
 	# Send back hash of data
 	return %geneData;
 }
 ###########################################################################################################
 #
-# GetCodonUsage - Takes an accession number and returns an array with codon usage numbers from DB.
+# GetChromoCodonUsage - Takes nothing and returns an array with codon usage numbers from DB.
 #
 ##########################################################################################################
-sub GetCodonUsage( $ ){
+sub GetChromoCodonUsage( $ ){
 	my $accessionNo = $_[0];
 	
+	my $sqlQuery = "SELECT codonCount FROM codonBias WHERE accessionNo = 'chrom_12'";
+	
+	my @chromoCodonUsage = DBinterface::DoQuery($sqlQuery);
+	
+	#print Dumper(@chromoCodonUsage);
+
 	my $sqlQuery = "SELECT codonCount FROM codonBias WHERE accessionNo = '$accessionNo'";
 	
 	my @codonUsage = DBinterface::DoQuery($sqlQuery);
 	
 	#print Dumper(@codonUsage);
+	
+	# Split out all individual codons in string to unique array entries.
+	
+	my @chromCodonArray = split(/,/, $chromoCodonUsage[0]->[0] );
+	
+	#print Dumper(@chromCodonArray);
+	
+	
+	my @codonArray = split(/,/, $codonUsage[0]->[0] );
+	
+	#print Dumper(@codonArray);
+	
+	
+	# Group condons into respective amino acid residues
+	
+	# Loop through array split out codon from number, create codon hash entry
+	# and assign it the number
+	
+	my %codonHash;
+	
+	foreach my $codon (@codonArray){
+	
+		my @codonDetails = split(/:/, $codon);
+		
+		$codonHash{$codonDetails[0]} = $codonDetails[1];
+	}
+	
+	print 'codonhash = ',Dumper(%codonHash);
+	
+	# From this hash take the codon numbers needed for each residue.
+	
+	my %residueHash;
+	
+	$residueHash{'Ala'} = $codonHash{'GCU'} + $codonHash{'GCC'} + $codonHash{'GCA'} + 
+		$codonHash{'GCG'};
+		
+	
+	
+	print Dumper(%residueHash);
+	
+	# For each residue workout the proportion in percentage for each condon.
 	 
 }
 

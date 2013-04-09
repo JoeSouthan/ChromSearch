@@ -226,16 +226,16 @@ print "************************** TEST : 'BuildSummaryData' ********************
 	#print Dumper(%data);
 }
 
-################################ TEST: 'GetCodonUsage' ################################
+################################ TEST: 'GetChromoCodonUsage' ################################
 
-# TEST 'GetCodonUsage'
+# TEST 'GetChromoCodonUsage'
 print "************************** TEST : 'GetCodonUsage' **************************\n";
 
 # CONDITION: With valid accession number as argument 
 {
-	my @codonData = DBinterface::GetCodonUsage('AB002805');
-	ok( @codonData, "with valid accession number AB002805 as an argument");
-	#print Dumper(@codonData);
+	my @codonData = DBinterface::GetChromoCodonUsage('AB002805');
+	ok( @codonData, "with no arguments");
+	print Dumper(@codonData);
 }
 
 ################################ TEST: 'FindRES' ################################
