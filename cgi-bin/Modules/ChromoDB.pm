@@ -142,10 +142,6 @@ sub getSequence{
 	return $seq;
 }
 
-# getSupportedRES - Takes nothing and returns a list of supported restriction enzymes from the DB.
-sub getSupportedRES(){
-	return 1;
-}
 ##########################################################################################################
 # 
 # showCodingSeq - Takes an identifier and returns an array of the introns and exons sequentially ordered
@@ -156,12 +152,16 @@ sub showCodingSeq{
 	# Get and store the input arguments, $class because of SOAP calling it.
 	my ( $accessionNo ) = @_;
 	
+	my %error = ();
+	
 	# Check for blank arguments passed in
 	if($accessionNo eq ''){
-		return 'ERROR:ZERO_LENGTH_ARGUMENT';
+		$error{'error'} = 'ERROR:ZERO_LENGTH_ARGUMENT';
+		return %error;
 	}
 
 	my @codingSeq = DBinterface::BuildCodingSeq($accessionNo);
+	
 	if(@codingSeq eq 'ERROR:DB_COLUMN_EMPTY'){
 		return 'ERROR:DB_COLUMN_EMPTY';
 	}
@@ -169,12 +169,16 @@ sub showCodingSeq{
 	# Return array or can be string if we want?.
 	return @codingSeq;
 }
-
+##########################################################################################################
+#
 # GetGeneSummaryData - Takes an accession number and returns GeneID, Gene Name, and the Seqeuence data annotated
-
+#
+##########################################################################################################
 sub GetGeneSummaryData{
 	# Get and store the input arguments, $class because of SOAP calling it.
 	my ( $accessionNo ) = $_[0];
+	
+	my %error = ();
 	
 	# Check for blank arguments passed in
 	if( ($accessionNo eq '') ){
@@ -187,6 +191,38 @@ sub GetGeneSummaryData{
 	return %geneData;
 }
 
+##########################################################################################################
+#
+# GetRES - Takes no arguments and returns a list of RES with name and cutsite
+#
+##########################################################################################################
+sub GetRES(){
+
+	# Attempt to retrieve all REsites from the DB
+	my @reSites = DBinterface::FindRES();
+	
+	my %error = ();
+	
+	# Chech that something was entered in to the array of sites
+	unless( @reSites ){
+		# If not return error message
+		$error{'error'} = 'NO_RESITES_FOUND'; 
+		return %error;
+	}
+	
+	# Hash for restriction sites 
+	my %restrictionSites;
+	
+	foreach my $res (@reSites){
+		# Assignb name for hash key
+		$resName = $res->[0];
+		# Assign cut site for hash value
+		$restrictionSites{$resName} = $res->[1];
+	}
+
+	# Return all restriction site information to caller
+	return %restrictionSites;
+}
 
 
 1;

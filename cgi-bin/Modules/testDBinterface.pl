@@ -46,9 +46,9 @@ print "\n************************** TEST : 'DoQuery' **************************\
 	#print Dumper(@queryData);
 }
 
-################################ TEST: 'queryColumn'###############################
+################################ TEST: 'QueryColumn'###############################
 
-print "\n************************** TEST : 'queryColumn' **************************\n";
+print "\n************************** TEST : 'QueryColumn' **************************\n";
 
 # CONDITION: geneId as argument
 {
@@ -71,9 +71,9 @@ print "\n************************** TEST : 'queryColumn' ***********************
 	#print Dumper( @columnData );
 }
 
-################################ TEST 'querySearch' ###############################
+################################ TEST 'QuerySearch' ###############################
 
-print "\n************************** TEST: 'querySearch' **************************\n";
+print "\n************************** TEST: 'QuerySearch' **************************\n";
 
 # CONDITION: Valid parameters for geneId
 {
@@ -163,9 +163,9 @@ print "\n************************** TEST: 'isArrayEmpty' ***********************
 	ok($result eq '1',"with one of the elements as valid");
 }
 
-################################ TEST : 'querySequence' ################################
+################################ TEST : 'QuerySequence' ################################
 
-print "\n************************** TEST: 'querySequence' **************************\n";
+print "\n************************** TEST: 'QuerySequence' **************************\n";
 
 # CONDITION: valid entry with no sequence data
 {
@@ -229,7 +229,7 @@ print "************************** TEST : 'BuildSummaryData' ********************
 ################################ TEST: 'GetChromoCodonUsage' ################################
 
 # TEST 'GetChromoCodonUsage'
-print "************************** TEST : 'GetCodonUsage' **************************\n";
+print "************************** TEST : 'GetChromoCodonUsage' **************************\n";
 
 # CONDITION: With valid accession number as argument 
 {
@@ -243,10 +243,10 @@ print "************************** TEST : 'GetCodonUsage' ***********************
 # TEST 'FindRES'
 print "************************** TEST : 'FindRES' **************************\n";
 
-# CONDITION: With valid accession number as argument 
+# CONDITION: No aguments, none necessary
 {
-	my @RESInfo = DBinterface::FindRES('GAATT','AB002805');
-	ok( @RESInfo, "with valid accession number AB002805 as an argument");
+	my @RESInfo = DBinterface::FindRES();
+	ok( @RESInfo, "no arguments by default");
 	#print Dumper(@RESInfo);
 }
 

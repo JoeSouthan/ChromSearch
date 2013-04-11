@@ -173,59 +173,25 @@ sub QuerySequence{
 
 ###############################################################################################
 #
-# FindRES - Takes a RES string and an accession number and returns a list of matches within the given identifer sequence.
+# FindRES -  Returns a list RES (names and cut sites) in the DB.  
 #
 ###############################################################################################
-sub FindRES( $ $ ){
+sub FindRES{
 	
-	# Expecting restriction enzyme sequence in the form of a string and the accession 
-	# nunmber of the sequence. 
-	my ( $RESSeq, $accessionNo ) = @_;
+	# Query to return all the current restriction enzymes in the database
+	my $sqlQuery = "SELECT name, site FROM restEnz";
 	
-	# Get the sequence associated with the accession number
-	my $dnaSeq = DBinterface::QuerySequence($accessionNo, 'GeneSeq');
+	# Query the database
+	my @allRES = DBinterface::DoQuery($sqlQuery);
 	
 	# Check that sequence was returned
-	unless( $dnaSeq ){
+	unless( @allRES ){
 		return undef;
 	}
 	
-	# Array to hold potential matches.
-	my @RESMatches;
-	
-	# Counter for tracking position in sequence.
-	my $seqPos = 0;
-	
-	# Hold any starting positions of any matches found.
-	my $match = 0;
-	
-	# Search through the dna sequence for matches to the given RES
-	while( $match > -1){
-		
-		# Attmept to find a match start from the current position.
-		$match = index($dnaSeq, $RESSeq, $seqPos);
-		
-		# If there is a valid match.
-		if( $match > -1 ){
-			# Increment match by one to mark the position where the site starts.
-			$match++;
-			
-			# Add start position to array.
-			push @RESMatches, $match;
-			
-			# Incremnt position by one to stop index finding the same site.
-			$seqPos = $match + 1;
-		}
-	}
-	
-	return @RESMatches;
+	return @allRES;
 }
 
-# addRES - Takes a DNA sequecne and a name for the restriction enzyme. Returns 1 on success 
-# (has been added) or 0 on fail (cannot be added)
-sub addRES( $$ ){
-	return 1;
-}
 
 ###############################################################################################
 #
@@ -332,7 +298,11 @@ sub BuildCodingSeq{
 	
 	return @CDSarray;
 }
-
+###########################################################################################################
+#
+# BuildSummaryData - 
+#
+##########################################################################################################
 sub BuildSummaryData( $ ){
 
 	# ASSUMPTION: identifer used for search is passed in i.e AccessionNumber or GeneName etc. 
@@ -372,19 +342,7 @@ sub BuildSummaryData( $ ){
 	$geneData{$accessionNo}{'GeneSeq'} = $geneInfo[0]->[3];
 	
 	# Amino acid sequence
-	$geneData{$accessionNo}{'ProteinSeq'} = $geneInfo[0]->[4]; 
-
-	# RES sites
-	my @EcoRISites = DBinterface::FindRES('GAATTC', $accessionNo);
-	$geneData{$accessionNo}{'EcoRI'} = [@EcoRISites];
-	
-	
-	my @BamHISites = DBinterface::FindRES('GGATCC', $accessionNo);
-	$geneData{$accessionNo}{'BamHI'} = [@BamHISites];
-	
-	
-	my @BsuMISites = DBinterface::FindRES('CTCGAG', $accessionNo);
-	$geneData{$accessionNo}{'BsuMI'} = [@BsuMISites];
+	$geneData{$accessionNo}{'ProteinSeq'} = $geneInfo[0]->[4];  
 	
 	# Send back hash of data
 	return %geneData;
@@ -441,9 +399,300 @@ sub GetChromoCodonUsage( $ ){
 	
 	my %residueHash;
 	
-	$residueHash{'Ala'} = $codonHash{'GCU'} + $codonHash{'GCC'} + $codonHash{'GCA'} + 
-		$codonHash{'GCG'};
-		
+	my $percentCount = 0;
+	my $codonTotalCount = 0;
+	
+	# Phenylalanine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'UUU'} + $codonHash{'UUC'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Phe'}{'UUU'} = $codonHash{'UUU'} * $percentCount;
+		$residueHash{'Phe'}{'UUC'} = $codonHash{'UUC'} * $percentCount;
+	}
+	
+	# Leucine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'UUA'} + $codonHash{'UUG'} + $codonHash{'CUU'} + 
+			$codonHash{'CUC'} + $codonHash{'CUA'} + $codonHash{'CUG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Leu'}{'UUA'} = $codonHash{'UUA'} * $percentCount;
+		$residueHash{'Leu'}{'UUG'} = $codonHash{'UUG'} * $percentCount;
+		$residueHash{'Leu'}{'CUU'} = $codonHash{'CUU'} * $percentCount;
+		$residueHash{'Leu'}{'CUC'} = $codonHash{'CUC'} * $percentCount;
+		$residueHash{'Leu'}{'CUA'} = $codonHash{'CUA'} * $percentCount;
+		$residueHash{'Leu'}{'CUG'} = $codonHash{'CUG'} * $percentCount;
+	}
+	
+	# Isoleucine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'AUU'} + $codonHash{'AUC'} + $codonHash{'AUA'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Ile'}{'AUU'} = $codonHash{'AUU'} * $percentCount;
+		$residueHash{'Ile'}{'AUC'} = $codonHash{'AUC'} * $percentCount;
+		$residueHash{'Ile'}{'AUA'} = $codonHash{'AUA'} * $percentCount;
+	}
+	
+	# Methionine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'AUG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Met'}{'AUG'} = $codonHash{'AUG'} * $percentCount;
+	}
+	
+	# Valine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'GUU'} + $codonHash{'GUC'} + $codonHash{'GUA'} +
+			$codonHash{'GUG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Val'}{'GUU'} = $codonHash{'GUU'} * $percentCount;
+		$residueHash{'Val'}{'GUC'} = $codonHash{'GUC'} * $percentCount;
+		$residueHash{'Val'}{'GUA'} = $codonHash{'GUA'} * $percentCount;
+		$residueHash{'Val'}{'GUG'} = $codonHash{'GUG'} * $percentCount;
+	}
+	
+	# Serine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'UCU'} + $codonHash{'UCC'} + $codonHash{'UCA'} +
+			$codonHash{'UCG'} + $codonHash{'AGU'} + $codonHash{'AGC'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Ser'}{'UCU'} = $codonHash{'UCU'} * $percentCount;
+		$residueHash{'Ser'}{'UCC'} = $codonHash{'UCC'} * $percentCount;
+		$residueHash{'Ser'}{'UCA'} = $codonHash{'UCA'} * $percentCount;
+		$residueHash{'Ser'}{'UCG'} = $codonHash{'UCG'} * $percentCount;
+		$residueHash{'Ser'}{'AGU'} = $codonHash{'AGU'} * $percentCount;
+		$residueHash{'Ser'}{'AGC'} = $codonHash{'AGC'} * $percentCount;
+	}
+	
+	# Proline
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'CCU'} + $codonHash{'CCC'} + $codonHash{'CCA'} +
+			$codonHash{'CCG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Pro'}{'CCU'} = $codonHash{'CCU'} * $percentCount;
+		$residueHash{'Pro'}{'CCC'} = $codonHash{'CCC'} * $percentCount;
+		$residueHash{'Pro'}{'CCA'} = $codonHash{'CCA'} * $percentCount;
+		$residueHash{'Pro'}{'CCG'} = $codonHash{'CCG'} * $percentCount;
+	}
+	
+	# Threonine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'ACU'} + $codonHash{'ACC'} + $codonHash{'ACA'} +
+			$codonHash{'ACG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Thr'}{'ACU'} = $codonHash{'ACU'} * $percentCount;
+		$residueHash{'Thr'}{'ACC'} = $codonHash{'ACC'} * $percentCount;
+		$residueHash{'Thr'}{'ACA'} = $codonHash{'ACA'} * $percentCount;
+		$residueHash{'Thr'}{'ACG'} = $codonHash{'ACG'} * $percentCount;
+	}
+	
+	# Alanine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'GCU'} + $codonHash{'GCC'} + $codonHash{'GCA'} +
+			$codonHash{'GCG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Ala'}{'GCU'} = $codonHash{'GCU'} * $percentCount;
+		$residueHash{'Ala'}{'GCC'} = $codonHash{'GCC'} * $percentCount;
+		$residueHash{'Ala'}{'GCA'} = $codonHash{'GCA'} * $percentCount;
+		$residueHash{'Ala'}{'GCG'} = $codonHash{'GCG'} * $percentCount;
+	}
+	
+	# Tyrosine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'UAU'} + $codonHash{'UAC'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Tyr'}{'UAU'} = $codonHash{'UAU'} * $percentCount;
+		$residueHash{'Tyr'}{'UAC'} = $codonHash{'UAC'} * $percentCount;
+	}
+	
+	# Histidine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'CAU'} + $codonHash{'CAC'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'His'}{'CAU'} = $codonHash{'CAU'} * $percentCount;
+		$residueHash{'His'}{'CAC'} = $codonHash{'CAC'} * $percentCount;
+	}
+	
+	# Aspergine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'AAU'} + $codonHash{'AAC'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Asn'}{'AAU'} = $codonHash{'AAU'} * $percentCount;
+		$residueHash{'Asn'}{'AAC'} = $codonHash{'AAC'} * $percentCount;
+	}
+	
+	# Lysine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'AAA'} + $codonHash{'AAG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Lys'}{'AAA'} = $codonHash{'AAA'} * $percentCount;
+		$residueHash{'Lys'}{'AAG'} = $codonHash{'AAG'} * $percentCount;
+	}
+	
+	# Aspartic acid
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'GAU'} + $codonHash{'GAC'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Asp'}{'GAU'} = $codonHash{'GAU'} * $percentCount;
+		$residueHash{'Asp'}{'GAC'} = $codonHash{'GAC'} * $percentCount;
+	}
+	
+	# Glutamate
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'GAA'} + $codonHash{'GAG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Glu'}{'GAA'} = $codonHash{'GAA'} * $percentCount;
+		$residueHash{'Glu'}{'GAG'} = $codonHash{'GAG'} * $percentCount;
+	}
+	
+	# Cysteine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'UGU'} + $codonHash{'UGC'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Cys'}{'UGU'} = $codonHash{'UGU'} * $percentCount;
+		$residueHash{'Cys'}{'UGC'} = $codonHash{'UGC'} * $percentCount;
+	}
+	
+	# STOP
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'UAA'} + $codonHash{'UAG'} + 
+			$codonHash{'UGA'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Stop'}{'UAA'} = $codonHash{'UAA'} * $percentCount;
+		$residueHash{'Stop'}{'UAG'} = $codonHash{'UAG'} * $percentCount;
+		$residueHash{'Stop'}{'UGA'} = $codonHash{'UGA'} * $percentCount;
+	}
+	
+	# Tryptophan
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'UGG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Trp'}{'UGG'} = $codonHash{'UGG'} * $percentCount;
+	}
+	
+	# Arginine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'CGU'} + $codonHash{'CGC'} + $codonHash{'CGA'} +
+			$codonHash{'CGG'} + $codonHash{'AGA'} + $codonHash{'AGG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Arg'}{'CGU'} = $codonHash{'CGU'} * $percentCount;
+		$residueHash{'Arg'}{'CGC'} = $codonHash{'CGC'} * $percentCount;
+		$residueHash{'Arg'}{'CGA'} = $codonHash{'CGA'} * $percentCount;
+		$residueHash{'Arg'}{'CGG'} = $codonHash{'CGG'} * $percentCount;
+		$residueHash{'Arg'}{'AGA'} = $codonHash{'AGA'} * $percentCount;
+		$residueHash{'Arg'}{'AGG'} = $codonHash{'AGG'} * $percentCount;
+	}
+	
+	# Glycine
+	{
+		$percentCount = 0;
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'GGU'} + $codonHash{'GGC'} + $codonHash{'GGA'} +
+			$codonHash{'GGG'};
+	
+		$percentCount = eval{ (100 / $codonTotalCount) };
+	
+		$residueHash{'Gly'}{'GGU'} = $codonHash{'GGU'} * $percentCount;
+		$residueHash{'Gly'}{'GGC'} = $codonHash{'GGC'} * $percentCount;
+		$residueHash{'Gly'}{'GGA'} = $codonHash{'GGA'} * $percentCount;
+		$residueHash{'Gly'}{'GGG'} = $codonHash{'GGG'} * $percentCount;
+	}
+	
 	
 	
 	print Dumper(%residueHash);
@@ -451,7 +700,6 @@ sub GetChromoCodonUsage( $ ){
 	# For each residue workout the proportion in percentage for each condon.
 	 
 }
-
 
 ##########################################################################################################
 #

@@ -1,5 +1,5 @@
 #!/usr/bin/perl
-use Test::Simple tests => 17;
+use Test::Simple tests => 18;
 use Data::Dumper;
 use strict;
 #use warnings;
@@ -147,6 +147,18 @@ print "************************** TEST : 'GetGeneSummaryData' ******************
 {
 	my %data = ChromoDB::GetGeneSummaryData('AB002805');
 	ok( %data, "with valid accession number AB002805 as an argument");
-	print Dumper(%data);
+	#print Dumper(%data);
+}
+
+################################ TEST: 'GetRES' ################################
+
+# TEST 'GetRES'
+print "************************** TEST : 'GetRES' **************************\n";
+
+# CONDITION: No arguments
+{
+	my %RESdata = ChromoDB::GetRES();
+	ok( %RESdata, "with no arguments");
+	#print Dumper(%RESdata);
 }
 
