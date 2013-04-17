@@ -22,7 +22,12 @@ $(document).ready(function() {
 		titles		 = $("#titles"),
 		ColNCS 		 = "#5C6E7C",
 		ColEXON		 = "#AAC1D2",
-		ColINTRON	 = "#A65534"
+		ColINTRON	 = "#A65534",
+		browse		 = $("#browse"),
+		browseb		 = $("#browsebox"),
+		searchID 	 = $("#searchform"),
+		searchbox	 = $("#searchbox"),
+		welcome 	 = $("#welcome")
 		;
 	//Scans the page for links and adds "#!/"" to it
 	function ajaxLinks () {
@@ -66,14 +71,20 @@ $(document).ready(function() {
 		success: function(xhr, status) {
 			loader.fadeOut("fast");
 			overlay.fadeOut("fast");
-			//google.setOnLoadCallback(drawChart(xhr));                                                   
+			$("#timeout").slideUp("fast");
 		},
-		error: function(jqXHR, exception) {
-			loader.fadeOut("fast");
-			errordiv.html("Ajax error: "+jqXHR.status+".");
-			showError();
+		error: function(jqXHR, exception, m) {	
+			if (exception === "timeout") {
+				$("#timeout").slideDown("fast");
+			} else {
+				loader.fadeOut("fast");
+				errordiv.html("Ajax error: "+jqXHR.status+".");
+				$("#timeout").slideUp("fast");
+				showError();
+			}
 		},
-		cache:true
+		cache:true,
+		timeout:10000
 	});
 	//Run the Ajax links when loaded in
 	$("#content").ajaxComplete( function() {
@@ -144,7 +155,7 @@ $(document).ready(function() {
 	function validateSearch () {
 		if (textBox.val().length < 3) {
 			submitButton.removeAttr("href");
-			submitButton.fadeTo("slow", 0.2);
+			submitButton.fadeTo("fast", 0.2);
 			textBox.addClass("error");
 			return false;
 		} else {
@@ -171,6 +182,10 @@ $(document).ready(function() {
 			dataStructure = {selector: searchterms[1], searchType: searchterms[2], query:searchterms[3] };
 		} else if (searchterms[1] == "single"){ 
 			dataStructure = {selector: searchterms[1], query:searchterms[2] };
+		} else if (searchterms[1] == "browse") {
+			var check = /([aA-zZ])/i;
+			var browseletter = check.exec(searchterms[2]);
+			dataStructure = {selector: searchterms[1], query:browseletter[1]};
 		}
 		var result = $.ajax ({
 			url:"json.json",
@@ -185,6 +200,10 @@ $(document).ready(function() {
 					overlay.fadeOut("fast");
 				} else if (searchterms[1] == "single") {
 					outputSingleHTML(data);		
+					loader.fadeOut("fast");
+					overlay.fadeOut("fast");
+				} else if (searchterms[1] == "browse"){
+					outputSearchHTML(data);
 					loader.fadeOut("fast");
 					overlay.fadeOut("fast");
 				} else {
@@ -328,14 +347,22 @@ $(document).ready(function() {
 		// eg !,search,GeneID,123p,10,0
 		var selector;
 		var location;
-		if (urlState[1] == "search") {
-			selector = "Search Result";
-			location = urlState[3];
-			breadcrumbs.html('<a href="">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
-		} else if (urlState[1] == "single"){
-			location = urlState[2];
-			selector = "Single Result";
-			breadcrumbs.html('<a href="/">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
+		if (urlState) {
+			if (urlState[1] == "search") {
+				selector = "Search Result";
+				location = urlState[3];
+				breadcrumbs.html('<a href="" id="home">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
+			} else if (urlState[1] == "single"){
+				location = urlState[2];
+				selector = "Single Result";
+				breadcrumbs.html('<a href="" id="home">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
+			} else if (urlState[1] == "browse") {
+				location = urlState[2];
+				selector = "Browsing";
+				breadcrumbs.html('<a href="" id="home">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
+			} else {
+				breadcrumbs.html("");
+			}
 		} else {
 			breadcrumbs.html("");
 		}
@@ -376,6 +403,47 @@ $(document).ready(function() {
     	});
    		parent.append(items);
 	}
+	function titleHandler (urlState){
+		if (urlState) {
+			if (urlState[1] == "single") {
+				document.title = "12Chrom - viewing \""+urlState[2]+"\"";
+			} else if (urlState[1] == "search") {
+				document.title = "12Chrom - searching \""+urlState[2]+"\"";
+			} else if (urlState[1] == "browse") {
+				document.title ="12Chrom - Browsing \""+urlState[2]+"\"";
+			} else {
+				document.title ="12Chrom - Chromosome 12 Analysis Tool";
+			}
+		} else {
+			document.title ="12Chrom - Chromosome 12 Analysis Tool";
+		}
+
+	}
+	function resetIndex (urlState) {
+		welcome.show();
+		searchID.hide();
+		browse.hide();
+		closeHelp();
+		showMain();
+		hideContent();
+		clearContent();
+		setBreadcrumbs(urlState);
+		titleHandler(urlState);
+	}
+	function searchHandler (urlState) {
+		clearContent();
+		doSearch(urlState);
+		setBreadcrumbs(urlState);
+		hideMain();
+		closeHelp();
+		showContent();
+		ajaxLinks();
+		titleHandler(urlState);
+	}
+
+
+
+
 	$('#namesort').live("click", function() {
 		if ($(this).hasClass("desc") || $(this).text() == "Accession" ) {
 			sortIt($('#result-wrapper'), "div", "span#acc", "asc", $("#namesort"), "Accession");
@@ -404,6 +472,9 @@ $(document).ready(function() {
 			sortIt($('#result-wrapper'), "div", "span#location", "desc", $("#locationsort"), "Location");
 		}
 	});
+
+
+
 	//Visual
 		//blur
 		textBox.blur(validateSearch);
@@ -427,6 +498,17 @@ $(document).ready(function() {
 		});
 		$("#show3").click(function() { 
 			$("#codonusage").slideToggle("fast");
+		});
+		$("#browsebox").live("click", function() {
+			browse.show();
+			welcome.hide();
+		});
+		$("#searchbox").live("click", function() {
+			welcome.hide();
+			searchID.show();
+		});
+		$("#home").live("click", function() {
+			resetIndex();
 		});
 		// $("#show4").click(function() { 
 			// $("#cutter").slideToggle("fast");
@@ -477,34 +559,20 @@ $(document).ready(function() {
 					if (urlState == undefined) {
 						alert("Incorrect url.");
 					}
-					closeHelp();
-					showMain();
-					hideContent();
-					clearContent();
-					setBreadcrumbs(urlState);
+					resetIndex(urlState);
 					break;
 				case(urlState[1] == "help"):
 					openHelp();
 					centerPopup();
 					break;
 				case(urlState[1] == "search"):
-					//Do the search
-					clearContent();
-					doSearch(urlState);
-					setBreadcrumbs(urlState);
-					hideMain();
-					closeHelp();
-					showContent();
-					ajaxLinks();
+					searchHandler(urlState);
 					break;
 				case(urlState[1] == "single"):
-					clearContent();
-					doSearch(urlState);
-					setBreadcrumbs(urlState);
-					hideMain();
-					closeHelp();
-					showContent();
-					ajaxLinks();
+					searchHandler(urlState);
+					break;
+				case(urlState[1] == "browse"):
+					searchHandler(urlState);
 					break;
 			}
 				

@@ -27,6 +27,7 @@ h3 {
 	background-color:#CCCCCC;
 	clear:both;
 	padding:5px;
+	border-left: 5px solid #555;
 }
 a {
 	color:#7D4840;
@@ -95,8 +96,6 @@ pre {
 }
 .right {
 	text-align:right;
-}
-.searchform {
 }
 #result-wrapper {
 	float:left;
@@ -386,7 +385,38 @@ pre {
 	left: 5px;
 
 }
-
+.welcome_wrapper {
+	clear:both;
+	width: 900px;
+	float: left;
+	margin-top: 20px;
+}
+.welcome{
+	text-align: center;
+}
+.frontbox {
+	border: 3px solid #555;
+	font-weight: bold;
+	box-shadow: 1px 1px 20px #000;
+	border-radius: 5px;
+	padding: 10px;
+	margin: 10px;
+	float: left;
+	width: 255px;
+	text-shadow:5px 5px 10px #fff;
+	font-size: 25px;
+	cursor: pointer;
+	color: #333;
+}
+#searchform {
+	display: none;
+}
+#browse{ 
+	display: none;
+}
+#timeout {
+	display: none;
+}
 /* colours */
 .red {
 	color:#763227;
@@ -398,6 +428,12 @@ pre {
 	font-weight:bold;
 }
 .green {
-	color:#00CC00;
 	font-weight:bold;
+	background-color:#9cd7be;
+}
+.yellow {
+	background-color: #fff2cb;
+}
+.blue {
+	background-color: #aac1d2;
 }

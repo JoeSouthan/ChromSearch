@@ -36,6 +36,10 @@
 	<h2 class="center">There was an error...</h2>
 	<p id="errordiv"></p>
 </div>
+<div class="boxes" id="timeout">
+	<h2 class="center">Waiting...</h2>
+	<p>Seems the data is taking a while to come back. Try refreshing!</p>
+</div>
 <div class="navbar-wrapper">
 	<div class="navbar-inner-wrapper">
 		<div class="header">
@@ -44,7 +48,7 @@
 		</div>
 		<span class="subheader">Chromosome 12 Analysis Tool</span>
 		<div class="navbar">
-					<div class="item">
+					<div class="item" id="home">
 						<a href="">Home</a>
 					</div>
 					<div class="item">
@@ -63,7 +67,65 @@
 <div class="wrapper">
 <div id="breadcrumbs-wrapper"></div>
 	<div id="main">
-		<div class="searchform">
+		
+		<div class="welcome_wrapper" id="welcome">
+			<div class="welcome">
+				<h2>Welcome to the Chromosome 12 Search Engine</h2>
+				<div class="frontbox yellow" id="browsebox"> 
+					<p>Browse &raquo;</p>
+				</div>
+				<div class="frontbox blue" id="searchbox">
+					<p>Search &raquo;</p>
+				</div>
+				<div class="frontbox green" id="helpbox">
+					<p>Help &raquo;</p>
+				</div>
+			</div>
+		</div>
+		<div class="welcome_wrapper" id="browse"> 
+			<div class="browse">
+				<h2>Browse</h2>
+				<div>
+					<h3>Browse by Gene Name</h3>
+						<div>
+							<p>Please select a letter</p>
+							<form method="get" action="" id ="browseGene">
+								<select>
+									<option value="a">A</option>
+									<option value="b">B</option>
+									<option value="c">C</option>
+									<option value="d">D</option>
+									<option value="e">E</option>
+									<option value="f">F</option>
+									<option value="g">G</option>
+									<option value="h">H</option>
+									<option value="i">I</option>
+									<option value="j">J</option>
+									<option value="k">K</option>
+									<option value="l">L</option>
+									<option value="m">M</option>
+									<option value="n">N</option>
+									<option value="o">O</option>
+									<option value="p">P</option>
+									<option value="q">Q</option>
+									<option value="r">R</option>
+									<option value="s">S</option>
+									<option value="t">T</option>
+									<option value="u">U</option>
+									<option value="v">V</option>
+									<option value="w">W</option>
+									<option value="x">X</option>
+									<option value="y">Y</option>
+									<option value="z">Z</option>
+								</select>
+									<input type="submit" value="Submit" />
+									<input type="reset" value="Reset" />
+							</form>
+						</div>
+				</div>
+			</div>
+		</div>
+		<div class="welcome_wrapper" id="searchform">
 					<div class="left"><img src="img/clippy.gif" alt="Clippy" width="94" height="87" /></div>
 					<h2 class="center">It looks like you're about to search.</h2>
 			<form method="post" action="cgi-bin/search_results.pl" id="mainSearch">

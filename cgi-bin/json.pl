@@ -30,7 +30,7 @@ foreach my $params (@params) {
 #Debug
  # $query = "q13";
  # $type = "ChromosomeLocation";
- # $selector = "search";
+  $selector = "res";
 
 
 #Print the JSON header
@@ -41,22 +41,25 @@ print $cgi->header('application/json');
 unless (defined ($selector)) {
 	print GenJSON::error("No selector chosen");
 } else {
-	unless (defined ($query)) {
-		print GenJSON::error("No query selected");
+	if ($selector eq "res") {
+		print GenJSON::getRes();
 	} else {
-		if ( $selector eq "search") {
-			unless (defined ($type)) {
-				print GenJSON::error("No type selected");
-			} else {
-				#print GenJSON::testJSONSearch();
-				print GenJSON::doSearch($query,$type);
-			}
-		} elsif ($selector eq "single") {
-			print GenJSON::testJSONSingle();
+		unless (defined ($query)) {
+			print GenJSON::error("No query selected");
 		} else {
-			print GenJSON::error("Invalid selector");
+			if ( $selector eq "search") {
+				unless (defined ($type)) {
+					print GenJSON::error("No type selected");
+				} else {
+					#print GenJSON::testJSONSearch();
+					print GenJSON::doSearch($query,$type);
+				}
+			} elsif ($selector eq "single") {
+				print GenJSON::doSearch($query, "AccessionNumber");
+			} else {
+				print GenJSON::error("Invalid selector");
+			}
 		}
-	}
-	
+	}	
 }
 
