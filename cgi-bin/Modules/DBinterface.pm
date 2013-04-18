@@ -7,7 +7,7 @@ use Data::Dumper;
 
 ##########################################################################################################
 #
-# DoQuery - Takes a MySQL search string, returns the result from the query in an array
+# DoQuery - Takes a MySQL query string, returns the result from the query in an array
 #
 ##########################################################################################################
 sub DoQuery( $ ){
@@ -51,7 +51,7 @@ sub DoQuery( $ ){
 		# Use isArrayFunction to check for 'empty' array.  The MySQL entries will
 		# always have something as their value, here if the array is full of 
 		# N/A entries then return custom message indicating no data and exit.
-		if( isArrayEmpty( @rowData ) eq 0 ){
+		if( IsArrayEmpty( @rowData ) eq 0 ){
 			SetLastErrorMessage('DB_RETURNED_NO_MATCHES');
 			return undef;
 		}else{
@@ -148,6 +148,7 @@ sub QueryColumn{
 		return @columnData;
 	}
 }
+
 ###############################################################################################
 #
 # QuerySequence - Takes an accession number and returns the DNA sequence for it from the DB.
@@ -195,7 +196,7 @@ sub FindRES{
 
 ###############################################################################################
 #
-# BuildCodingSeq - Takes an Id and returns an array with all the introns and exons in sequence.
+# BuildCodingSeq - Takes an accession number and returns an array with all the introns and exons in sequence.
 #
 ###############################################################################################
 sub BuildCodingSeq{
@@ -300,12 +301,12 @@ sub BuildCodingSeq{
 }
 ###########################################################################################################
 #
-# BuildSummaryData - 
+# BuildSummaryData - Takes an accession number and returns a hash with all the relevent summary data
+# 		     for a gene.
 #
 ##########################################################################################################
 sub BuildSummaryData( $ ){
 
-	# ASSUMPTION: identifer used for search is passed in i.e AccessionNumber or GeneName etc. 
 	# Get and store the input arguments 
 	my $accessionNo = $_[0];
 	
@@ -315,6 +316,10 @@ sub BuildSummaryData( $ ){
 	my $sqlQuery = "SELECT geneId, chromLoc, proteinName, geneSeq, proteinSeq FROM gene WHERE accessionNo = '$accessionNo'";
 	
 	my @geneInfo = DBinterface::DoQuery($sqlQuery);
+	
+	unless( @geneInfo ){
+		return undef;
+	}
 	
 	# Get gene name , if unnamed set to unnamed.
 	my $geneName = 0;
@@ -347,43 +352,25 @@ sub BuildSummaryData( $ ){
 	# Send back hash of data
 	return %geneData;
 }
+
 ###########################################################################################################
 #
-# GetChromoCodonUsage - Takes nothing and returns an array with codon usage numbers from DB.
+# CalculateCodonUsage - Takes an array of codons and returns a hash with the percentage for each amino acid
 #
 ##########################################################################################################
-sub GetChromoCodonUsage( $ ){
-	my $accessionNo = $_[0];
-	
-	my $sqlQuery = "SELECT codonCount FROM codonBias WHERE accessionNo = 'chrom_12'";
-	
-	my @chromoCodonUsage = DBinterface::DoQuery($sqlQuery);
-	
-	#print Dumper(@chromoCodonUsage);
+sub CalculateCodonUsage( @ ){
 
-	my $sqlQuery = "SELECT codonCount FROM codonBias WHERE accessionNo = '$accessionNo'";
+	my @codons = $_[0];
 	
-	my @codonUsage = DBinterface::DoQuery($sqlQuery);
-	
-	#print Dumper(@codonUsage);
-	
+	#print Dumper(@codons);
+
 	# Split out all individual codons in string to unique array entries.
-	
-	my @chromCodonArray = split(/,/, $chromoCodonUsage[0]->[0] );
-	
-	#print Dumper(@chromCodonArray);
-	
-	
-	my @codonArray = split(/,/, $codonUsage[0]->[0] );
-	
-	#print Dumper(@codonArray);
-	
+	my @codonArray = split(/,/, $codons[0]->[0] );
 	
 	# Group condons into respective amino acid residues
 	
 	# Loop through array split out codon from number, create codon hash entry
 	# and assign it the number
-	
 	my %codonHash;
 	
 	foreach my $codon (@codonArray){
@@ -393,10 +380,7 @@ sub GetChromoCodonUsage( $ ){
 		$codonHash{$codonDetails[0]} = $codonDetails[1];
 	}
 	
-	print 'codonhash = ',Dumper(%codonHash);
-	
 	# From this hash take the codon numbers needed for each residue.
-	
 	my %residueHash;
 	
 	my $percentCount = 0;
@@ -692,14 +676,28 @@ sub GetChromoCodonUsage( $ ){
 		$residueHash{'Gly'}{'GGA'} = $codonHash{'GGA'} * $percentCount;
 		$residueHash{'Gly'}{'GGG'} = $codonHash{'GGG'} * $percentCount;
 	}
-	
-	
-	
-	print Dumper(%residueHash);
-	
-	# For each residue workout the proportion in percentage for each condon.
 	 
+	return %residueHash;
 }
+##########################################################################################################
+#
+# GetCodons - Takes an accession number for a gene and returns an array of codons from the DB
+#
+##########################################################################################################
+sub GetCodons( $ ){
+
+	# Grab the accesion number for the genes codons we want
+	my $accessionNo = $_[0];
+	
+	# Query for codons given the accession number
+	my $sqlQuery = "SELECT codonCount FROM codonBias WHERE accessionNo = '$accessionNo'";
+	
+	# Run the query and save the result in a array
+	my @accesionCodons = DBinterface::DoQuery($sqlQuery);
+	
+	return @accesionCodons;
+}
+
 
 ##########################################################################################################
 #
@@ -745,10 +743,10 @@ sub databaseConnect{
 
 ##########################################################################################################
 #
-# isArrayEmpty - Takes an array as input and returns true if it is empty or false if not empty
+# IsArrayEmpty - Takes an array as input and returns true if it is empty or false if not empty
 #
 ##########################################################################################################
-sub isArrayEmpty( @ ){
+sub IsArrayEmpty( @ ){
 	
 	# Get copy of passed in array
 	my @array = @_;
@@ -764,7 +762,7 @@ sub isArrayEmpty( @ ){
 			
 			if( ( length($array[$i][$j]) ) && ($array[$i][$j] ne 'N/A') )
 			{
-				return 1; # Has length or is equal to N/A
+				return 1; # Has length or is not equal to N/A
 			}
 		}
 	}
@@ -779,13 +777,10 @@ sub GetLastErrorMessage{
 sub SetLastErrorMessage( $ ){
 	$lastErrorMessage = $_[0];
 }
-# Constants
-
-use constant FALSE => 1;
-use constant TRUE => 0;
 
 # Global variables
 
+# global to store the last error
 my $lastErrorMessage = '';
 
 1;

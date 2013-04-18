@@ -4,7 +4,7 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use Test::Simple tests => 28;
+use Test::Simple tests => 31;
 use DBinterface;
 
 ################################ TEST: 'databaseConnect'###############################
@@ -124,42 +124,42 @@ print "\n************************** TEST: 'getIdentifier' **********************
 	my $identifier = DBinterface::GetIdentifier("geneindentifier");
 	ok( !defined($identifier), "with incorrect parameter 'geneidentifier'");
 }
-################################ TEST : 'isArrayEmpty' ################################ 
+################################ TEST : 'IsArrayEmpty' ################################ 
 
-print "\n************************** TEST: 'isArrayEmpty' **************************\n";
+print "\n************************** TEST: 'IsArrayEmpty' **************************\n";
 
 # CONDITION: 2D array with items in
 {
 	my @items = ( ["one","two","three"], ["four","five","six"] );
-	my $result = DBinterface::isArrayEmpty( @items );
+	my $result = DBinterface::IsArrayEmpty( @items );
 	ok($result eq '1', "with valid filled out array" );
 }
 
 # CONDITION: 2d array with blank entries
 {
 	my @items = (['','','',''], ['','',''], ['','','']);
-	my $result = DBinterface::isArrayEmpty( @items );
+	my $result = DBinterface::IsArrayEmpty( @items );
 	ok($result eq '0', "with blank array elements");
 }
 
 # CONDITION: 2d array with 'N/A' as array elements 
 {
 	my @items = (['N/A','N/A','N/A','N/A'], ['N/A','N/A','N/A','N/A']);
-	my $result = DBinterface::isArrayEmpty( @items );
+	my $result = DBinterface::IsArrayEmpty( @items );
 	ok($result eq '0', "with 'N/A' array elements");
 }
 
 # CONDITION: Array with mixed blank and 'N/A' as array elements 
 {
 	my @items = (['N/A','','N/A',''], ['N/A','','N/A','']);
-	my $result = DBinterface::isArrayEmpty( @items );
+	my $result = DBinterface::IsArrayEmpty( @items );
 	ok($result eq '0', "with mixed blank and 'N/A' array elements");
 }
 
 # CONDITION: Array with one of the elements as valid
 {
 	my @items = (['N/A','','N/A','ValidElement',''], ['N/A','','N/A','N/A',''] );
-	my $result = DBinterface::isArrayEmpty( @items );
+	my $result = DBinterface::IsArrayEmpty( @items );
 	ok($result eq '1',"with one of the elements as valid");
 }
 
@@ -180,9 +180,9 @@ print "\n************************** TEST: 'QuerySequence' **********************
 	#print $seq,"\n";
 }
 
-################################ TEST : 'buildCodingSeq' ################################
+################################ TEST : 'BuildCodingSeq' ################################
 
-print "\n************************** TEST: 'buildCodingSeq' **************************\n";
+print "\n************************** TEST: 'BuildCodingSeq' **************************\n";
 
 {
 	my @seq = DBinterface::BuildCodingSeq('AB002805');
@@ -226,18 +226,6 @@ print "************************** TEST : 'BuildSummaryData' ********************
 	#print Dumper(%data);
 }
 
-################################ TEST: 'GetChromoCodonUsage' ################################
-
-# TEST 'GetChromoCodonUsage'
-print "************************** TEST : 'GetChromoCodonUsage' **************************\n";
-
-# CONDITION: With valid accession number as argument 
-{
-	my @codonData = DBinterface::GetChromoCodonUsage('AB002805');
-	ok( @codonData, "with no arguments");
-	print Dumper(@codonData);
-}
-
 ################################ TEST: 'FindRES' ################################
 
 # TEST 'FindRES'
@@ -250,4 +238,43 @@ print "************************** TEST : 'FindRES' **************************\n"
 	#print Dumper(@RESInfo);
 }
 
+################################ TEST: 'GetCodons' ################################
+
+# TEST 'GetCodons'
+print "************************** TEST : 'GetCodons' **************************\n";
+
+# CONDITION: No aguments, none necessary
+{
+	my @Codons = DBinterface::GetCodons('AB002805');
+	ok( @Codons, "with valid accession number");
+	#print Dumper(@Codons);
+}
+
+# CONDITION: Special case for the whole chromosome
+{
+	my @Codons = DBinterface::GetCodons('Chrom_12');
+	ok( @Codons, "with accession for whole of chromosome 12");
+	#print Dumper(@Codons);
+}
+
+################################ TEST: 'CalculateCodonUsage' ################################
+
+# TEST 'CalculateCodonUsage'
+print "************************** TEST : 'CalculateCodonUsage' **************************\n";
+
+# CONDITION: With valid accession number as argument 
+{
+	my @Codons = DBinterface::GetCodons('AB002805');
+	my %codonData = DBinterface::CalculateCodonUsage(@Codons);
+	ok( %codonData, "with valid accession number");
+	#print Dumper(%codonData);
+}
+
+# CONDITION: With codons for whole chromosome  
+{
+	my @Codons = DBinterface::GetCodons('Chrom_12');
+	my %codonData = DBinterface::CalculateCodonUsage(@Codons);
+	ok( %codonData, "with accession for whole chromosome");
+	#print Dumper(%codonData);
+}
 
