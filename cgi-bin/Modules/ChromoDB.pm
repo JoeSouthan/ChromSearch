@@ -54,7 +54,7 @@ sub ShowAllIdentifiers( $ ){
 
 ##########################################################################################################
 #
-# getSearchResults - Takes a string from the webpage and searches the database for matches
+# getSearchResults - Takes input string for an identifier from the webpage and searches the database for matches
 #
 ##########################################################################################################
 sub getSearchResults{
@@ -82,7 +82,7 @@ sub getSearchResults{
 	
 	# String must contain matches to return
 	unless( @queryResult ){
-	
+
 		# If is null return null string or error code
 		$error{'error'} = DBinterface::GetLastErrorMessage();
 		return %error; 	
@@ -144,7 +144,7 @@ sub getSequence{
 
 ##########################################################################################################
 # 
-# showCodingSeq - Takes an identifier and returns an array of the introns and exons sequentially ordered
+# showCodingSeq - Takes an accession number and returns an array of the introns and exons sequentially ordered
 #
 ##########################################################################################################
 sub showCodingSeq{
@@ -162,13 +162,16 @@ sub showCodingSeq{
 
 	my @codingSeq = DBinterface::BuildCodingSeq($accessionNo);
 	
-	if(@codingSeq eq 'ERROR:DB_COLUMN_EMPTY'){
-		return 'ERROR:DB_COLUMN_EMPTY';
+	unless( @codingSeq ){
+		# If is null return null string or error code
+		$error{'error'} = DBinterface::GetLastErrorMessage();
+		return %error; 
 	}
 	
 	# Return array or can be string if we want?.
 	return @codingSeq;
 }
+
 ##########################################################################################################
 #
 # GetGeneSummaryData - Takes an accession number and returns GeneID, Gene Name, and the Seqeuence data annotated

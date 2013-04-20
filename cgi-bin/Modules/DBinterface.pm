@@ -16,7 +16,7 @@ sub DoQuery( $ ){
 	my $sqlQuery = $_[0];
 	
 	# Attempt to connect to database 
-	my $hDb = DBinterface::databaseConnect();
+	my $hDb = DBinterface::DatabaseConnect();
 	if( $hDb ){
 		
 		# Array to hold output
@@ -109,7 +109,7 @@ sub QuerySearch{
 	my ($searchString, $idType) = @_;
 	
 	# Run search query **$searchstring must be in quotes***
-	my $sqlQuery = "SELECT accessionNo, geneId, chromLoc, proteinName, ProteinId, geneSeqLen FROM gene WHERE $idType='$searchString'";
+	my $sqlQuery = "SELECT accessionNo, geneId, chromLoc, proteinName, ProteinId, geneSeqLen FROM gene WHERE $idType LIKE '%$searchString%'";
 	
 	# Run query
 	my @searchResults = DBinterface::DoQuery($sqlQuery);
@@ -325,14 +325,24 @@ sub BuildSummaryData( $ ){
 	my $geneName = 0;
 	
 	# Data to return
-
-	# Codon usage
 	
-
 	# Build hash
 	
 	# Hash to save all data in.
 	my %geneData;
+	
+	# Codon usage
+	
+	# Attempt to retrieve the codons for the given accession number
+	my @codons = DBinterface::GetCodons( $accessionNo );
+	
+	unless( @codons ){
+		# No codons returned list as empty
+		$geneData{$accessionNo}{'CodonUsage'} = 'N/A';
+	}else{
+		# Valid array of codons converted to percentages and packaged in to hash
+		$geneData{$accessionNo}{'CodonUsage'} = [CalculateCodonUsage(@codons)];
+	}
 	
 	# Gene name
 	$geneData{$accessionNo}{'GeneName'} = $geneInfo[0]->[0];
@@ -701,11 +711,11 @@ sub GetCodons( $ ){
 
 ##########################################################################################################
 #
-# databaseConnect - Takes database name, username, password and server name, returns handle to DB or undef.
+# DatabaseConnect - Takes database name, username, password and server name, returns handle to DB or undef.
 # let the caller handle success and fail of connect.
 #
 ##########################################################################################################
-sub databaseConnect{
+sub DatabaseConnect{
 	
 	#Defined the connection details to the database
 	my $dbname = 'scouls01'; 

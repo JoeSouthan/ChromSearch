@@ -4,16 +4,16 @@ use strict;
 use warnings;
 use Data::Dumper;
 
-use Test::Simple tests => 31;
+use Test::Simple tests => 32;
 use DBinterface;
 
-################################ TEST: 'databaseConnect'###############################
+################################ TEST: 'DatabaseConnect'###############################
 
-print "\n************************** TEST : 'databaseConnect' **************************\n";
+print "\n************************** TEST : 'DatabaseConnect' **************************\n";
 
 # CONDITION: Just run function
 {
-	my $dbhandle = DBinterface::databaseConnect();
+	my $dbhandle = DBinterface::DatabaseConnect();
 	ok( $dbhandle, 'Test DB connection' );
 }
 
@@ -106,12 +106,19 @@ print "\n************************** TEST: 'QuerySearch' ************************
 # CONDITION: Valid parameters but not in DB
 {
 	my @results = DBinterface::QuerySearch("HEX5","proteinName");
-	ok( @results, "Testing 'querySearch' with valid parameters but not in DB");
+	ok( @results, "with valid parameters but not in DB");
 	#print Dumper( @results );
 }
-################################ TEST 'getIdentifier' ###############################
+# CONDITION: Valid arguments but only partial name
+{
+	my @results = DBinterface::QuerySearch("AB00","accessionNo");
+	ok( @results, "with valid arguments but only partial name");
+	#print Dumper( @results );
+}
 
-print "\n************************** TEST: 'getIdentifier' **************************\n";
+################################ TEST 'GetIdentifier' ###############################
+
+print "\n************************** TEST: 'GetIdentifier' **************************\n";
 
 # CONDITION: Valid parameters
 {

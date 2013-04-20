@@ -6,9 +6,9 @@ use strict;
 
 use ChromoDB;
 
-################################ TEST: 'showAllIdentifiers' ################################
+################################ TEST: 'ShowAllIdentifiers' ################################
 
-# TEST 'showAllIdentifiers'
+# TEST 'ShowAllIdentifiers'
 
 print "************************** TEST : 'ShowAllIdentifiers' **************************\n";
 
@@ -99,6 +99,11 @@ print "************************** TEST : 'getSearchResults' ********************
 }
 
 # CONDITION Partial words in search string.
+{
+	my %results = ChromoDB::getSearchResults('AB00','AccessionNumber');
+	ok( %results, "with partial AccessionNumber argument");
+	#print Dumper(%results);
+}
 
 ################################ TEST: 'getSequence' ################################
 
@@ -123,14 +128,15 @@ print "************************** TEST : 'showCodingSeq' ***********************
 
 # CONDITION: No arguments
 {
-	my $results = ChromoDB::showCodingSeq('');
-	ok( $results eq 'ERROR:ZERO_LENGTH_ARGUMENT', "with no arguments");
+	my @codingSeq = ChromoDB::showCodingSeq('');
+	ok( @codingSeq, "with no arguments");
+	print Dumper(@codingSeq);
 }
 # CONDITION: With valid accession number as argument 
 {
-	my $results = ChromoDB::showCodingSeq('AB002805');
-	ok( length($results), "with valid accession number AB002805 as an argument");
-	print $results,"\n";
+	my @codingSeq = ChromoDB::showCodingSeq('AB002805');
+	ok( @codingSeq, "with valid accession number AB002805 as an argument");
+	print Dumper(@codingSeq);
 }
 
 ################################ TEST: 'GetGeneSummaryData' ################################
