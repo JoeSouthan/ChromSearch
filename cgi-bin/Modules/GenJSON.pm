@@ -11,7 +11,7 @@ our @EXPORT = qw ();
 sub doSearch {
 	my $json = JSON->new;
 	my ($query,$type)= @_;
-	my %result = ChromoDB::GetSearchResults($query,$type);
+	my %result = ChromoDB::getSearchResults($query,$type);
 	return $json->pretty->encode(\%result);
 
 }
@@ -28,6 +28,19 @@ sub getRes {
 	my $json = JSON->new;
 	my %result = ChromoDB::GetRES();
 	return $json->pretty->encode(\%result);
+}
+sub CalcRES {
+	my $json = JSON->new;
+	my %result = @_;
+
+	return $json->pretty->encode(\%result);
+
+}
+sub help {
+	my $json = JSON->new;
+	my %result = @_;
+	return $json->pretty->encode(\%result);
+ 
 }
 sub error {
 	my $json = JSON->new;

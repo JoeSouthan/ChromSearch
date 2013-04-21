@@ -25,7 +25,8 @@ $(document).ready(function() {
 		searchID 	 = $("#searchform"),
 		searchbox	 = $("#searchbox"),
 		welcome 	 = $("#welcome"),
-		validation   = $("#validation")
+		validation   = $("#validation"),
+		EnzC_CB 	 = $("#EnzCutter_cb")
 		;
 	//Scans the page for links and adds "#!/"" to it
 	function ajaxLinks () {
@@ -63,13 +64,11 @@ $(document).ready(function() {
 	//Ajax call setup
 	$.ajaxSetup({
 		beforeSend: function(xhr, status) {
-			loader.fadeIn("fast");
-			overlay.fadeIn("fast");
+
 		},
 		success: function(xhr, status) {
 			loader.fadeOut("fast");
 			overlay.fadeOut("fast");
-			$("#timeout").slideUp("fast");
 		},
 		error: function(jqXHR, exception, m) {	
 			if (exception === "timeout") {
@@ -96,19 +95,6 @@ $(document).ready(function() {
 	  //    "top" : winh/2-poph/2,  
 			"left" : winw/2-popw/2  
 		}); 
-	}
-
-	//Help Functions
-	function closeHelp() {
-		if (help.is(":visible")) {
-			overlay.fadeOut("fast");
-			help.slideUp("fast");
-		}
-	}
-	function openHelp() {
-		overlay.fadeIn("fast");
-		help.slideDown("fast");
-
 	}
 
 	//Main Functions
@@ -171,25 +157,77 @@ $(document).ready(function() {
 			type: "GET",
 			dataType: "json",
 			data: dataStructure,
+			beforeSend: function() {			
+				loader.fadeIn("fast");
+				overlay.fadeIn("fast");},
 			success: function (data) {
 				if (searchterms[1] == "search") {
 					outputSearchHTML(data);		
-					loader.fadeOut("fast");
-					overlay.fadeOut("fast");
 				} else if (searchterms[1] == "single") {
 					outputSingleHTML(data);		
-					loader.fadeOut("fast");
-					overlay.fadeOut("fast");
 				} else if (searchterms[1] == "browse"){
 					outputSearchHTML(data);
-					loader.fadeOut("fast");
-					overlay.fadeOut("fast");
 				} else {
 					console.log(searchterms[1]);
 				}
+				loader.fadeOut("fast");
+				overlay.fadeOut("fast");
 			},
 		
 		});
+	}
+
+	//JSON for EnzCutter
+	//Sumbit = [mode, query(being choice of enzymes), gene, sequence]
+	function EnzCutter (submit) {
+		if (submit[0] == "GetRES"){
+			dataStructure = {mode:"GetRES"};
+		} else if (submit[0] == "CalcRES") {
+			dataStructure = {mode:"CalcRES", query:submit[1], gene:submit[2], sequence: submit[3]};
+		}
+		var result = $.ajax ({
+			url:"cgi-bin/json.pl?selector=res",
+			//url:"res.json",
+			type:"GET",
+			data: dataStructure,
+			dataType:"json",
+			beforeSend: function() {
+				loader.fadeIn("fast");
+			},
+			success: function (data) {
+				if (submit[0] == "GetRES"){
+					populateEnzCutter(data);
+				} else if (submit[0] == "CalcRES") {
+					//
+				}
+				loader.fadeOut("fast");
+				overlay.fadeOut("fast");
+			}
+		});
+
+	}
+	function populateEnzCutter (data){
+		var counter = 0 ;
+		var dataArray = [];
+		$.each (data, function(i,val){
+			dataArray.push(i);
+			counter++;
+		});
+		$("#EnzCutter_number").html("<span>"+counter+" Enzymes avaliable</span>");
+		$('#EnzCutter_autocomplete').textext({
+            plugins : 'autocomplete tags filter arrow'
+        })
+        .bind('getSuggestions', function(e, data){
+            var list = dataArray,
+                textext = $(e.target).textext()[0],
+                query = (data ? data.query : '') || ''
+                ;
+
+            $(this).trigger(
+                'setSuggestions',
+                { result : textext.itemManager().filter(list, query) }
+            );
+        });
 	}
 	//Output JSON to HTML
 	function outputSearchHTML (data) {
@@ -217,20 +255,24 @@ $(document).ready(function() {
 	//Outputs the Single page HTML
 	function outputSingleHTML (data) {
 		var counter = 0;
-		//console.log(data);
 		$.each(data, function (i,val) {
 			var features = val["SeqFeat"];
+			var pnamel = val["ProteinName"].length;
+			var pname = val["ProteinName"];
 			var name = i;
+			if (pnamel < 1) {
+				pname = "Unknown";
+			}
 			content.html(' \
     <div class="searchform"> \
     	<h2 class="center">Single result for: '+i+'.</h2> \
         <div class="singleresult"> \
         	<div class="info"> \
-            	<span>Name: '+val["GeneName"]+' | Genbank Accession: '+i+' | Chromosomal Location: '+val["ChromosomeLocation"]+'</span> \
+            	<span>Name: </span><span class="bold">'+val["GeneName"]+'</span><span> | Genbank Accession: </span><span class="bold">'+i+'</span><span> | Chromosomal Location: </span><span class="bold">'+val["ChromosomeLocation"]+'</span> \
             </div> \
             <div class="single-wide"> \
             	<h2>Protein Product</h2>\
-            	<p>'+val["ProteinName"]+'</p>\
+            	<p>'+pname+'</p>\
             	<h2>Sequence Characteristics</h2> \
             	<h3>Gene Layout</h3> \
                 <div class="diagram centerdiv" id="chart_div0"></div>\
@@ -245,33 +287,32 @@ $(document).ready(function() {
                 <p>Some Text</p> \
                 <h3>BsuMI</h3> \
                 <p>Some Text</p> \
-                <p id="cutter-text">Would you like to <a href="#cutter" id="show4">cut your own?</a></p> \
-				<div id="spinner"> \
-					<img src="../img/ajaxloader.gif" alt="Loading" width="24" height="24" /> \
-				</div> \
-                <div id="cutter"> \
-                </div> \
+                <h2>EnzCutter</h2> \
+                <div class="bold underline red pointer" id="EnzCutter_open">Would you like to cut your own?</div> \
             </div> \
             <div class="clearfix"></div> \
             <div class="single-wide"> \
             	<h2>Sequences</h2> \
-            	<a id="show1">Click to reveal DNA Sequence</a> \
+            	<div class="bold underline red pointer" id="show1">Click to reveal DNA Sequence</div> \
             	<div id="SequenceDNA"> \
-					<span></span> \
+					<span class="sequence"></span> \
 				</div> \
                 <br /> \
-                <a id="show2">Click to reveal Translated Amino Acid Sequence</a> \
+                <div class="bold underline red pointer" id="show2">Click to reveal Translated Amino Acid Sequence</div> \
                 <div id="SequenceAA"> \
 					<span></span> \
 				</div> \
 				<br /> \
-				<a id="show3">Codon usage</a> \
+				<div class="bold underline red pointer" id="show3">Codon usage</div> \
 				<div id="codonusage"> \
 					<span></span> \
 				</div> \
             </div> \
         </div> \
     </div>');
+		$("#EnzCutter_currentGene").html("<p class=\"bold\">"+i+"</p>");
+		$("#EnzCutter_welcome").html("<p>Please choose enzymes to cleave with.</p>");
+		$("textarea#EnzCutter_textarea").remove();
 		google.setOnLoadCallback(drawChart(features,counter, name));
 		});
 	}
@@ -287,7 +328,6 @@ $(document).ready(function() {
 			feats.push(f1[0]);
 			var difference = f1[1].split(":");
 			var glength = Math.abs(parseInt(difference[0])-parseInt(difference[1]));
-			//console.log(glength);
 			numbers.push(glength);
 		});
 		//Set the colours based on the sequence feature
@@ -380,6 +420,29 @@ $(document).ready(function() {
     	});
    		parent.append(items);
 	}
+	function doHelp (page) {
+		var result = $.ajax ({
+			url:"cgi-bin/json.pl?selector=help",
+			//url:"help.json",
+			type:"GET",
+			data: page[0],
+			dataType:"json",
+			beforeSend: function() {
+				loader.fadeIn("fast");
+			},
+			success: function (data) {
+				outputHelp(data);
+				help.slideDown("fast");
+				loader.fadeOut("fast");
+				overlay.fadeOut("fast");
+			}
+		});
+	}
+	function outputHelp (data) {
+		$.each(data, function (i,val) {
+			return true;
+		});
+	}
 	function titleHandler (urlState){
 		if (urlState) {
 			if (urlState[1] == "single") {
@@ -396,23 +459,29 @@ $(document).ready(function() {
 		}
 
 	}
+	function replaceTextbox () {
+		$("#EnzCutter_autocompleteWrapper").html('<textarea type="text" name="query" id="EnzCutter_textarea" autofocus="autofocus" cols="40" rows="4"></textarea>');
+		$("#EnzCutter_currentGene").html("");
+	}
 	function resetIndex (urlState) {
 		welcome.show();
 		searchID.hide();
 		browse.hide();
-		closeHelp();
 		showMain();
 		hideContent();
 		clearContent();
 		setBreadcrumbs(urlState);
 		titleHandler(urlState);
+		replaceTextbox();
+		$("#EnzCutter").slideUp("fast");
+		help.slideUp("fast");
 	}
 	function searchHandler (urlState) {
 		clearContent();
 		doSearch(urlState);
 		setBreadcrumbs(urlState);
 		hideMain();
-		closeHelp();
+		help.slideUp("fast");
 		showContent();
 		ajaxLinks();
 		titleHandler(urlState);
@@ -474,6 +543,9 @@ $(document).ready(function() {
 		$("#home").live("click", function() {
 			$.History.go("!/");
 		});
+		$("#closepopup").live("click", function() {
+			$(this).parent().slideUp();
+		})
 
 		//Search Submitters
 		$("#browsesubmit").live("click", function(event) {
@@ -487,28 +559,50 @@ $(document).ready(function() {
 			var query = textBox.val();
 			$.History.go("!/search/"+radioVal+"/"+query)
 		});
-		$("#show4").live("click", function() { 
-			$("#cutter").slideToggle("fast");
+		$("#EnzCutter_open").live("click", function(event){
+			event.preventDefault();	
+			$("#EnzCutter").slideToggle("fast");
 		});
-		$("#closepopup").live("click", function() {
-			closeHelp();
+		$("#EnzCutter_submit").live("click", function(event) {
+			event.preventDefault();
+			var sequence = $("textarea#EnzCutter_textarea").val();
+			var enzymes = $("input[name=autocomplete]").val();
+			var regex = /\w+/g;
+			enzymes = enzymes.match(regex);
+			enzymes = enzymes.join(',');
+			if (sequence === undefined) {
+				sequence = $("#EnzCutter_currentGene").text();
+			}
+			if (enzymes) {
+				if (sequence.length < 7) {
+					$("#EnzCutter_number").html('<span class="red">Sequence must be longer than 10 characters.</span>');
+				} else {
+					EnzCutter(["CalcRES", enzymes, sequence]);
+				}
+			} else { 
+				$("#EnzCutter_number").html('<span class="red">Please choose an enzyme.</span>');
+			}
 		});
-		$("#overlay").live("click", function() {
-			closeHelp();
+		$("#help_open, #helpbox").live("click", function(event){
+			event.preventDefault();
+			doHelp("test");
 		});
+
 		$(window).resize(function() {  
 			centerPopup();  
 		}); 
 		function moveTitle () {
 			var offset = $(window).scrollTop()+103;
-			if ($(window).scrollTop() > 10) 
+			if ($(window).scrollTop() > 10) {
 				$("#titles").stop().animate({ top:"50px"},"fast");
-			else 
+			} else {
 				$("#titles").stop().animate({ top:offset},"fast");
+			}
 		}
 		$(window).scroll(moveTitle);
 		moveTitle();
 		ajaxLinks();
+		EnzCutter(["GetRES"]);
 		$("#no-js-alert").hide();
 	
 		//jQueryUi
@@ -523,8 +617,7 @@ $(document).ready(function() {
 	//	alert(state);
 		switch (true) {
 				case(urlState[1] == "help"):
-					openHelp();
-					centerPopup();
+					//Need to work something out for this
 					break;
 				case(urlState[1] == "search"):
 					searchHandler(urlState);
