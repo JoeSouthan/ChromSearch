@@ -460,7 +460,7 @@ $(document).ready(function() {
 
 	}
 	function replaceTextbox () {
-		$("#EnzCutter_autocompleteWrapper").html('<textarea type="text" name="query" id="EnzCutter_textarea" autofocus="autofocus" cols="40" rows="4"></textarea>');
+		$("#EnzCutter_autocompleteWrapper").html('<textarea type="text" name="query" id="EnzCutter_textarea" autofocus="autofocus" cols="40" rows="4" style="width:400px"></textarea>');
 		$("#EnzCutter_currentGene").html("");
 	}
 	function resetIndex (urlState) {
