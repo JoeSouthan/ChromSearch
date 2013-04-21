@@ -77,42 +77,49 @@ print "\n************************** TEST: 'QuerySearch' ************************
 
 # CONDITION: Valid parameters for geneId
 {
-	my @results = DBinterface::QuerySearch("2780780","geneId");
+	my @results = DBinterface::QuerySearch('2780780','geneId',0);
 	ok(@results, "with valid parameters '2780780' as search string and 'geneId' as identifier type" );
 	#print Dumper( @results );
 }
 
 # CONDITION: Valid parameters for proteinName
 {
-	my @results = DBinterface::QuerySearch("DUSP6","proteinName");
+	my @results = DBinterface::QuerySearch('DUSP6','proteinName',0);
 	ok( @results, "with valid parameters 'DUSP1' as search string and 'proteinName' as type");
 	#print Dumper( @results );
 }
 
 # CONDITION: Valid parameters for accessionNo
 {
-	my @results = DBinterface::QuerySearch("AB002805","accessionNo");
+	my @results = DBinterface::QuerySearch('AB002805','accessionNo',0);
 	ok( @results, "with valid parameters 'AB002805' as search string and 'accessionNo' as type");
 	#print Dumper( @results );
 }
 
 # CONDITION: Valid parameters for chromosome location
 {
-	my @results = DBinterface::QuerySearch("12q13","chromLoc");
+	my @results = DBinterface::QuerySearch('12q13','chromLoc',0);
 	ok( @results, "with valid parameters '12q13' as search string and 'chromLoc' as type" );
 	#print Dumper( @results );
 }
 	
 # CONDITION: Valid parameters but not in DB
 {
-	my @results = DBinterface::QuerySearch("HEX5","proteinName");
+	my @results = DBinterface::QuerySearch('HEX5','proteinName',0);
 	ok( @results, "with valid parameters but not in DB");
 	#print Dumper( @results );
 }
 # CONDITION: Valid arguments but only partial name
 {
-	my @results = DBinterface::QuerySearch("AB00","accessionNo");
+	my @results = DBinterface::QuerySearch('AB00','accessionNo',0);
 	ok( @results, "with valid arguments but only partial name");
+	#print Dumper( @results );
+}
+
+# CONDITION: Valid arguments in browse mode
+{
+	my @results = DBinterface::QuerySearch('A','proteinName',1);
+	ok( @results, "with valid arguments in browse mode");
 	#print Dumper( @results );
 }
 
@@ -215,22 +222,10 @@ print "\n************************** TEST: 'BuildCodingSeq' *********************
 
 
 print "\n************************** TEST: 'Set/Get error messages' **************************\n";
-
-DBinterface::SetLastErrorMessage('NO_DATA');
-my $errorMessage = DBinterface::GetLastErrorMessage();
-ok( $errorMessage eq 'NO_DATA', "get last error message");
-
-
-################################ TEST: 'BuildSummaryData' ################################
-
-# TEST 'BuildSummaryData'
-print "************************** TEST : 'BuildSummaryData' **************************\n";
-
-# CONDITION: With valid accession number as argument 
 {
-	my %data = DBinterface::BuildSummaryData('AB002805');
-	ok( %data, "with valid accession number AB002805 as an argument");
-	#print Dumper(%data);
+	DBinterface::SetLastErrorMessage('NO_DATA');
+	my $errorMessage = DBinterface::GetLastErrorMessage();
+	ok( $errorMessage eq 'NO_DATA', "get last error message");
 }
 
 ################################ TEST: 'FindRES' ################################

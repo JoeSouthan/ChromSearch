@@ -51,63 +51,70 @@ print "************************** TEST : 'ShowAllIdentifiers' ******************
 	#print Dumper(%items);
 }
 
-################################ TEST: 'getSearchResults' ################################
+################################ TEST: 'GetSearchResults' ################################
 
-# TEST 'getSearchResults'
-print "************************** TEST : 'getSearchResults' **************************\n";
+# TEST 'GetSearchResults'
+print "************************** TEST : 'GetSearchResults' **************************\n";
 
 # CONDITION: No parameters
 {
-	my %results = ChromoDB::getSearchResults("","");
+	my %results = ChromoDB::GetSearchResults('','',0);
 	ok( $results{'error'} eq 'ERROR:ZERO_LENGTH_ARGUMENT', "with no parameters");
 	#print Dumper(%results);
 }
 
 # CONDITION: Correct parameters of 2780780 (assumes this dummy data is in DB) and GeneID
 {
-	my %results = ChromoDB::getSearchResults("2780780","GeneID");
+	my %results = ChromoDB::GetSearchResults('2780780','GeneID',0);
 	ok( %results, "with '2780780' and 'GeneID' as parameters");
 	#print Dumper(%results);
 }
 
 # CONDITION: Correct parameters of DUSP6 (assumes this dummy data is in DB) and ProteinProduct
 {
-	my %results = ChromoDB::getSearchResults("DUSP6","ProteinProduct");
+	my %results = ChromoDB::GetSearchResults('DUSP6','ProteinProduct',0);
 	ok( %results, "with 'DUSP6' and 'ProteinProduct' as parameters");
 	#print Dumper(%results);
 }
 
 # CONDITION: Correct parameters of AB002805 (assumes this dummy data is in DB) and AccessionNumber
 {
-	my %results = ChromoDB::getSearchResults('AB002805','AccessionNumber');
+	my %results = ChromoDB::GetSearchResults('AB002805','AccessionNumber',0);
 	ok( %results, "with '2780780' and 'AccessionNumber' as parameters");
 	#print Dumper(%results);
 }
 
 # CONDITION: Correct parameters of q13 (assumes this dummy data is in DB) and ChromosomeLocation
 {
-	my %results = ChromoDB::getSearchResults('q13','ChromosomeLocation');
+	my %results = ChromoDB::GetSearchResults('q13','ChromosomeLocation',0);
 	ok( %results, "with 'q13' and 'ChromosomeLocation' as parameters");
 	#print Dumper(%results);
 }
 
 # CONDITION: Correct agrument but AccessionNumber not in DB
 {
-	my %results = ChromoDB::getSearchResults('AB0000000','AccessionNumber');
+	my %results = ChromoDB::GetSearchResults('AB0000000','AccessionNumber',0);
 	ok( $results{'error'} eq 'DB_RETURNED_NO_MATCHES', "with invalid AccessionNumber argument");
 	#print Dumper(%results);
 }
 
 # CONDITION Partial words in search string.
 {
-	my %results = ChromoDB::getSearchResults('AB00','AccessionNumber');
+	my %results = ChromoDB::GetSearchResults('AB00','AccessionNumber',0);
 	ok( %results, "with partial AccessionNumber argument");
+	#print Dumper(%results);
+}
+
+# CONDITION With single letter for browse mode.
+{
+	my %results = ChromoDB::GetSearchResults('A','ProteinProduct',1);
+	ok( %results, "with single letter for browse mode");
 	#print Dumper(%results);
 }
 
 ################################ TEST: 'getSequence' ################################
 
-# TEST 'getDNAsequence'
+# TEST 'getSequence'
 print "************************** TEST : 'getSequence' **************************\n";
 
 # CONDITION: No arguments
@@ -120,40 +127,6 @@ print "************************** TEST : 'getSequence' *************************
 {
 	my $results = ChromoDB::getSequence('AB002805', 'GeneSeq');
 	ok( length($results), "with valid accession number");
-}
-################################ TEST: 'showCodingSeq' ################################
-
-# TEST 'showCodingSeq'
-print "************************** TEST : 'showCodingSeq' **************************\n";
-
-# CONDITION: No arguments
-{
-	my @codingSeq = ChromoDB::showCodingSeq('');
-	ok( @codingSeq, "with no arguments");
-	print Dumper(@codingSeq);
-}
-# CONDITION: With valid accession number as argument 
-{
-	my @codingSeq = ChromoDB::showCodingSeq('AB002805');
-	ok( @codingSeq, "with valid accession number AB002805 as an argument");
-	print Dumper(@codingSeq);
-}
-
-################################ TEST: 'GetGeneSummaryData' ################################
-
-# TEST 'GetGeneSummaryData'
-print "************************** TEST : 'GetGeneSummaryData' **************************\n";
-
-# CONDITION: No arguments
-{
-	my %data = ChromoDB::GetGeneSummaryData('');
-	ok( $data{'error'} eq 'ERROR:ZERO_LENGTH_ARGUMENT', "with no arguments");
-}
-# CONDITION: With valid accession number as argument 
-{
-	my %data = ChromoDB::GetGeneSummaryData('AB002805');
-	ok( %data, "with valid accession number AB002805 as an argument");
-	#print Dumper(%data);
 }
 
 ################################ TEST: 'GetRES' ################################

@@ -103,13 +103,19 @@ sub GetIdentifier{
 # QuerySearch - Takes a search string and type, returns comma separated list of search results
 #
 ##########################################################################################################
-sub QuerySearch{
+sub QuerySearch( $$$ ){
 	
 	# Get the function parameters, assumes valid non-zero string and valid identifier input
-	my ($searchString, $idType) = @_;
+	my ($searchString, $idType, $browseMode) = @_;
 	
-	# Run search query **$searchstring must be in quotes***
-	my $sqlQuery = "SELECT accessionNo, geneId, chromLoc, proteinName, ProteinId, geneSeqLen FROM gene WHERE $idType LIKE '%$searchString%'";
+	my $sqlQuery = '';
+	
+	if( 0 == $browseMode ){
+		# Run search query **$searchstring must be in quotes***
+		$sqlQuery = "SELECT accessionNo, geneId, chromLoc, proteinName, ProteinId, geneSeqLen FROM gene WHERE $idType LIKE '%$searchString%'";
+	}else{
+		$sqlQuery = "SELECT accessionNo, geneId, chromLoc, proteinName, ProteinId, geneSeqLen FROM gene WHERE $idType LIKE '$searchString%'";
+	}
 	
 	# Run query
 	my @searchResults = DBinterface::DoQuery($sqlQuery);
@@ -250,7 +256,7 @@ sub BuildCodingSeq{
 	if( '1' == $tableRows[0][0] ){
 	
 		# If yes, then sequecne starts with exon.
-		# Get first and second numbers of first entry and fomrat them into a string
+		# Get first and second numbers of first entry and format them into a string
 		my $entry = join("","EXON;",$tableRows[0][0],":",$tableRows[0][1]);
 		push(@CDSarray, $entry);
 		
@@ -266,7 +272,7 @@ sub BuildCodingSeq{
 		}
 		
 	}else{
-		# If no then infer an intron and calculate intron length, sequence begins with intron.
+		# If no then infer an NCS and calculate NCS length.
 		my $entry = join("","NCS;","0",":",$tableRows[0][0]-1);
 		push(@CDSarray, $entry);
 	}
@@ -274,6 +280,7 @@ sub BuildCodingSeq{
 	# Extract start and end positions of the exons, put them into array.
 	for( my $i = $tableRowIndex; $i < scalar(@tableRows); $i++){
 		
+		# Temporary variables for the start and stop positions of the exons
 		my ($segStart, $segStop); 
 		
 		# Get start number of current exon
@@ -286,82 +293,20 @@ sub BuildCodingSeq{
 		my $entry = join("","EXON;",$segStart,":",$segStop);
 		push(@CDSarray, $entry);
 	
-		# Find distance between current exon and next and denote as NCS in array.
+		# Find distance between current exon and next and denote as NCS if last in array.
 		if( defined($tableRows[$i+1]) )
 		{
-			my $ncsEntry = join("","NCS;",$tableRows[$i][1]+1,":",$tableRows[$i+1][0]-1);
-			push(@CDSarray, $ncsEntry);
+			my $nextEntry = join("","INTRON;",$tableRows[$i][1]+1,":",$tableRows[$i+1][0]-1);
+			push(@CDSarray, $nextEntry);
 		}else{
-			my $ncsEntry = join("","NCS;",$segStop+1,":",$sequenceLength[0][0]);
-			push(@CDSarray, $ncsEntry);
+			my $nextEntry = join("","NCS;",$segStop+1,":",$sequenceLength[0][0]);
+			push(@CDSarray, $nextEntry);
 		}
 	}
 	
 	return @CDSarray;
 }
-###########################################################################################################
-#
-# BuildSummaryData - Takes an accession number and returns a hash with all the relevent summary data
-# 		     for a gene.
-#
-##########################################################################################################
-sub BuildSummaryData( $ ){
 
-	# Get and store the input arguments 
-	my $accessionNo = $_[0];
-	
-	# Function should never be called with blank argument as it will be called when the user select from search
-	# or browse list.
-	
-	my $sqlQuery = "SELECT geneId, chromLoc, proteinName, geneSeq, proteinSeq FROM gene WHERE accessionNo = '$accessionNo'";
-	
-	my @geneInfo = DBinterface::DoQuery($sqlQuery);
-	
-	unless( @geneInfo ){
-		return undef;
-	}
-	
-	# Get gene name , if unnamed set to unnamed.
-	my $geneName = 0;
-	
-	# Data to return
-	
-	# Build hash
-	
-	# Hash to save all data in.
-	my %geneData;
-	
-	# Codon usage
-	
-	# Attempt to retrieve the codons for the given accession number
-	my @codons = DBinterface::GetCodons( $accessionNo );
-	
-	unless( @codons ){
-		# No codons returned list as empty
-		$geneData{$accessionNo}{'CodonUsage'} = 'N/A';
-	}else{
-		# Valid array of codons converted to percentages and packaged in to hash
-		$geneData{$accessionNo}{'CodonUsage'} = [CalculateCodonUsage(@codons)];
-	}
-	
-	# Gene name
-	$geneData{$accessionNo}{'GeneName'} = $geneInfo[0]->[0];
-	
-	# Chomosome location 
-	$geneData{$accessionNo}{'ChromLoc'} = $geneInfo[0]->[1];
-	
-	# Protein product
-	$geneData{$accessionNo}{'ProteinProduct'} = $geneInfo[0]->[2];
-	
-	# DNA sequence
-	$geneData{$accessionNo}{'GeneSeq'} = $geneInfo[0]->[3];
-	
-	# Amino acid sequence
-	$geneData{$accessionNo}{'ProteinSeq'} = $geneInfo[0]->[4];  
-	
-	# Send back hash of data
-	return %geneData;
-}
 
 ###########################################################################################################
 #
@@ -718,15 +663,15 @@ sub GetCodons( $ ){
 sub DatabaseConnect{
 	
 	#Defined the connection details to the database
-	# my $dbname = 'scouls01'; 
-	# my $user = 'scouls01';
-	# my $password = 'iwr8sh8vb'; 
-	# my $dbserver = 'localhost';
+	 my $dbname = 'scouls01'; 
+	 my $user = 'scouls01';
+	 my $password = 'iwr8sh8vb'; 
+	 my $dbserver = 'localhost';
 	
-	my $dbname = 'biocomp2'; 
-	my $user = 'c2';
-	my $password = 'coursework123'; 
-	my $dbserver = 'localhost';
+	# my $dbname = 'biocomp2'; 
+	# my $user = 'c2';
+	# my $password = 'coursework123'; 
+	# my $dbserver = 'localhost';
 	
 	# Specify the location and name of the database
 	my $datasource = "dbi:mysql:database=$dbname;host=$dbserver;";

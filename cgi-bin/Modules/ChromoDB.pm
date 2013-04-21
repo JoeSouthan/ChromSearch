@@ -54,13 +54,13 @@ sub ShowAllIdentifiers( $ ){
 
 ##########################################################################################################
 #
-# getSearchResults - Takes input string for an identifier from the webpage and searches the database for matches
+# GetSearchResults - Takes input string for an identifier from the webpage and searches the database for matches
 #
 ##########################################################################################################
-sub getSearchResults{
+sub GetSearchResults( $$$ ){
 	
 	# Get and store the input arguments, $class because of SOAP calling it.
-	my ($searchString, $idType) = @_;
+	my ($searchString, $idType, $browseMode) = @_;
 	
 	my %error = ();
 	
@@ -78,13 +78,14 @@ sub getSearchResults{
 	}
 	
 	# Send a search query to the DB
-	my @queryResult = DBinterface::QuerySearch($searchString, $id);
+	my @queryResult = DBinterface::QuerySearch($searchString, $id, $browseMode);
 	
 	# String must contain matches to return
-	unless( @queryResult ){
+	unless( @queryResult[0] ){
 
 		# If is null return null string or error code
 		$error{'error'} = DBinterface::GetLastErrorMessage();
+		# Return error string
 		return %error; 	
 		
 	}else{
@@ -107,6 +108,19 @@ sub getSearchResults{
 			# is no data.
 			my @sequence = DBinterface::BuildCodingSeq($queryResult[$i]->[0]);
 			$searchResults{$accessionNumber}{'SeqFeat'} = [@sequence];
+			
+			# Retrieve codon usage data
+	
+			# Attempt to retrieve the codons for the given accession number
+			my @codons = DBinterface::GetCodons( $queryResult[$i]->[0] );
+			
+			unless( @codons ){
+			# No codons returned list as empty
+			$searchResults{$accessionNumber}{'CodonUsage'} = 'N/A';
+			}else{
+				# Valid array of codons converted to percentages and packaged in to hash
+			$searchResults{$accessionNumber}{'CodonUsage'} = [DBinterface::CalculateCodonUsage(@codons)];
+			}
 		}
 
 		# Return the hash to JSON
@@ -140,58 +154,6 @@ sub getSequence{
 	}
 	
 	return $seq;
-}
-
-##########################################################################################################
-# 
-# showCodingSeq - Takes an accession number and returns an array of the introns and exons sequentially ordered
-#
-##########################################################################################################
-sub showCodingSeq{
-
-	# Get and store the input arguments, $class because of SOAP calling it.
-	my ( $accessionNo ) = @_;
-	
-	my %error = ();
-	
-	# Check for blank arguments passed in
-	if($accessionNo eq ''){
-		$error{'error'} = 'ERROR:ZERO_LENGTH_ARGUMENT';
-		return %error;
-	}
-
-	my @codingSeq = DBinterface::BuildCodingSeq($accessionNo);
-	
-	unless( @codingSeq ){
-		# If is null return null string or error code
-		$error{'error'} = DBinterface::GetLastErrorMessage();
-		return %error; 
-	}
-	
-	# Return array or can be string if we want?.
-	return @codingSeq;
-}
-
-##########################################################################################################
-#
-# GetGeneSummaryData - Takes an accession number and returns GeneID, Gene Name, and the Seqeuence data annotated
-#
-##########################################################################################################
-sub GetGeneSummaryData{
-	# Get and store the input arguments, $class because of SOAP calling it.
-	my ( $accessionNo ) = $_[0];
-	
-	my %error = ();
-	
-	# Check for blank arguments passed in
-	if( ($accessionNo eq '') ){
-		$error{'error'} = 'ERROR:ZERO_LENGTH_ARGUMENT';
-		return %error;
-	}
-	
-	my %geneData = DBinterface::BuildSummaryData($accessionNo);
-	
-	return %geneData;
 }
 
 ##########################################################################################################
