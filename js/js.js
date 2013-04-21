@@ -587,6 +587,10 @@ $(document).ready(function() {
 			event.preventDefault();
 			doHelp("test");
 		});
+		$("#contact_open").live("click", function(event) {
+			event.preventDefault();
+			$("#contact").slideToggle("fast");
+		});
 
 		$(window).resize(function() {  
 			centerPopup();  

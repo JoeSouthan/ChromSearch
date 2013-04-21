@@ -430,6 +430,9 @@ pre {
 #help {
 	display: none;
 }
+#contact {
+	display: none;
+}
 /* colours */
 .red {
 	color:#763227;
