@@ -166,8 +166,8 @@ $(document).ready(function() {
 			dataStructure = {selector: searchterms[1], query:browseletter[1]};
 		}
 		var result = $.ajax ({
-			url:"json.json",
-			//url:"cgi-bin/json.pl?",
+			//url:"json.json",
+			url:"cgi-bin/json.pl?",
 			type: "GET",
 			dataType: "json",
 			data: dataStructure,
@@ -194,22 +194,22 @@ $(document).ready(function() {
 	//Output JSON to HTML
 	function outputSearchHTML (data) {
 		var counter = 0;
-		content.html('<div class="center result-spacer"><h2>Results</h2></div>');
-		content.append('<div class="titles" id="titles"><div class="title title-acc" id="namesort">Accession</div><div class="title title-product" id="productsort">Protein Product</div><div class="title title-diagram">Gene Layout</div><div class="title title-loc" id="lengthsort">Length</div><div class="title title-loc" id="locationsort">Location</div>');
+		content.html('<div class="titles" id="titles"><div class="title title-acc" id="namesort">Accession</div><div class="title title-product" id="productsort">Protein Product</div><div class="title title-diagram">Gene Layout</div><div class="title title-loc" id="lengthsort">Length</div><div class="title title-loc" id="locationsort">Location</div>');
 		$.each(data, function(i,val) {
 			var features = val["SeqFeat"];
 			var name = i;
 			content.append('\
 				<div class="result" id="'+i+'">\
 					<div class="result-div acc"><span id="acc"><a href="return_single.pl?gene='+val["GeneName"]+'">'+i+'</a></span></div> \
-					<div class="result-div product"><span id="product">Protein Product</span></div> \
+					<div class="result-div product"><span id="product">'+val["ProteinName"]+'</span></div> \
 					<div class="result-div diagram" id="chart_div'+counter+'"></div> \
 					<div class="result-div link"><span id="length">'+val["GeneLength"]+'</span></div> \
-					<div class="result-div link"><span id="location">24.q13</span></div> \
+					<div class="result-div link"><span id="location">'+val["ChromosomeLocation"]+'</span></div> \
 				</div>');
 			google.setOnLoadCallback(drawChart(features,counter, name));
 			counter++;
 		});
+		content.prepend('<div class="center result-spacer"><h2>'+counter+' Results</h2></div>');
 		$(".result").wrapAll('<div id="result-wrapper"/>');
 	
 	
@@ -226,11 +226,11 @@ $(document).ready(function() {
     	<h2 class="center">Single result for: '+i+'.</h2> \
         <div class="singleresult"> \
         	<div class="info"> \
-            	<span>Name: '+val["GeneName"]+' | Genbank Accession: '+i+' | Chromosomal Location: '+val["GeneLength"]+'</span> \
+            	<span>Name: '+val["GeneName"]+' | Genbank Accession: '+i+' | Chromosomal Location: '+val["ChromosomeLocation"]+'</span> \
             </div> \
             <div class="single-wide"> \
             	<h2>Protein Product</h2>\
-            	<p>Some Product</p>\
+            	<p>'+val["ProteinName"]+'</p>\
             	<h2>Sequence Characteristics</h2> \
             	<h3>Gene Layout</h3> \
                 <div class="diagram centerdiv" id="chart_div0"></div>\
@@ -242,7 +242,9 @@ $(document).ready(function() {
                 <h3>EcoR1</h3> \
                 <p>Some Text</p> \
                 <h3>BamH1</h3> \
+                <p>Some Text</p> \
                 <h3>BsuMI</h3> \
+                <p>Some Text</p> \
                 <p id="cutter-text">Would you like to <a href="#cutter" id="show4">cut your own?</a></p> \
 				<div id="spinner"> \
 					<img src="../img/ajaxloader.gif" alt="Loading" width="24" height="24" /> \

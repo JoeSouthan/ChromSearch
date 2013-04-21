@@ -718,15 +718,15 @@ sub GetCodons( $ ){
 sub DatabaseConnect{
 	
 	#Defined the connection details to the database
-	my $dbname = 'scouls01'; 
-	my $user = 'scouls01';
-	my $password = 'iwr8sh8vb'; 
-	my $dbserver = 'localhost';
-	
-	# my $dbname = 'biocomp2'; 
-	# my $user = 'c2';
-	# my $password = 'coursework123'; 
+	# my $dbname = 'scouls01'; 
+	# my $user = 'scouls01';
+	# my $password = 'iwr8sh8vb'; 
 	# my $dbserver = 'localhost';
+	
+	my $dbname = 'biocomp2'; 
+	my $user = 'c2';
+	my $password = 'coursework123'; 
+	my $dbserver = 'localhost';
 	
 	# Specify the location and name of the database
 	my $datasource = "dbi:mysql:database=$dbname;host=$dbserver;";

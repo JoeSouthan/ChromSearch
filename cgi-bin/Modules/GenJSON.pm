@@ -11,13 +11,14 @@ our @EXPORT = qw ();
 sub doSearch {
 	my $json = JSON->new;
 	my ($query,$type)= @_;
-	my %result = ChromoDB::getSearchResults($query,$type);
+	my %result = ChromoDB::GetSearchResults($query,$type);
 	return $json->pretty->encode(\%result);
 
 }
 sub doSingle {
 	my $json = JSON->new;
 	my ($query,$type)= @_;
+	$type = "GeneID";
 	my %result = ChromoDB::getSearchResults($query,$type);
 	return $json->pretty->encode(\%result);
 
@@ -25,15 +26,7 @@ sub doSingle {
 #Gets the restriction enzymes and their cut sites
 sub getRes {
 	my $json = JSON->new;
-	#my %result = ChromoDB::GetRes();
-	my %sites = (
-		"EcoR1" => "AAA|T",
-		"BamFI" => "ATT|G",
-	);
-	my %result = {
-		"sites" => (%sites),
-
-	};
+	my %result = ChromoDB::GetRES();
 	return $json->pretty->encode(\%result);
 }
 sub error {

@@ -30,7 +30,7 @@ foreach my $params (@params) {
 #Debug
  # $query = "q13";
  # $type = "ChromosomeLocation";
-#  $selector = "res";
+  $selector = "res";
 
 
 #Print the JSON header
@@ -55,7 +55,7 @@ unless (defined ($selector)) {
 					print GenJSON::doSearch($query,$type);
 				}
 			} elsif ($selector eq "single") {
-				print GenJSON::doSearch($query, "AccessionNumber");
+				print GenJSON::doSingle($query);
 			} else {
 				print GenJSON::error("Invalid selector");
 			}
