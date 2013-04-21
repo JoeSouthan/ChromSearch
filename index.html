@@ -89,8 +89,8 @@
 					<h3>Browse by Gene Name</h3>
 						<div>
 							<p>Please select a letter</p>
-							<form method="get" action="" id ="browseGene">
-								<select>
+							<form method="get" action="cgi-bin/search_results.pl?search=browse" id ="browseGene">
+								<select name="selection">
 									<option value="a">A</option>
 									<option value="b">B</option>
 									<option value="c">C</option>
@@ -117,8 +117,9 @@
 									<option value="x">X</option>
 									<option value="y">Y</option>
 									<option value="z">Z</option>
+
 								</select>
-									<input type="submit" value="Submit" />
+									<input type="submit" value="Submit" id="browsesubmit" />
 									<input type="reset" value="Reset" />
 							</form>
 						</div>
@@ -141,10 +142,10 @@
 					</div>
 					<br />
 					<br />
-					<p class="right"><a href="#" id="showadvanced">Advanced search options</a></p>
+					<!--<p class="right"><a href="#" id="showadvanced">Advanced search options</a></p>
 					<div id="advanced">
 						<span>Number of results per page</span><input id="perpage" type="text" name="perpage" value="10" size="2" />
-					</div>
+					</div>-->
 					<div id="searchTerms"></div>
 					<div id="searchLink">
 						<a href="" id="submitSearch">Submit</a>

@@ -30,7 +30,7 @@ foreach my $params (@params) {
 #Debug
  # $query = "q13";
  # $type = "ChromosomeLocation";
-  $selector = "res";
+#  $selector = "res";
 
 
 #Print the JSON header

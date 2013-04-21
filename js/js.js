@@ -510,6 +510,13 @@ $(document).ready(function() {
 		$("#home").live("click", function() {
 			resetIndex();
 		});
+		$("#browsesubmit").live("click", function(event) {
+			event.preventDefault();
+			var selection = $('select[name="selection"]').val();
+			var urlState = ["!", "browse", selection];
+			searchHandler(urlState);
+			$.History.go("!/browse/"+selection);
+		});
 		// $("#show4").click(function() { 
 			// $("#cutter").slideToggle("fast");
 		// });
@@ -537,7 +544,6 @@ $(document).ready(function() {
 		submitButton.removeAttr("href");
 		submitButton.fadeTo("fast", 0.2);
 		ajaxLinks();
-		$("#no-js").hide();
 		$("#no-js-alert").hide();
 		$("#searchLink").show();
 		
@@ -552,15 +558,9 @@ $(document).ready(function() {
 	//Looks at the url and does operations based on what it gets	
 	$.History.bind(function(state) {
 		urlState = state.split(/\//g);
-	//	alert(urlState[1]);
+	//	console.log(urlState);
 	//	alert(state);
 		switch (true) {
-				case(urlState[1] == "/" || urlState[1] == "" || urlState == undefined):
-					if (urlState == undefined) {
-						alert("Incorrect url.");
-					}
-					resetIndex(urlState);
-					break;
 				case(urlState[1] == "help"):
 					openHelp();
 					centerPopup();
@@ -573,6 +573,12 @@ $(document).ready(function() {
 					break;
 				case(urlState[1] == "browse"):
 					searchHandler(urlState);
+					break;
+				default:
+					if (urlState == undefined) {
+						alert("Incorrect url.");
+					}
+					resetIndex(urlState);
 					break;
 			}
 				
