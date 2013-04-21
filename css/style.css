@@ -354,11 +354,6 @@ pre {
 	top:130px;
 	box-shadow:0 5px 50px rgba(255, 255, 255, 1);
 }
-#mainSearch input {
-	border:1px solid #333;
-	font-size:11px;
-	padding:5px;
-}
 .boxes {
 	position:fixed;
 	top:20px;

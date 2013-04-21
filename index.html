@@ -119,6 +119,8 @@
 									<option value="z">Z</option>
 
 								</select>
+								<br />
+								<br />	
 									<input type="submit" value="Submit" id="browsesubmit" />
 									<input type="reset" value="Reset" />
 							</form>
@@ -135,10 +137,10 @@
 					<br />
 					<br />
 					<div id="searchType">
-					<input type="radio" id="r1" name="searchType" value="GeneID" checked="checked"/><label for="r1">Gene Identifier</label>
-					<input type="radio" id="r2" name="searchType" value="ProteinProduct" /><label for="r2">Protein Product</label>
-					<input type="radio"  id="r3" name="searchType" value="AccessionNumber" /><label for="r3">GenBank Accession</label>
-					<input type="radio" id="r4" name="searchType" value="ChromosomeLocation" /><label for="r4">Chromosomal Location</label>
+						<input type="radio" id="r1" name="searchType" value="GeneID" checked="checked"/><label for="r1">Gene Identifier</label>
+						<input type="radio" id="r2" name="searchType" value="ProteinProduct" /><label for="r2">Protein Product</label>
+						<input type="radio"  id="r3" name="searchType" value="AccessionNumber" /><label for="r3">GenBank Accession</label>
+						<input type="radio" id="r4" name="searchType" value="ChromosomeLocation" /><label for="r4">Chromosomal Location</label>
 					</div>
 					<br />
 					<br />
@@ -146,14 +148,9 @@
 					<div id="advanced">
 						<span>Number of results per page</span><input id="perpage" type="text" name="perpage" value="10" size="2" />
 					</div>-->
-					<div id="searchTerms"></div>
-					<div id="searchLink">
-						<a href="" id="submitSearch">Submit</a>
-					</div>
-					<div id="no-js">
-						<input type="submit" value="Submit" />
-						<input type="reset" value="Reset" />
-					</div>
+					<div class="red" id="validation"></div>
+					<input type="submit" value="Submit" id="searchsubmit" />
+					<input type="reset" value="Reset" />
 				</div>
 			</form>
 		</div>

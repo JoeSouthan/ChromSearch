@@ -4,8 +4,6 @@
 $(document).ready(function() {
 	// Variables
 	var textBox 	 = $("#searchquery"),
-		submitButton = $("#submitSearch"),
-		searchLive	 = $("#searchTerms"),
 		main		 = $("#main"),
 		mainWrapper	 = $("#main_wrapper"),
 		content		 = $("#content"),
@@ -14,7 +12,6 @@ $(document).ready(function() {
 		loader		 = $("#loader"),
 		radioName	 = $("input[name=searchType]:radio"),
 		radioValue	 = $("input[name=searchType]:checked", "#mainSearch").val(),
-		query 		 = textBox.val(),
 		perpage 	 = $("#perpage").val(),
 		error		 = $("#errorbox"),
 		errordiv	 = $("#errordiv"),
@@ -27,7 +24,8 @@ $(document).ready(function() {
 		browseb		 = $("#browsebox"),
 		searchID 	 = $("#searchform"),
 		searchbox	 = $("#searchbox"),
-		welcome 	 = $("#welcome")
+		welcome 	 = $("#welcome"),
+		validation   = $("#validation")
 		;
 	//Scans the page for links and adds "#!/"" to it
 	function ajaxLinks () {
@@ -58,10 +56,10 @@ $(document).ready(function() {
 			}
 		});
 	}
-	//Clears the #content div
-	function clearContent () {
-		content.html("");
-	}
+	//Run the Ajax links when loaded in
+	$("#content").ajaxComplete( function() {
+		ajaxLinks();
+	});
 	//Ajax call setup
 	$.ajaxSetup({
 		beforeSend: function(xhr, status) {
@@ -86,11 +84,6 @@ $(document).ready(function() {
 		cache:true,
 		timeout:10000
 	});
-	//Run the Ajax links when loaded in
-	$("#content").ajaxComplete( function() {
-		ajaxLinks();
-	});
-
 	//Function to centre a popup
 	//From -http://www.joelpeterson.com/blog/2010/12/quick-and-easy-windowless-popup-overlay-in-jquery/
 	function centerPopup(){  
@@ -133,6 +126,10 @@ $(document).ready(function() {
 	function hideContent () {
 		content.hide();
 	}
+	//Clears the #content div
+	function clearContent () {
+		content.html("");
+	}
 
 	//Error Functions
 	function showError () {
@@ -142,38 +139,19 @@ $(document).ready(function() {
 		overlay.delay(6000).fadeOut("fast");
 	}	
 	
-	//Creates the main search link
-	function createSearchLink (type) {
-		var query = textBox.val();
-		var perpage = $("#perpage").val();
-		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
-		return "#!/search/"+radioVal+"/"+query+"/"+perpage+"/0";
-	}
-
-
 	//Search Validation
 	function validateSearch () {
 		if (textBox.val().length < 3) {
-			submitButton.removeAttr("href");
-			submitButton.fadeTo("fast", 0.2);
+			validation.fadeIn("fast");
+			validation.html("<p>Query must be greater than 3 characters</p>");
 			textBox.addClass("error");
 			return false;
 		} else {
-			var searchLink = createSearchLink("link");
-			submitButton.attr("href", searchLink);
-			submitButton.fadeTo("fast", 1);
+			validation.fadeOut("fast");
 			textBox.removeClass("error");
 			return true;
 		} 
-	}
-	function showSearch (){
-		var query = textBox.val();
-		var perpage = $("#perpage").val();
-		var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
-
-		searchLive.html("<p>You are searching for: "+query+" using a "+radioVal+" search.</p>");	
-	}
-	
+	}	
 	//Do a JSON search based on URL recieved by history.js
 	function doSearch (searchterms) {
 		// eg !,search,GeneID,123p,10,0
@@ -207,7 +185,7 @@ $(document).ready(function() {
 					loader.fadeOut("fast");
 					overlay.fadeOut("fast");
 				} else {
-					alert(searchterms[1]);
+					console.log(searchterms[1]);
 				}
 			},
 		
@@ -219,8 +197,6 @@ $(document).ready(function() {
 		content.html('<div class="center result-spacer"><h2>Results</h2></div>');
 		content.append('<div class="titles" id="titles"><div class="title title-acc" id="namesort">Accession</div><div class="title title-product" id="productsort">Protein Product</div><div class="title title-diagram">Gene Layout</div><div class="title title-loc" id="lengthsort">Length</div><div class="title title-loc" id="locationsort">Location</div>');
 		$.each(data, function(i,val) {
-			//alert(i+","+val["name"]);
-		//	console.log(i,val);
 			var features = val["SeqFeat"];
 			var name = i;
 			content.append('\
@@ -277,17 +253,17 @@ $(document).ready(function() {
             <div class="clearfix"></div> \
             <div class="single-wide"> \
             	<h2>Sequences</h2> \
-            	<a href="#SequenceDNA" id="show1">Click to reveal DNA Sequence</a> \
+            	<a id="show1">Click to reveal DNA Sequence</a> \
             	<div id="SequenceDNA"> \
 					<span></span> \
 				</div> \
                 <br /> \
-                <a href="#SequenceAA" id="show2">Click to reveal Translated Amino Acid Sequence</a> \
+                <a id="show2">Click to reveal Translated Amino Acid Sequence</a> \
                 <div id="SequenceAA"> \
 					<span></span> \
 				</div> \
 				<br /> \
-				<a href="#codonusage" id="show3">Codon usage</a> \
+				<a id="show3">Codon usage</a> \
 				<div id="codonusage"> \
 					<span></span> \
 				</div> \
@@ -373,7 +349,6 @@ $(document).ready(function() {
 	function sortIt(parent, childSelector, keySelector, mode, sortid, type) {
 		var up = type + " &#9650;";
 		var down = type + " &#9660;";
-//		alert(sortid);
 	   	if (sortid.hasClass("desc") || sortid.text() == type ) {
 			//sort asc
 			sortid.html(up).text();
@@ -476,27 +451,14 @@ $(document).ready(function() {
 
 
 	//Visual
-		//blur
-		textBox.blur(validateSearch);
-		textBox.blur(showSearch);
-		radioName.blur(showSearch);
-		//$("a").hover(ajaxLinks);
-		//keypress
-		textBox.keyup(validateSearch);
-		textBox.keyup(showSearch);
-		radioName.keyup(showSearch);
-		//Change
-		radioName.change(showSearch);
-		radioName.change(validateSearch);
-
 		//Toggles 
-		$("#show1").click(function() { 
+		$("#show1").live("click" , function() { 
 			$("#SequenceDNA").slideToggle("fast");
 		});
-		$("#show2").click(function() { 
+		$("#show2").live("click", function() { 
 			$("#SequenceAA").slideToggle("fast");
 		});
-		$("#show3").click(function() { 
+		$("#show3").live("click" ,function() { 
 			$("#codonusage").slideToggle("fast");
 		});
 		$("#browsebox").live("click", function() {
@@ -508,26 +470,29 @@ $(document).ready(function() {
 			searchID.show();
 		});
 		$("#home").live("click", function() {
-			resetIndex();
+			$.History.go("!/");
 		});
+
+		//Search Submitters
 		$("#browsesubmit").live("click", function(event) {
 			event.preventDefault();
 			var selection = $('select[name="selection"]').val();
-			var urlState = ["!", "browse", selection];
-			searchHandler(urlState);
 			$.History.go("!/browse/"+selection);
 		});
-		// $("#show4").click(function() { 
-			// $("#cutter").slideToggle("fast");
-		// });
-		$("#closepopup").click(function() {
+		$("#searchsubmit").live("click", function(event){ 
+			event.preventDefault();
+			var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
+			var query = textBox.val();
+			$.History.go("!/search/"+radioVal+"/"+query)
+		});
+		$("#show4").live("click", function() { 
+			$("#cutter").slideToggle("fast");
+		});
+		$("#closepopup").live("click", function() {
 			closeHelp();
 		});
-		$("#overlay").click(function() {
+		$("#overlay").live("click", function() {
 			closeHelp();
-		});
-		$(document).on("click", "#showadvanced", function() {
-			$("#advanced").slideToggle("fast");
 		});
 		$(window).resize(function() {  
 			centerPopup();  
@@ -541,18 +506,12 @@ $(document).ready(function() {
 		}
 		$(window).scroll(moveTitle);
 		moveTitle();
-		submitButton.removeAttr("href");
-		submitButton.fadeTo("fast", 0.2);
 		ajaxLinks();
 		$("#no-js-alert").hide();
-		$("#searchLink").show();
-		
+	
 		//jQueryUi
 		$("#searchType").buttonset();
-		
-		submitButton.click(function () {
-			//alert ("click");
-		});
+		$('input[type="submit"], input[type="reset"]').button();
 	
 	//jQuery plugin: History.js 
 	//Looks at the url and does operations based on what it gets	
