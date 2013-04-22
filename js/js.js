@@ -68,7 +68,7 @@ $(document).ready(function() {
 				dataStructure = {selector: searchterms[1], query:browseletter[1]};
 			}
 			var result = $.ajax ({
-				//url:"error.json",
+				//url:"json.json",
 				url:"cgi-bin/json.pl?",
 				type: "GET",
 				dataType: "json",
@@ -317,7 +317,7 @@ $(document).ready(function() {
 				var name = i;
 				content.append('\
 					<div class="result" id="'+i+'">\
-						<div class="result-div acc"><span id="acc"><a href="return_single.pl?gene='+val["GeneName"]+'">'+i+'</a></span></div> \
+						<div class="result-div acc"><span id="acc"><div class="red pointer underline" id="single_open"><a href="#!/single/'+val["GeneName"]+'">'+i+'</a></div><span id="single_id">'+val["GeneName"]+'</span></div> \
 						<div class="result-div product"><span id="product">'+val["ProteinName"]+'</span></div> \
 						<div class="result-div diagram" id="chart_div'+counter+'"></div> \
 						<div class="result-div link"><span id="length">'+val["GeneLength"]+'</span></div> \
@@ -550,7 +550,7 @@ $(document).ready(function() {
 			event.preventDefault();
 			var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
 			var query = textBox.val();
-			$.History.go("!/search/"+radioVal+"/"+query)
+			$.History.go("!/search/"+radioVal+"/"+query);
 		});
 
 	//
