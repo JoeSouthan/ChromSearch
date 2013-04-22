@@ -28,6 +28,8 @@ h3 {
 	clear:both;
 	padding:5px;
 	border-left: 5px solid #555;
+	box-shadow: 5px 4px 5px #333;
+	border-radius: 5px;
 }
 a {
 	color:#7D4840;
@@ -46,7 +48,9 @@ li{
 	padding:5px;
 }
 pre {
-	line-height:11%;
+	background-color: #C4C4C4;
+	padding: 10px;
+	margin:10px;
 }
 /*--------*/
 
@@ -91,9 +95,9 @@ pre {
 	font-size:9px;
 	line-height:90%;
 	color:#fff;
-	position:relative;
-	top:-5px;
-	left:-67px;
+	position:absolute;
+	top:2px;
+	left:66px;
 }
 .header {
 	float:left;
@@ -387,6 +391,16 @@ pre {
 
 }
 /*------*/
+.help_wrapper {
+	margin-left: 10px;
+	position: relative;
+	top: -15px;
+	border-left: 1px solid #aac1d2;
+	border-bottom: 1px solid #aac1d2;
+	padding: 10px 0 5px 10px;
+	margin-top: 15px;
+	border-radius: 5px;
+}
 
 /*Generic*/
 .center {

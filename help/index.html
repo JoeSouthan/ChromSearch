@@ -1,0 +1,159 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>12Chrom - Help</title>
+	<link href="../css/style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/smoothness/jquery-ui.css">
+	<link rel="icon" type="image/png" href="../img/favicon.png" />
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.8.3/jquery.min.js"></script>
+	<script src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.10.2/jquery-ui.min.js"></script>
+	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
+	<script type="text/javascript" src="../js/js.js"></script>
+	<script type="text/javascript" src="../js/jquery.history.min.js"></script>
+	<script language="javascript" type="text/javascript" src="../js/textext.js"></script>
+</head>
+
+<body>
+<div class="boxes" id="no-js-alert">
+	<h3>Reduced functionality</h3>
+	<p>This site requires JavaScript. Please enable it.</p>
+</div>
+<div class="boxes" id="contact">
+	<div id="closepopup">Close?</div>
+	<h2 class="center">Contact</h2>
+	<p>Maybe later</p>
+</div> 
+<div class="navbar-wrapper">
+	<div class="navbar-inner-wrapper">
+		<div class="header">
+			<h1>12Chrom - Help</h1>
+		</div>
+		<span class="subheader">Chromosome 12 Analysis Tool</span>
+		<div class="navbar">
+					<div class="item" id="home">
+						<a href="">Home</a>
+					</div>
+					<div class="item">
+						<a href="contact" id="contact_open">Contact </a>
+					</div>
+		</div>
+	</div>
+</div>
+<div class="wrapper">
+	<div id="main">
+		<h2 class="center">Help</h2>
+		<span class="bold">Contents:</span>
+		<ul>
+			<li>Main</li>
+			<li>Search</li>
+			<li>Single</li>
+			<li>EnzCutter</li>
+			<li>Codon Usage</li>
+			<li>Gene Layout</li>
+			<li>API</li>
+		</ul>
+		<h3>Main</h3>
+			<div class="help_wrapper">
+				<p>Text</p>
+			</div>
+		<h3>Search Results</h3>
+			<div class="help_wrapper">
+				<p>Text</p>
+			</div>
+		<h3>Single Page</h3>
+			<div class="help_wrapper">
+				<p>Text</p>
+			</div>
+		<h3>EnzCutter</h3>
+			<div class="help_wrapper">
+				<p>Text</p>
+			</div>
+		<h3>Codon Usage</h3>
+			<div class="help_wrapper">
+				<p>Text</p>
+			</div>
+		<h3>Gene Layout</h3>
+			<div class="help_wrapper">
+				<p>Text</p>
+			</div>
+		<h3>API</h3>
+		<div class="help_wrapper">
+			<p>This site has an avaiable JSON API that is very easily called.</p>
+			<p>All requests must be directed toward:</p>
+				<pre>cgi-bin/json.pl</pre>
+			<h4>Search</h4>
+				<p>To search the database 3 flags must be set:</p>
+				<ul>
+					<li>selector: <span class="bold">"search"</span></li>
+					<li>type: Either <span class="bold">GeneID, ProteinProduct, AccessionNumber, ChromosomeLocation</span></li>
+					<li>query: <span class="bold">Your query</span></li>
+				</ul>
+				<p>For example, a GeneID search for a gene with the Accession number of "1914776"</p>
+				<pre>cgi-bin/json.pl?<span class="bold">&amp;selector=search&amp;type=GeneID&amp;query=1914776</span></pre>
+				<p>The above would return:</p>
+				<pre>
+{
+   "Y12331" : {
+      "GeneName" : "1914776",
+      "GeneLength" : "2261",
+      "ChromosomeLocation" : "q13",
+      "ProteinId" : "CAA72999.1",
+      "SeqFeat" : [
+         "NCS;0:1164",
+         "EXON;1165:1197",
+         "NCS;1198:2188",
+         "EXON;2189:2261",
+         "NCS;2262:2261"
+      ],
+      "ProteinName" : "mitochondrial serine hydroxymethyltransferase"
+   }
+}</pre>
+			<h4>Single</h4>
+			<p>To show a single gene record</p>
+			<ul>
+				<li>selector: <span class="bold">"single"</span></li>
+				<li>query: <span class="bold">Your query</span></li>
+			</ul>
+			<p>For example:</p>
+			<pre>cgi-bin/json.pl?<span class="bold">&amp;selector=single&amp;query=1914776</span></pre>
+			<h4>Help</h4>
+			<p>Not done</p>
+			<h4>Browse</h4>
+			<p>To browse for Protein product names:</p>
+			<ul>
+				<li>selector: <span class="bold">"browse"</span></li>
+				<li>query: <span class="bold">Your query</span></li>
+			</ul>
+			<p>For example:</p>
+			<pre>cgi-bin/json.pl?<span class="bold">&amp;selector=single&amp;query=a</span></pre>
+			<h4>Restriction Enzymes</h4>
+			<p>To list all the avaliable restriciton enzymes in the database:</p>
+			<ul>
+				<li>selector: <span class="bold">"res"</span></li>
+				<li>mode: <span class="bold">"GetRES"</span></li>
+			</ul>
+			<p>For example:</p>
+			<pre>cgi-bin/json.pl?<span class="bold">&amp;selector=res&amp;mode=GetRES</span></pre>
+			<p>Would return:</p>
+			<pre>{
+   "BamHI" : "G|GATCC",
+   "EcoRI" : "G|AATTC",
+   "BsuMI" : "C|TCGAG"
+}</pre>
+			<h4>EnzCutter</h4>
+			<p>To cut a sequence or specific gene with a restriction enzyme, use EnzCutter</p>
+			<ul>
+				<li>selector: <span class="bold">"res"</span></li>
+				<li>mode: <span class="bold">"CalcRES"</span></li>
+				<li>Either, query: <span class="bold">"Nucleic acid sequnce"</span></li>
+				<li>Or, gene: <span class="bold">"Gene ID"</span></li>
+			</ul>
+			<pre>cgi-bin/json.pl?<span class="bold">selector=res&amp;mode=CalcRES&amp;query=EcoRI%2CBamHI&amp;gene=TestSequence</span></pre>
+			<p>Will return:</p>
+			<pre>Not yet!</pre>
+		</div>
+	</div>	
+</div>
+</body>
+</html>
