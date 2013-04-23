@@ -135,7 +135,7 @@ pre {
 .search_wrapper {
 	text-align:center;
 }
-#result-wrapper {
+#result-wrapper, #titles {
 	float:left;
 	width:100%;
 	background-color:#779399;
@@ -186,23 +186,21 @@ pre {
 /*------*/
 
 /*Headers*/
-.titles {
-	width: 921px;
+.titles-fixed {
+	position: fixed;
+	top: 110px;
+	width: 900px !important;
+	z-index: 3;
 	color: #fff;
 	background-color:#000;
 	background-image:linear-gradient(to bottom,#4c4c4c, #000000); 
-	padding: 5px 0;
-	margin:0 0 0 -10px;
-	float: left;
-	position: fixed;
-	z-index: 3;
-	top: 103px;
 }
 .title {
 	float: left;
 	text-align: center;
 	padding: 0 10px;
 	text-decoration: underline;
+	cursor: pointer;
 }
 .title-acc {
 
@@ -212,10 +210,13 @@ pre {
 	width: 302px;
 }
 .title-diagram{
-	width: 318px;
+	width: 310px;
 }
 .title-loc{ 
-	width: 38px;
+	width: 10px;
+}
+.title-len{ 
+	width: 34px;
 }
 /*------*/
 

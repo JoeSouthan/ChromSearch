@@ -224,22 +224,21 @@ $(document).ready(function() {
 
 		//Sorts the results
 		//Adapted from: http://stackoverflow.com/questions/7831712/jquery-sort-divs-by-innerhtml-of-children
-		function sortIt(parent, childSelector, keySelector, mode, sortid, type) {
-			var up = type + " &#9650;";
-			var down = type + " &#9660;";
-		   	if (sortid.hasClass("desc") || sortid.text() == type ) {
+		function sortIt(parent, childSelector, keySelector, mode, sortid) {
+		   	if (sortid.hasClass("desc")) {
 				//sort asc
-				sortid.html(up).text();
 				sortid.removeClass("desc");
 				sortid.addClass("asc");
 			} else if (sortid.hasClass("asc")) {
 				//sort desc
-				sortid.html(down).text();
 				sortid.removeClass("asc");
 				sortid.addClass("desc");
+			} else {
+				sortid.addClass("asc");
+				sortid.removeClass("unsorted");
 			}
 		    var items = parent.children(childSelector).sort(function(a, b) {
-		    if (keySelector == "span#length" || keySelector == "span#location") {
+		    if (keySelector == "span#length") {
 		    	var vA = parseInt($(keySelector, a).text());
 	        	var vB = parseInt($(keySelector, b).text());
 		    } else {
@@ -257,34 +256,20 @@ $(document).ready(function() {
 	   		parent.append(items);
 		}
 		//Sort Logic
-			$('#namesort').live("click", function() {
-				if ($(this).hasClass("desc") || $(this).text() == "Accession" ) {
-					sortIt($('#result-wrapper'), "div", "span#acc", "asc", $("#namesort"), "Accession");
-				} else {
-					sortIt($('#result-wrapper'), "div", "span#acc", "desc", $("#namesort"), "Accession");
+
+
+			$('#namesort, #productsort, #lengthsort, #locationsort').live("click", function() {
+				var spans = { namesort:"span#acc", productsort:"span#product", lengthsort:"span#length", locationsort:"span#location"};
+				var location = spans[$(this).attr("id")];
+				if ($(this).hasClass("unsorted")) {
+					sortIt($('#result-wrapper'), "div", location, "asc", $(this));
+				} else if ($(this).hasClass("asc")) {
+					sortIt($('#result-wrapper'), "div", location, "desc", $(this));
+				} else if ($(this).hasClass("desc")) {
+					sortIt($('#result-wrapper'), "div", location, "asc", $(this));
 				}
 			});
-			$('#productsort').live("click", function() {
-				if ($(this).hasClass("desc") || $(this).text() == "Accession" ) {
-					sortIt($('#result-wrapper'), "div", "span#product", "asc", $("#productsort"), "Protein Product");
-				} else {
-					sortIt($('#result-wrapper'), "div", "span#product", "desc", $("#productsort"), "Protein Product");
-				}
-			});
-			$('#lengthsort').live("click", function() {
-				if ($(this).hasClass("desc") || $(this).text() == "Accession" ) {
-					sortIt($('#result-wrapper'), "div", "span#length", "asc", $("#lengthsort"), "Length");
-				} else {
-					sortIt($('#result-wrapper'), "div", "span#length", "desc", $("#lengthsort"), "Length");
-				}
-			});
-			$('#locationsort').live("click", function() {
-				if ($(this).hasClass("desc") || $(this).text() == "Accession" ) {
-					sortIt($('#result-wrapper'), "div", "span#location", "asc", $("#locationsort"), "Location");
-				} else {
-					sortIt($('#result-wrapper'), "div", "span#location", "desc", $("#locationsort"), "Location");
-				}
-			});
+
 		//
 		//Change the page title based on context
 		function titleHandler (urlState){
@@ -311,7 +296,7 @@ $(document).ready(function() {
 		//Output Search JSON to HTML
 		function outputSearchHTML (data) {
 			var counter = 0;
-			content.html('<div class="titles" id="titles"><div class="title title-acc" id="namesort">Accession</div><div class="title title-product" id="productsort">Protein Product</div><div class="title title-diagram">Gene Layout</div><div class="title title-loc" id="lengthsort">Length</div><div class="title title-loc" id="locationsort">Location</div>');
+			content.html('<div class="titles-fixed" id="titles"><div class="title title-acc unsorted" id="namesort">Accession</div><div class="title title-product unsorted" id="productsort">Protein Product</div><div class="title title-diagram">Gene Layout</div><div class="title title-len unsorted" id="lengthsort">Length</div><div class="title title-loc unsorted" id="locationsort">Location</div>');
 			$.each(data, function(i,val) {
 				var features = val["SeqFeat"];
 				var name = i;
@@ -634,8 +619,8 @@ $(document).ready(function() {
 		}); 
 		//Move the headers down with the page
 		function moveTitle () {
-			var offset = $(window).scrollTop()+103;
-			if ($(window).scrollTop() > 10) {
+			var offset = $(window).scrollTop()+110;
+			if ($(window).scrollTop() > 2) {
 				$("#titles").stop().animate({ top:"50px"},"fast");
 			} else {
 				$("#titles").stop().animate({ top:offset},"fast");
