@@ -12,15 +12,23 @@ our @EXPORT = qw ();
 sub doSearch {
 	my $json = JSON->new;
 	my ($query,$type)= @_;
-	my %result = ChromoDB::getSearchResults($query,$type);
+	my %result = ChromoDB::GetSearchResults($query,$type,0);
 	return $json->pretty->encode(\%result);
 
 }
 sub doSingle {
 	my $json = JSON->new;
-	my ($query,$type)= @_;
+	my ($query)= @_;
 	$type = "GeneID";
-	my %result = ChromoDB::getSearchResults($query,$type);
+	my %result = ChromoDB::GetSearchResults($query,$type,0);
+	return $json->pretty->encode(\%result);
+
+}
+sub doBrowse {
+	my $json = JSON->new;
+	my ($query)= @_;
+	$type = "ProteinName";
+	my %result = ChromoDB::GetSearchResults($query,$type,1);
 	return $json->pretty->encode(\%result);
 
 }
@@ -37,8 +45,7 @@ sub CalcRES {
 	if ($enz =~s/%2C/\,/g) {
 			#Need logic for duplicates
 	}
-	my %result = EnzCutter::doCut($query,$enz);
-
+	my %result = EnzCutter::doCut($query,$enz);	
 	return $json->pretty->encode(\%result);
 
 }

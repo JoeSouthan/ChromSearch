@@ -32,7 +32,7 @@ sub doCut {
 		#Get it's sequence
 		
 		my %search = ChromoDB::GetSearchResults($query,"AccessionNumber", 0);
-		$sequence = $search{$query}{"GeneSeq"};
+		$sequence = $search{$query}{"DNASeq"};
 	}
 
 	#Process the sequence

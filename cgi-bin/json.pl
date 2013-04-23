@@ -97,9 +97,7 @@ unless (defined ($selector)) {
 			} elsif ($selector eq "single") {
 				print GenJSON::doSingle($query);
 			} elsif ($selector eq "browse")  {
-				#print GenJSON::doBrowse($query,$type);
-				#Temp
-				print GenJSON::doSearch($query,$type);
+				print GenJSON::doBrowse($query);
 			} else {
 				print GenJSON::error("Search: Invalid selector");
 			}
