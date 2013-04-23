@@ -19,7 +19,7 @@ sub doSearch {
 sub doSingle {
 	my $json = JSON->new;
 	my ($query)= @_;
-	$type = "GeneID";
+	my $type = "GeneID";
 	my %result = ChromoDB::GetSearchResults($query,$type,0);
 	return $json->pretty->encode(\%result);
 
@@ -27,7 +27,7 @@ sub doSingle {
 sub doBrowse {
 	my $json = JSON->new;
 	my ($query)= @_;
-	$type = "ProteinName";
+	my $type = "ProteinName";
 	my %result = ChromoDB::GetSearchResults($query,$type,1);
 	return $json->pretty->encode(\%result);
 

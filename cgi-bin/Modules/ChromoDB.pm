@@ -48,7 +48,7 @@ sub GetSearchResults( $$$ ){
 	my @queryResult = QuerySearch($searchString, $id, $browseMode);
 	
 	# String must contain matches to return
-	unless( @queryResult[0] ){
+	unless( $queryResult[0] ){
 
 		# If is null return null string or error code
 		$error{'error'} = GetLastErrorMessage();
