@@ -3,6 +3,7 @@ package GenJSON;
 use strict;
 use JSON;
 use ChromoDB;
+use EnzCutter;
 use Exporter;
 use Data::Dumper;
 our @ISA = qw(Exporter);
@@ -11,15 +12,23 @@ our @EXPORT = qw ();
 sub doSearch {
 	my $json = JSON->new;
 	my ($query,$type)= @_;
-	my %result = ChromoDB::GetSearchResults($query,$type);
+	my %result = ChromoDB::GetSearchResults($query,$type,0);
 	return $json->pretty->encode(\%result);
 
 }
 sub doSingle {
 	my $json = JSON->new;
-	my ($query,$type)= @_;
+	my ($query)= @_;
 	$type = "GeneID";
-	my %result = ChromoDB::getSearchResults($query,$type);
+	my %result = ChromoDB::GetSearchResults($query,$type,0);
+	return $json->pretty->encode(\%result);
+
+}
+sub doBrowse {
+	my $json = JSON->new;
+	my ($query)= @_;
+	$type = "ProteinName";
+	my %result = ChromoDB::GetSearchResults($query,$type,1);
 	return $json->pretty->encode(\%result);
 
 }
@@ -28,6 +37,23 @@ sub getRes {
 	my $json = JSON->new;
 	my %result = ChromoDB::GetRES();
 	return $json->pretty->encode(\%result);
+}
+sub CalcRES {
+	my $json = JSON->new;
+	my ($query, $enz) = @_;
+	#Remove %2C's 
+	if ($enz =~s/%2C/\,/g) {
+			#Need logic for duplicates
+	}
+	my %result = EnzCutter::doCut($query,$enz);	
+	return $json->pretty->encode(\%result);
+
+}
+sub help {
+	my $json = JSON->new;
+	my %result = @_;
+	return $json->pretty->encode(\%result);
+ 
 }
 sub error {
 	my $json = JSON->new;

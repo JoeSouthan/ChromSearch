@@ -1,6 +1,6 @@
 #! /usr/bin/perl -w
 #
-#	Script to serve JSON
+#	Script to serve JSON with logic to prevent wrong usage
 #
 use strict;
 use JSON;
@@ -14,8 +14,7 @@ my $cgi = new CGI;
 my $json = JSON->new;
 my @params= $cgi->param();
 
-my ($selector, $query,$type);
-# json.pl?selector=(search/single)&$query=(query)&type=(searchType)
+my ($selector, $query,$type,$mode,$gene, $sequence, $page);
 foreach my $params (@params) {
 	if ($params eq "query") {
 		$query = $cgi->param($params);
@@ -23,14 +22,26 @@ foreach my $params (@params) {
 		$type = $cgi->param($params);
 	} elsif ($params eq "selector") {
 		$selector = $cgi->param($params);
-	} 
+	} elsif ($params eq "mode") {
+		$mode = $cgi->param($params);
+	} elsif ($params eq "gene") {
+		$gene = $cgi->param($params);
+	} elsif ($params eq "sequence") {
+		$sequence = $cgi->param($params);
+	} elsif ($params eq "page") {
+		$page = $cgi->param($params);
+	}
 }
 
 
 #Debug
- # $query = "q13";
- # $type = "ChromosomeLocation";
-  $selector = "res";
+	# $query = "AB002805";
+	# $type = "ChromosomeLocation";
+	# $selector = "res";
+	# $mode = "CalcRES";
+	# $gene = "EcoRI%2CBamHI";
+	# %252C
+	# $sequence = "AFAPFMPAMFPMAF";
 
 
 #Print the JSON header
@@ -39,27 +50,66 @@ print $cgi->header('application/json');
 #Time for logic!
 #Search
 unless (defined ($selector)) {
-	print GenJSON::error("No selector chosen");
+	print GenJSON::error("General: No selector chosen");
 } else {
+	# RES mode
 	if ($selector eq "res") {
-		print GenJSON::getRes();
-	} else {
+		unless (defined($mode)) {
+			print GenJSON::error("RES: No mode selected");
+		} else {
+			if ($mode eq "GetRES") {
+				print GenJSON::getRes();
+			} elsif ($mode eq "CalcRES") {
+				if (defined($gene)) {
+					if (defined($sequence)){
+						print GenJSON::error("RES: Please only use one of either gene or sequence");
+					} else {
+						unless (5 <= length($query)) {
+							print GenJSON::error("RES: Gene ID is too small");
+						} else {
+							print GenJSON::CalcRES($query, $gene);
+						}
+					}
+				} elsif (defined($sequence)) {
+					if (defined($gene)){
+						print GenJSON::error("RES: Please only use one of either gene or sequence");
+					} else {
+						print GenJSON::CalcRES($sequence,$query);
+					}
+				} else {
+					print GenJSON::error("RES: No sequence or Gene ID");
+				}
+			} else {
+				print GenJSON::error("RES: Invalid Mode");
+			}
+		}
+	# Search mode
+	} elsif ($selector eq "single" or $selector eq "search" or $selector eq "browse") {
 		unless (defined ($query)) {
-			print GenJSON::error("No query selected");
+			print GenJSON::error("Search: No query selected");
 		} else {
 			if ( $selector eq "search") {
 				unless (defined ($type)) {
-					print GenJSON::error("No type selected");
+					print GenJSON::error("Search: No type selected");
 				} else {
-					#print GenJSON::testJSONSearch();
 					print GenJSON::doSearch($query,$type);
 				}
 			} elsif ($selector eq "single") {
 				print GenJSON::doSingle($query);
+			} elsif ($selector eq "browse")  {
+				print GenJSON::doBrowse($query);
 			} else {
-				print GenJSON::error("Invalid selector");
+				print GenJSON::error("Search: Invalid selector");
 			}
 		}
-	}	
+	} elsif	($selector eq "help"){
+		unless (defined($page)){
+			print GenJSON::error("Help: No page") ;
+		} else {
+			print GenJSON::help($page);
+		}
+	} else {
+		print GenJSON::error("General: Invalid selector");
+	}
 }
 

@@ -11,6 +11,7 @@
 	<script type="text/javascript" src="https://www.google.com/jsapi"></script>
 	<script type="text/javascript" src="js/js.js"></script>
 	<script type="text/javascript" src="js/jquery.history.min.js"></script>
+	<script language="javascript" type="text/javascript" src="js/textext.js"></script>
 </head>
 
 <body>
@@ -18,13 +19,10 @@
 	<h3>Reduced functionality</h3>
 	<p>This site requires JavaScript. Please enable it.</p>
 </div>
-<div id="help">
-	<a id="closepopup">x</a>
-	<div class="float-left">
-		<h2>Help!</h2>
-		<p>1. Enter your search in the search box (GenBank Accession Number, Chromosome Location or Gene ID)</p>
-		<p>2. Select the type of search you would like to do.</p>
-		<p>3. Submit the search.</p>
+<div class="boxes" id="help">
+	<div id="closepopup">Close?</div>
+	<h2 class="center">Help</h2>
+	<div id="Help_text">
 	</div>
 </div>
 <div id="overlay"></div>
@@ -33,12 +31,43 @@
 	<span class="inlinetext">Please Wait...</span>
 </div>
 <div class="boxes" id="errorbox">
+	<div id="closepopup">Close?</div>
 	<h2 class="center">There was an error...</h2>
 	<p id="errordiv"></p>
 </div>
 <div class="boxes" id="timeout">
 	<h2 class="center">Waiting...</h2>
 	<p>Seems the data is taking a while to come back. Try refreshing!</p>
+</div>
+<div class="boxes" id="contact">
+	<div id="closepopup">Close?</div>
+	<h2 class="center">Contact</h2>
+	<p>Maybe later</p>
+</div> 
+<div class="boxes" id="EnzCutter"> 
+	<div id="closepopup">Close?</div>
+	<h2 class="center">EnzCutter</h2>
+	<div id="intro_text">
+		<p id="EnzCuttter_welcome">Please paste in your sequence to be enzymatically cleaved in the box and submit</p>
+		<form method="post" action="cgi-bin/enz_cutter.pl" id="EnzCutter_form">
+			<div id="EnzCutter_sequence">
+				<p class="bold">Sequence:</p>
+				<div id="EnzCutter_currentGene"></div>
+				<div id="EnzCutter_autocompleteWrapper">
+					<textarea type="text" name="query" id="EnzCutter_textarea" autofocus="autofocus" cols="40" rows="4" style="width:400px"></textarea>
+				</div>
+			</div>
+			<p class="bold">Choose some enzymes:</p>
+			<span id="EnzCutter_number"></span>
+			<div id="EnzCutter_avaliable">
+				<textarea type="text" name="autocomplete" id="EnzCutter_autocomplete" cols="40" rows="1" style="width:400px"></textarea>
+				<div id="EnzCutter_cb">
+				</div>
+			</div>
+			<br /><br />
+			<input type="submit" value="Submit" id="EnzCutter_submit" />
+		</form>
+	</div>
 </div>
 <div class="navbar-wrapper">
 	<div class="navbar-inner-wrapper">
@@ -52,13 +81,13 @@
 						<a href="">Home</a>
 					</div>
 					<div class="item">
-						<a href="cgi-bin/enz_cutter.pl">EnzCutter</a>
+						<a href="cgi-bin/enz_cutter.pl" id="EnzCutter_open">EnzCutter</a>
 					</div>
 					<div class="item">
-						<a href="help" id="showhelp">Help</a>
+						<a href="help" id="help_open">Help</a>
 					</div>
 					<div class="item">
-						<a href="contact">Contact </a>
+						<a href="contact" id="contact_open">Contact </a>
 					</div>
 					
 		</div>
@@ -69,16 +98,19 @@
 	<div id="main">
 		
 		<div class="welcome_wrapper" id="welcome">
-			<div class="welcome">
+			<div class="welcome" >
 				<h2>Welcome to the Chromosome 12 Search Engine</h2>
 				<div class="frontbox yellow" id="browsebox"> 
 					<p>Browse &raquo;</p>
+					<span class="boxspan">Browse by Protein product</span>
 				</div>
 				<div class="frontbox blue" id="searchbox">
 					<p>Search &raquo;</p>
+					<span class="boxspan">Search the database</span>
 				</div>
 				<div class="frontbox green" id="helpbox">
 					<p>Help &raquo;</p>
+					<span class="boxspan">Not sure where to start?</span>
 				</div>
 			</div>
 		</div>
@@ -154,11 +186,14 @@
 				</div>
 			</form>
 		</div>
+
 		<div class="footer">Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
 
 	</div>
-<div id="content">
-</div>
+	<div id="EnzCutter_Results">
+	</div>
+	<div id="content">
+	</div>
 </div>
 </body>
 </html>
