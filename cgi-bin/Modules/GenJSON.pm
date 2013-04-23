@@ -27,7 +27,7 @@ sub doSingle {
 sub doBrowse {
 	my $json = JSON->new;
 	my ($query)= @_;
-	my $type = "ProteinName";
+	my $type = "AccessionNumber";
 	my %result = ChromoDB::GetSearchResults($query,$type,1);
 	return $json->pretty->encode(\%result);
 
