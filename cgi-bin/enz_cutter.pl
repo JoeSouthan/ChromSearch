@@ -2,14 +2,10 @@
 use strict;
 use CGI;
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser); 
-use SOAP::Lite;
-use Time::HiRes qw ( time );
 use Data::Dumper;#Debug
 
 #Define the usual
 my $cgi = new CGI;
-my $soap = SOAP::Lite->uri('ChromoDB')->proxy('http://c2:coursework123@joes-pi.dyndns.org/cgi-bin/proxy.pl');
-my $time = time();
 
 #Find what enzymes they want  - POST
 my ($custom, @enzymes, $gene,$query);

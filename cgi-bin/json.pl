@@ -33,18 +33,14 @@ foreach my $params (@params) {
 	}
 }
 
-sub fixGene {
-	if ($query =~s/%2C/\,/g) {
-		#Need logic for duplicates
-	}
-}
 
 #Debug
-	# $query = "q13";
+	# $query = "AB002805";
 	# $type = "ChromosomeLocation";
 	# $selector = "res";
 	# $mode = "CalcRES";
-	# $gene = "EcoRI%252CBamHI";
+	# $gene = "EcoRI%2CBamHI";
+	# %252C
 	# $sequence = "AFAPFMPAMFPMAF";
 
 
@@ -68,19 +64,17 @@ unless (defined ($selector)) {
 					if (defined($sequence)){
 						print GenJSON::error("RES: Please only use one of either gene or sequence");
 					} else {
-						unless (5 <= length($gene)) {
+						unless (5 <= length($query)) {
 							print GenJSON::error("RES: Gene ID is too small");
 						} else {
-							fixGene();
-							print GenJSON::CalcRES($query,$gene);
+							print GenJSON::CalcRES($query, $gene);
 						}
 					}
 				} elsif (defined($sequence)) {
 					if (defined($gene)){
 						print GenJSON::error("RES: Please only use one of either gene or sequence");
 					} else {
-						fixGene();
-						print GenJSON::CalcRES($query,$sequence);
+						print GenJSON::CalcRES($sequence,$query);
 					}
 				} else {
 					print GenJSON::error("RES: No sequence or Gene ID");

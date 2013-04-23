@@ -3,6 +3,7 @@ package GenJSON;
 use strict;
 use JSON;
 use ChromoDB;
+use EnzCutter;
 use Exporter;
 use Data::Dumper;
 our @ISA = qw(Exporter);
@@ -31,7 +32,12 @@ sub getRes {
 }
 sub CalcRES {
 	my $json = JSON->new;
-	my %result = @_;
+	my ($query, $enz) = @_;
+	#Remove %2C's 
+	if ($enz =~s/%2C/\,/g) {
+			#Need logic for duplicates
+	}
+	my %result = EnzCutter::doCut($query,$enz);
 
 	return $json->pretty->encode(\%result);
 
