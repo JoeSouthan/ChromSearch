@@ -20,7 +20,7 @@ sub doSingle {
 	my $json = JSON->new;
 	my ($query)= @_;
 	my $type = "GeneID";
-	my %result = ChromoDB::GetSearchResults($query,$type,0);
+	my %result = ChromoDB::GetSearchResults($query,$type,2);
 	return $json->pretty->encode(\%result);
 
 }

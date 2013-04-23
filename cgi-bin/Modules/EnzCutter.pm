@@ -31,7 +31,7 @@ sub doCut {
 		#Its a known gene
 		#Get it's sequence
 		
-		my %search = ChromoDB::GetSearchResults($query,"AccessionNumber", 0);
+		my %search = ChromoDB::GetSearchResults($query,"AccessionNumber", 2);
 		$sequence = $search{$query}{"DNASeq"};
 	}
 
