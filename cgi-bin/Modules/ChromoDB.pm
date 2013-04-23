@@ -70,40 +70,42 @@ sub GetSearchResults( $$$ ){
 			$searchResults{$accessionNumber}{'ProteinId'} = $queryResult[$i]->[4];
 			$searchResults{$accessionNumber}{'GeneLength'} = $queryResult[$i]->[5];
 			
+			if( 2 == $browseMode ){
 			
-			# Get the DNA seq
-			my $DNASeq = QuerySequence($accessionNumber, 'geneSeq');
-			if( $DNASeq ){
-				$searchResults{$accessionNumber}{'DNASeq'} = $DNASeq;
-			}else{
-				$searchResults{$accessionNumber}{'DNASeq'} = 'N/A'
-			}
+				# Get the DNA seq
+				my $DNASeq = QuerySequence($accessionNumber, 'geneSeq');
+				if( $DNASeq ){
+					$searchResults{$accessionNumber}{'DNASeq'} = $DNASeq;
+				}else{
+					$searchResults{$accessionNumber}{'DNASeq'} = 'N/A'
+				}
 			
-			# Get the amino acid sequence
-			my $AASeq = QuerySequence($accessionNumber, 'proteinSeq');
-			if( $AASeq ){
-				$searchResults{$accessionNumber}{'AASeq'} = $AASeq;
-			}else{
-				$searchResults{$accessionNumber}{'AASeq'} = 'N/A'
-			}
+				# Get the amino acid sequence
+				my $AASeq = QuerySequence($accessionNumber, 'proteinSeq');
+				if( $AASeq ){
+					$searchResults{$accessionNumber}{'AASeq'} = $AASeq;
+				}else{
+					$searchResults{$accessionNumber}{'AASeq'} = 'N/A'
+				}
 			
-			# Retrieve coding sequence data for given accession number
-			# Need error checking for below and a messge to indicate if there
-			# is no data.
-			my @sequence = BuildCodingSeq($queryResult[$i]->[0]);
-			$searchResults{$accessionNumber}{'SeqFeat'} = [@sequence];
+				# Retrieve coding sequence data for given accession number
+				# Need error checking for below and a messge to indicate if there
+				# is no data.
+				my @sequence = BuildCodingSeq($queryResult[$i]->[0]);
+				$searchResults{$accessionNumber}{'SeqFeat'} = [@sequence];
 			
-			# Retrieve codon usage data
+				# Retrieve codon usage data
 	
-			# Attempt to retrieve the codons for the given accession number
-			my @codons = GetCodons( $queryResult[$i]->[0] );
+				# Attempt to retrieve the codons for the given accession number
+				my @codons = GetCodons( $queryResult[$i]->[0] );
 			
-			unless( @codons ){
-			# No codons returned list as empty
-			$searchResults{$accessionNumber}{'CodonUsage'} = 'N/A';
-			}else{
-				# Valid array of codons converted to percentages and packaged in to hash
-			$searchResults{$accessionNumber}{'CodonUsage'} = [CalculateCodonUsage(@codons)];
+				unless( @codons ){
+				# No codons returned list as empty
+				$searchResults{$accessionNumber}{'CodonUsage'} = 'N/A';
+				}else{
+					# Valid array of codons converted to percentages and packaged in to hash
+				$searchResults{$accessionNumber}{'CodonUsage'} = [CalculateCodonUsage(@codons)];
+				}
 			}
 		}
 
@@ -158,15 +160,15 @@ sub GetRES{
 sub DatabaseConnect{
 	
 	#Defined the connection details to the database
-	# my $dbname = 'scouls01'; 
-	# my $user = 'scouls01';
-	# my $password = 'iwr8sh8vb'; 
-	# my $dbserver = 'localhost';
+	#my $dbname = 'scouls01'; 
+	#my $user = 'scouls01';
+	#my $password = 'iwr8sh8vb'; 
+	#my $dbserver = 'localhost';
 	
-	 my $dbname = 'biocomp2'; 
-	 my $user = 'c2';
-	 my $password = 'coursework123'; 
-	 my $dbserver = 'localhost';
+	my $dbname = 'biocomp2'; 
+	my $user = 'c2';
+	my $password = 'coursework123'; 
+	my $dbserver = 'localhost';
 	
 	# Specify the location and name of the database
 	my $datasource = "dbi:mysql:database=$dbname;host=$dbserver;";
@@ -294,7 +296,9 @@ sub QuerySearch( $$$ ){
 	
 	my $sqlQuery = '';
 	
-	if( 0 == $browseMode ){
+	# If the search is in default mode, then find everything if associated with the 
+	# search string.  If in broswe mode return everything that starts with the given letter.
+	if( 0 == $browseMode || 2 == $browseMode){
 		# Run search query **$searchstring must be in quotes***
 		$sqlQuery = "SELECT accessionNo, geneId, chromLoc, proteinName, ProteinId, geneSeqLen FROM gene WHERE $idType LIKE '%$searchString%'";
 	}else{

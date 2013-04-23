@@ -75,6 +75,13 @@ print "************************** TEST : 'GetSearchResults' ********************
 	#print Dumper(%results);
 }
 
+# CONDITION With return everything mode on i.e. 2.
+{
+	my %results = GetSearchResults('AB002805','AccessionNumber',2);
+	ok( %results, "with return everything mode on");
+	#print Dumper(%results);
+}
+
 ################################ TEST: 'GetRES' ################################
 
 # TEST 'GetRES'
@@ -124,6 +131,7 @@ print "\n************************** TEST : 'DoQuery' **************************\
 	my @queryData = DoQuery( $sqlQuery );
 	ok( $queryData[0]->[0] == 2780780, "Testing 'DoQuery'' with valid string 'SELECT geneId FROM gene WHERE 
 	geneId = '2780780'" );
+	#print Dumper(@queryData);
 }
 
 # CONDITION: Valid string 'SELECT geneId FROM gene'
