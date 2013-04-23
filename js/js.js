@@ -103,7 +103,7 @@ $(document).ready(function() {
 			if (submit[0] == "GetRES"){
 				dataStructure = {mode:"GetRES"};
 			} else if (submit[0] == "CalcRES") {
-				dataStructure = {mode:"CalcRES", query:submit[1], gene:submit[2], sequence: submit[3]};
+				dataStructure = {mode:"CalcRES", query:submit[1], gene:submit[3], sequence: submit[2]};
 			}
 			var result = $.ajax ({
 				url:"cgi-bin/json.pl?selector=res",
@@ -600,7 +600,7 @@ $(document).ready(function() {
 				sequence = $("#EnzCutter_currentGene").text();
 			}
 			if (enzymes) {
-				if (sequence.length < 7) {
+				if (sequence.length < 5) {
 					$("#EnzCutter_number").html('<span class="red">Sequence must be longer than 10 characters.</span>');
 				} else {
 					EnzCutter(["CalcRES", enzymes, sequence]);
