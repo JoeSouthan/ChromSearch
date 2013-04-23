@@ -70,6 +70,12 @@ sub GetSearchResults( $$$ ){
 			$searchResults{$accessionNumber}{'ProteinId'} = $queryResult[$i]->[4];
 			$searchResults{$accessionNumber}{'GeneLength'} = $queryResult[$i]->[5];
 			
+			# Retrieve coding sequence data for given accession number
+			# Need error checking for below and a messge to indicate if there
+			# is no data.
+			my @sequence = BuildCodingSeq($queryResult[$i]->[0]);
+			$searchResults{$accessionNumber}{'SeqFeat'} = [@sequence];
+			
 			if( 2 == $browseMode ){
 			
 				# Get the DNA seq
@@ -87,12 +93,6 @@ sub GetSearchResults( $$$ ){
 				}else{
 					$searchResults{$accessionNumber}{'AASeq'} = 'N/A'
 				}
-			
-				# Retrieve coding sequence data for given accession number
-				# Need error checking for below and a messge to indicate if there
-				# is no data.
-				my @sequence = BuildCodingSeq($queryResult[$i]->[0]);
-				$searchResults{$accessionNumber}{'SeqFeat'} = [@sequence];
 			
 				# Retrieve codon usage data
 	

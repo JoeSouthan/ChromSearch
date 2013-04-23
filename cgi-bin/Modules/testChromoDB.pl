@@ -44,7 +44,7 @@ print "************************** TEST : 'GetSearchResults' ********************
 {
 	my %results = GetSearchResults('AB002805','AccessionNumber',0);
 	ok( %results, "with '2780780' and 'AccessionNumber' as parameters");
-	print Dumper(%results);
+	#print Dumper(%results);
 }
 
 # CONDITION: Correct parameters of q13 (assumes this dummy data is in DB) and ChromosomeLocation
