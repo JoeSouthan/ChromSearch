@@ -1,7 +1,7 @@
 package ChromoDB;
 
 use strict;
-#use warnings;
+use warnings;
 
 use DBI;
 use Data::Dumper;
@@ -10,7 +10,7 @@ use Exporter;
 our @ISA = qw(Exporter);
 our @EXPORT = qw(GetSearchResults DatabaseConnect GetIdentifier DoQuery QuerySearch IsArrayEmpty
 	BuildCodingSeq GetCodons FindRES SetLastErrorMessage GetLastErrorMessage QuerySequence
-	CalculateCodonUsage);
+	CalculateCodonUsage CalculatePercent);
 
 # Global variables
 
@@ -468,9 +468,18 @@ sub GetCodons( $ ){
 	my $sqlQuery = "SELECT codonCount FROM codonBias WHERE accessionNo = '$accessionNo'";
 	
 	# Run the query and save the result in a array
-	my @accesionCodons = DoQuery($sqlQuery);
+	my @accessionCodons = DoQuery($sqlQuery);
 	
-	return @accesionCodons;
+	# In the DB condons for all entries are just one long comma separated string so
+	# split out all individual codons in string to unique array entries.
+	my @codonArray = split(/,/, $accessionCodons[0]->[0] );
+	
+	# Search and replace any T's with U's, as the DB has codons stored as using thymine.
+	foreach my $codonEntry (@codonArray){
+		$codonEntry =~ s/T/U/g;
+	}
+	
+	return @codonArray;
 }
 
 ##########################################################################################################
@@ -540,6 +549,29 @@ sub QuerySequence{
 	}
 }
 
+###############################################################################################
+#
+# CalculatePercent - Takes the total number of codons and number for each codons and returns the percentage
+#
+###############################################################################################
+sub CalculatePercent($$){
+	my($numerator, $denominator) = @_;
+	
+	# If tthere are no codons involved then return 0 to ensure that the codon is not set to 
+	# undef or a divide by 0 happens.
+	if(0 == $denominator){
+		return 0;
+	}
+	
+	# Calculate the percentage.
+	my $percent = ($numerator / $denominator) * 100; 
+	
+	# Return the rounded result. 
+	# Caluclatiuon taken from RET's post at http://stackoverflow.com/questions/178539/how-do-you-round-a-floating-point-number-in-perl 
+	return int($percent + 0.5);
+}
+
+
 ###########################################################################################################
 #
 # CalculateCodonUsage - Takes an array of codons and returns a hash with the percentage for each amino acid
@@ -547,19 +579,97 @@ sub QuerySequence{
 ##########################################################################################################
 sub CalculateCodonUsage( @ ){
 
-	my @codons = $_[0];
-	
-	#print Dumper(@codons);
+	# Expects an array from GetCodons
+	my @codonArray = @_;
 
-	# Split out all individual codons in string to unique array entries.
-	my @codonArray = split(/,/, $codons[0]->[0] );
+	# Prepare and initialise all hash elements for all 64 possible codons
+	# this will store the values for each codon form the array passed in.
+	my %codonHash = ();
 	
-	# Group condons into respective amino acid residues
+	$codonHash{'UUU'} = 0; #1
+	$codonHash{'UUC'} = 0; #2
+	$codonHash{'UUA'} = 0; #3
+	$codonHash{'UUG'} = 0; #4
+	$codonHash{'CUU'} = 0; #5
+	$codonHash{'CUC'} = 0; #6
+	$codonHash{'CUA'} = 0; #7
+	$codonHash{'CUG'} = 0; #8
+	$codonHash{'AUU'} = 0; #9
+	$codonHash{'AUC'} = 0; #10
+	$codonHash{'AUA'} = 0; #11
+	$codonHash{'AUG'} = 0; #12
+	$codonHash{'GUU'} = 0; #13
+	$codonHash{'GUC'} = 0; #14
+	$codonHash{'GUA'} = 0; #15
+	$codonHash{'GUG'} = 0; #16
 	
-	# Loop through array split out codon from number, create codon hash entry
-	# and assign it the number
-	my %codonHash;
+	$codonHash{'UCU'} = 0; #17
+	$codonHash{'UCC'} = 0; #18
+	$codonHash{'UCA'} = 0; #19
+	$codonHash{'UCG'} = 0; #20
 	
+	$codonHash{'AGU'} = 0; #21
+	$codonHash{'AGC'} = 0; #22
+	
+	$codonHash{'CCU'} = 0; #23
+	$codonHash{'CCC'} = 0; #24
+	$codonHash{'CCA'} = 0; #25
+	$codonHash{'CCG'} = 0; #26
+	
+	$codonHash{'ACU'} = 0; #27
+	$codonHash{'ACC'} = 0; #28
+	$codonHash{'ACA'} = 0; #29
+	$codonHash{'ACG'} = 0; #30
+	
+	$codonHash{'GCU'} = 0; #31
+	$codonHash{'GCC'} = 0; #32
+	$codonHash{'GCA'} = 0; #33
+	$codonHash{'GCG'} = 0; #34
+	
+	$codonHash{'UAU'} = 0; #35
+	$codonHash{'UAC'} = 0; #36
+	
+	$codonHash{'CAU'} = 0; #37
+	$codonHash{'CAC'} = 0; #38
+	
+	$codonHash{'AAU'} = 0; #39
+	$codonHash{'AAC'} = 0; #40
+	$codonHash{'AAA'} = 0; #41
+	$codonHash{'AAG'} = 0; #42
+	
+	$codonHash{'GAU'} = 0; #43
+	$codonHash{'GAC'} = 0; #44
+	
+	$codonHash{'GAA'} = 0; #45
+	$codonHash{'GAG'} = 0; #46
+	
+	$codonHash{'UGU'} = 0; #47
+	$codonHash{'UGC'} = 0; #48
+	
+	$codonHash{'UAA'} = 0; #49
+	$codonHash{'UAG'} = 0; #50
+	$codonHash{'UGA'} = 0; #51
+	
+	$codonHash{'UGG'} = 0; #52
+	
+	$codonHash{'CGU'} = 0; #53
+	$codonHash{'CGC'} = 0; #54
+	$codonHash{'CGA'} = 0; #55
+	$codonHash{'CGG'} = 0; #56
+	
+	$codonHash{'AGA'} = 0; #57
+	$codonHash{'AGG'} = 0; #58
+	
+	$codonHash{'GGU'} = 0; #59
+	$codonHash{'GGC'} = 0; #60
+	$codonHash{'GGA'} = 0; #61
+	$codonHash{'GGG'} = 0; #62
+	
+	$codonHash{'CAA'} = 0; #63
+	$codonHash{'CAG'} = 0; #64
+	
+	
+	# Loop through array split out 3 letter codon from number, assign number to codon hash entry
 	foreach my $codon (@codonArray){
 	
 		my @codonDetails = split(/:/, $codon);
@@ -567,303 +677,260 @@ sub CalculateCodonUsage( @ ){
 		$codonHash{$codonDetails[0]} = $codonDetails[1];
 	}
 	
-	# From this hash take the codon numbers needed for each residue.
-	my %residueHash;
+	# For all codons in codonArray group into amino acids and calculate the percentage
+	# for each codon to represent the codon usage for each amino acid.
 	
-	my $percentCount = 0;
+	# Hash to store all the amino acids, will return this when finished.
+	my %residueHash = ();
+	
+	# Initialise variable for keeping track of the total numebr of condons per residue
+	# this gets reset each time an amino acid codon usage is calculated.
 	my $codonTotalCount = 0;
 	
 	# Phenylalanine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
-	
+		# Get the total number of codons that make up the amino acid
 		$codonTotalCount = $codonHash{'UUU'} + $codonHash{'UUC'};
-	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Phe'}{'UUU'} = $codonHash{'UUU'} * $percentCount;
-		$residueHash{'Phe'}{'UUC'} = $codonHash{'UUC'} * $percentCount;
+		
+		# Assign the percentage to each codon using the CalculatePercent function
+		$residueHash{'Phe'}{'UUU'} = CalculatePercent($codonHash{'UUU'}, $codonTotalCount);
+		$residueHash{'Phe'}{'UUC'} = CalculatePercent($codonHash{'UUC'}, $codonTotalCount);
 	}
+	
+	# Repeat above for every amino acids using there own codons.
 	
 	# Leucine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'UUA'} + $codonHash{'UUG'} + $codonHash{'CUU'} + 
 			$codonHash{'CUC'} + $codonHash{'CUA'} + $codonHash{'CUG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Leu'}{'UUA'} = $codonHash{'UUA'} * $percentCount;
-		$residueHash{'Leu'}{'UUG'} = $codonHash{'UUG'} * $percentCount;
-		$residueHash{'Leu'}{'CUU'} = $codonHash{'CUU'} * $percentCount;
-		$residueHash{'Leu'}{'CUC'} = $codonHash{'CUC'} * $percentCount;
-		$residueHash{'Leu'}{'CUA'} = $codonHash{'CUA'} * $percentCount;
-		$residueHash{'Leu'}{'CUG'} = $codonHash{'CUG'} * $percentCount;
+		$residueHash{'Leu'}{'UUA'} = CalculatePercent($codonHash{'UUA'}, $codonTotalCount);
+		$residueHash{'Leu'}{'UUG'} = CalculatePercent($codonHash{'UUG'}, $codonTotalCount);
+		$residueHash{'Leu'}{'CUU'} = CalculatePercent($codonHash{'CUU'}, $codonTotalCount);
+		$residueHash{'Leu'}{'CUC'} = CalculatePercent($codonHash{'CUC'}, $codonTotalCount);
+		$residueHash{'Leu'}{'CUA'} = CalculatePercent($codonHash{'CUA'}, $codonTotalCount);
+		$residueHash{'Leu'}{'CUG'} = CalculatePercent($codonHash{'CUG'}, $codonTotalCount);
 	}
 	
 	# Isoleucine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'AUU'} + $codonHash{'AUC'} + $codonHash{'AUA'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Ile'}{'AUU'} = $codonHash{'AUU'} * $percentCount;
-		$residueHash{'Ile'}{'AUC'} = $codonHash{'AUC'} * $percentCount;
-		$residueHash{'Ile'}{'AUA'} = $codonHash{'AUA'} * $percentCount;
+		$residueHash{'Ile'}{'AUU'} = CalculatePercent($codonHash{'AUU'}, $codonTotalCount);
+		$residueHash{'Ile'}{'AUC'} = CalculatePercent($codonHash{'AUC'}, $codonTotalCount);
+		$residueHash{'Ile'}{'AUA'} = CalculatePercent($codonHash{'AUA'}, $codonTotalCount);
 	}
 	
 	# Methionine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'AUG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Met'}{'AUG'} = $codonHash{'AUG'} * $percentCount;
+		$residueHash{'Met'}{'AUG'} = CalculatePercent($codonHash{'AUG'}, $codonTotalCount);
 	}
 	
 	# Valine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'GUU'} + $codonHash{'GUC'} + $codonHash{'GUA'} +
 			$codonHash{'GUG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Val'}{'GUU'} = $codonHash{'GUU'} * $percentCount;
-		$residueHash{'Val'}{'GUC'} = $codonHash{'GUC'} * $percentCount;
-		$residueHash{'Val'}{'GUA'} = $codonHash{'GUA'} * $percentCount;
-		$residueHash{'Val'}{'GUG'} = $codonHash{'GUG'} * $percentCount;
+		$residueHash{'Val'}{'GUU'} = CalculatePercent($codonHash{'GUU'}, $codonTotalCount);
+		$residueHash{'Val'}{'GUC'} = CalculatePercent($codonHash{'GUC'}, $codonTotalCount);
+		$residueHash{'Val'}{'GUA'} = CalculatePercent($codonHash{'GUA'}, $codonTotalCount);
+		$residueHash{'Val'}{'GUG'} = CalculatePercent($codonHash{'GUG'}, $codonTotalCount);
 	}
 	
 	# Serine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'UCU'} + $codonHash{'UCC'} + $codonHash{'UCA'} +
 			$codonHash{'UCG'} + $codonHash{'AGU'} + $codonHash{'AGC'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Ser'}{'UCU'} = $codonHash{'UCU'} * $percentCount;
-		$residueHash{'Ser'}{'UCC'} = $codonHash{'UCC'} * $percentCount;
-		$residueHash{'Ser'}{'UCA'} = $codonHash{'UCA'} * $percentCount;
-		$residueHash{'Ser'}{'UCG'} = $codonHash{'UCG'} * $percentCount;
-		$residueHash{'Ser'}{'AGU'} = $codonHash{'AGU'} * $percentCount;
-		$residueHash{'Ser'}{'AGC'} = $codonHash{'AGC'} * $percentCount;
+		$residueHash{'Ser'}{'UCU'} = CalculatePercent($codonHash{'UCU'}, $codonTotalCount);
+		$residueHash{'Ser'}{'UCC'} = CalculatePercent($codonHash{'UCC'}, $codonTotalCount);
+		$residueHash{'Ser'}{'UCA'} = CalculatePercent($codonHash{'UCA'}, $codonTotalCount);
+		$residueHash{'Ser'}{'UCG'} = CalculatePercent($codonHash{'UCG'}, $codonTotalCount);
+		$residueHash{'Ser'}{'AGU'} = CalculatePercent($codonHash{'AGU'}, $codonTotalCount);
+		$residueHash{'Ser'}{'AGC'} = CalculatePercent($codonHash{'AGC'}, $codonTotalCount);
 	}
 	
 	# Proline
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'CCU'} + $codonHash{'CCC'} + $codonHash{'CCA'} +
 			$codonHash{'CCG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Pro'}{'CCU'} = $codonHash{'CCU'} * $percentCount;
-		$residueHash{'Pro'}{'CCC'} = $codonHash{'CCC'} * $percentCount;
-		$residueHash{'Pro'}{'CCA'} = $codonHash{'CCA'} * $percentCount;
-		$residueHash{'Pro'}{'CCG'} = $codonHash{'CCG'} * $percentCount;
+		$residueHash{'Pro'}{'CCU'} = CalculatePercent($codonHash{'CCU'}, $codonTotalCount);
+		$residueHash{'Pro'}{'CCC'} = CalculatePercent($codonHash{'CCC'}, $codonTotalCount);
+		$residueHash{'Pro'}{'CCA'} = CalculatePercent($codonHash{'CCA'}, $codonTotalCount);
+		$residueHash{'Pro'}{'CCG'} = CalculatePercent($codonHash{'CCG'}, $codonTotalCount);
 	}
 	
 	# Threonine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'ACU'} + $codonHash{'ACC'} + $codonHash{'ACA'} +
 			$codonHash{'ACG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Thr'}{'ACU'} = $codonHash{'ACU'} * $percentCount;
-		$residueHash{'Thr'}{'ACC'} = $codonHash{'ACC'} * $percentCount;
-		$residueHash{'Thr'}{'ACA'} = $codonHash{'ACA'} * $percentCount;
-		$residueHash{'Thr'}{'ACG'} = $codonHash{'ACG'} * $percentCount;
+		$residueHash{'Thr'}{'ACU'} = CalculatePercent($codonHash{'ACU'}, $codonTotalCount);
+		$residueHash{'Thr'}{'ACC'} = CalculatePercent($codonHash{'ACC'}, $codonTotalCount);
+		$residueHash{'Thr'}{'ACA'} = CalculatePercent($codonHash{'ACA'}, $codonTotalCount);
+		$residueHash{'Thr'}{'ACG'} = CalculatePercent($codonHash{'ACG'}, $codonTotalCount);
 	}
 	
 	# Alanine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'GCU'} + $codonHash{'GCC'} + $codonHash{'GCA'} +
 			$codonHash{'GCG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Ala'}{'GCU'} = $codonHash{'GCU'} * $percentCount;
-		$residueHash{'Ala'}{'GCC'} = $codonHash{'GCC'} * $percentCount;
-		$residueHash{'Ala'}{'GCA'} = $codonHash{'GCA'} * $percentCount;
-		$residueHash{'Ala'}{'GCG'} = $codonHash{'GCG'} * $percentCount;
+		$residueHash{'Ala'}{'GCU'} = CalculatePercent($codonHash{'GCU'}, $codonTotalCount);
+		$residueHash{'Ala'}{'GCC'} = CalculatePercent($codonHash{'GCC'}, $codonTotalCount);
+		$residueHash{'Ala'}{'GCA'} = CalculatePercent($codonHash{'GCA'}, $codonTotalCount);
+		$residueHash{'Ala'}{'GCG'} = CalculatePercent($codonHash{'GCG'}, $codonTotalCount);
 	}
 	
 	# Tyrosine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'UAU'} + $codonHash{'UAC'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Tyr'}{'UAU'} = $codonHash{'UAU'} * $percentCount;
-		$residueHash{'Tyr'}{'UAC'} = $codonHash{'UAC'} * $percentCount;
+		$residueHash{'Tyr'}{'UAU'} = CalculatePercent($codonHash{'UAU'}, $codonTotalCount);
+		$residueHash{'Tyr'}{'UAC'} = CalculatePercent($codonHash{'UAC'}, $codonTotalCount);
 	}
 	
 	# Histidine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'CAU'} + $codonHash{'CAC'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
+		$residueHash{'His'}{'CAU'} = CalculatePercent($codonHash{'CAU'}, $codonTotalCount);
+		$residueHash{'His'}{'CAC'} = CalculatePercent($codonHash{'CAC'}, $codonTotalCount);
+	}
 	
-		$residueHash{'His'}{'CAU'} = $codonHash{'CAU'} * $percentCount;
-		$residueHash{'His'}{'CAC'} = $codonHash{'CAC'} * $percentCount;
+	# Glutamine
+	{
+		$codonTotalCount = 0;
+	
+		$codonTotalCount = $codonHash{'CAA'} + $codonHash{'CAG'};
+		
+		$residueHash{'Gln'}{'CAA'} = CalculatePercent($codonHash{'CAA'}, $codonTotalCount);
+		$residueHash{'Gln'}{'CAG'} = CalculatePercent($codonHash{'CAG'}, $codonTotalCount);
 	}
 	
 	# Aspergine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'AAU'} + $codonHash{'AAC'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Asn'}{'AAU'} = $codonHash{'AAU'} * $percentCount;
-		$residueHash{'Asn'}{'AAC'} = $codonHash{'AAC'} * $percentCount;
+		$residueHash{'Asn'}{'AAU'} = CalculatePercent($codonHash{'AAU'}, $codonTotalCount);
+		$residueHash{'Asn'}{'AAC'} = CalculatePercent($codonHash{'AAC'}, $codonTotalCount);
 	}
 	
 	# Lysine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'AAA'} + $codonHash{'AAG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Lys'}{'AAA'} = $codonHash{'AAA'} * $percentCount;
-		$residueHash{'Lys'}{'AAG'} = $codonHash{'AAG'} * $percentCount;
+		$residueHash{'Lys'}{'AAA'} = CalculatePercent($codonHash{'AAA'}, $codonTotalCount);
+		$residueHash{'Lys'}{'AAG'} = CalculatePercent($codonHash{'AAG'}, $codonTotalCount);
 	}
 	
 	# Aspartic acid
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'GAU'} + $codonHash{'GAC'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Asp'}{'GAU'} = $codonHash{'GAU'} * $percentCount;
-		$residueHash{'Asp'}{'GAC'} = $codonHash{'GAC'} * $percentCount;
+		$residueHash{'Asp'}{'GAU'} = CalculatePercent($codonHash{'GAU'}, $codonTotalCount);
+		$residueHash{'Asp'}{'GAC'} = CalculatePercent($codonHash{'GAC'}, $codonTotalCount);
 	}
 	
 	# Glutamate
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'GAA'} + $codonHash{'GAG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Glu'}{'GAA'} = $codonHash{'GAA'} * $percentCount;
-		$residueHash{'Glu'}{'GAG'} = $codonHash{'GAG'} * $percentCount;
+		$residueHash{'Glu'}{'GAA'} = CalculatePercent($codonHash{'GAA'}, $codonTotalCount);
+		$residueHash{'Glu'}{'GAG'} = CalculatePercent($codonHash{'GAG'}, $codonTotalCount);
 	}
 	
 	# Cysteine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'UGU'} + $codonHash{'UGC'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Cys'}{'UGU'} = $codonHash{'UGU'} * $percentCount;
-		$residueHash{'Cys'}{'UGC'} = $codonHash{'UGC'} * $percentCount;
+		$residueHash{'Cys'}{'UGU'} = CalculatePercent($codonHash{'UGU'}, $codonTotalCount);
+		$residueHash{'Cys'}{'UGC'} = CalculatePercent($codonHash{'UGC'}, $codonTotalCount);
 	}
 	
 	# STOP
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
-		$codonTotalCount = $codonHash{'UAA'} + $codonHash{'UAG'} + 
-			$codonHash{'UGA'};
+		$codonTotalCount = $codonHash{'UAA'} + $codonHash{'UAG'} + $codonHash{'UGA'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Stop'}{'UAA'} = $codonHash{'UAA'} * $percentCount;
-		$residueHash{'Stop'}{'UAG'} = $codonHash{'UAG'} * $percentCount;
-		$residueHash{'Stop'}{'UGA'} = $codonHash{'UGA'} * $percentCount;
+		$residueHash{'Stop'}{'UAA'} = CalculatePercent($codonHash{'UAA'}, $codonTotalCount);
+		$residueHash{'Stop'}{'UAG'} = CalculatePercent($codonHash{'UAG'}, $codonTotalCount);
+		$residueHash{'Stop'}{'UGA'} = CalculatePercent($codonHash{'UGA'}, $codonTotalCount);
 	}
 	
 	# Tryptophan
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'UGG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Trp'}{'UGG'} = $codonHash{'UGG'} * $percentCount;
+		$residueHash{'Trp'}{'UGG'} = CalculatePercent($codonHash{'UGG'}, $codonTotalCount);
 	}
 	
 	# Arginine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'CGU'} + $codonHash{'CGC'} + $codonHash{'CGA'} +
 			$codonHash{'CGG'} + $codonHash{'AGA'} + $codonHash{'AGG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Arg'}{'CGU'} = $codonHash{'CGU'} * $percentCount;
-		$residueHash{'Arg'}{'CGC'} = $codonHash{'CGC'} * $percentCount;
-		$residueHash{'Arg'}{'CGA'} = $codonHash{'CGA'} * $percentCount;
-		$residueHash{'Arg'}{'CGG'} = $codonHash{'CGG'} * $percentCount;
-		$residueHash{'Arg'}{'AGA'} = $codonHash{'AGA'} * $percentCount;
-		$residueHash{'Arg'}{'AGG'} = $codonHash{'AGG'} * $percentCount;
+		$residueHash{'Arg'}{'CGU'} = CalculatePercent($codonHash{'CGU'}, $codonTotalCount);
+		$residueHash{'Arg'}{'CGC'} = CalculatePercent($codonHash{'CGC'}, $codonTotalCount);
+		$residueHash{'Arg'}{'CGA'} = CalculatePercent($codonHash{'CGA'}, $codonTotalCount);
+		$residueHash{'Arg'}{'CGG'} = CalculatePercent($codonHash{'CGG'}, $codonTotalCount);
+		$residueHash{'Arg'}{'AGA'} = CalculatePercent($codonHash{'AGA'}, $codonTotalCount);
+		$residueHash{'Arg'}{'AGG'} = CalculatePercent($codonHash{'AGG'}, $codonTotalCount);
 	}
 	
 	# Glycine
 	{
-		$percentCount = 0;
 		$codonTotalCount = 0;
 	
 		$codonTotalCount = $codonHash{'GGU'} + $codonHash{'GGC'} + $codonHash{'GGA'} +
 			$codonHash{'GGG'};
 	
-		$percentCount = eval{ (100 / $codonTotalCount) };
-	
-		$residueHash{'Gly'}{'GGU'} = $codonHash{'GGU'} * $percentCount;
-		$residueHash{'Gly'}{'GGC'} = $codonHash{'GGC'} * $percentCount;
-		$residueHash{'Gly'}{'GGA'} = $codonHash{'GGA'} * $percentCount;
-		$residueHash{'Gly'}{'GGG'} = $codonHash{'GGG'} * $percentCount;
+		$residueHash{'Gly'}{'GGU'} = CalculatePercent($codonHash{'GGU'}, $codonTotalCount );
+		$residueHash{'Gly'}{'GGC'} = CalculatePercent($codonHash{'GGC'}, $codonTotalCount );
+		$residueHash{'Gly'}{'GGA'} = CalculatePercent($codonHash{'GGA'}, $codonTotalCount );
+		$residueHash{'Gly'}{'GGG'} = CalculatePercent($codonHash{'GGG'}, $codonTotalCount );
 	}
-	 
+	
+	# Return the filled out hash containing the amino acid residues back to caller.
 	return %residueHash;
 }
 

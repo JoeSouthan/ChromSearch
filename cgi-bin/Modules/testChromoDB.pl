@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::Simple tests => 39;
+use Test::Simple tests => 40;
 use Data::Dumper;
 use strict;
 use warnings;
@@ -244,20 +244,21 @@ print "\n************************** TEST: 'IsArrayEmpty' ***********************
 
 print "\n************************** TEST: 'BuildCodingSeq' **************************\n";
 
+# CONDITION: With valid accession number 
 {
 	my @seq = BuildCodingSeq('AB002805');
 	ok( @seq, "with valid argument accession number 'AB002805' with one exon");
 	#print Dumper(@seq);
 }
 
-
+# CONDITION: with valid accession number that has more than one exon
 {
 	my @seq = BuildCodingSeq('AB005990');
 	ok( @seq, "with valid argument accession number 'AB005990' with more than one exon");
 	#print Dumper(@seq);
 }
 
-
+# CONDITION: With valid argument accession number that has more than one exon
 {
 	my @seq = BuildCodingSeq('GU994024');
 	ok( @seq, "with valid argument accession number 'GU994024' with more than one exon");
