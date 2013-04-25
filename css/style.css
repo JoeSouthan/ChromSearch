@@ -23,8 +23,8 @@ h1 {
 h3 {
 	font-size:16px;
 	font-weight:500;
-	margin:0;
-	background-color:#CCCCCC;
+	margin:0 0 10px;
+	background-color:#E3E3E3;
 	clear:both;
 	padding:5px;
 	border-left: 5px solid #555;
@@ -258,13 +258,9 @@ pre {
 }
 .singleresult h2 {
 	margin:0 0 10px 0;
+	border-bottom: 2px dotted #000;
 }
-#SequenceDNA {
-	display:none;
-}
-#SequenceAA{
-	display:none;
-}
+
 .sequence {
 	font-family: monospace;
 }
@@ -302,12 +298,12 @@ pre {
 	left:35%;
 	border:1px solid #E77776;
 }
-
 #loader, #content,
 #searchLink, #searchform,
 #browse, #timeout,
 #EnzCutter, #help,
-#contact {
+#contact, #SequenceDNA,
+#SequenceAA {
 	display:none;
 }
 #EnzCutter_currentGene {

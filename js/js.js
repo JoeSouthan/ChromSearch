@@ -341,8 +341,8 @@ $(document).ready(function() {
 	            	<h3>Gene Layout</h3> \
 	                <div class="diagram centerdiv" id="chart_div0"></div>\
 	                <h3>Codon Usage</h3> \
-					<div class="center"> \
-						<img src="img/test.png" alt="Codon Usage"/> \
+					<div id="codon_img" class="center"> \
+						<a href="cgi-bin/codon_img.pl?download=true&gene='+i+'" alt="Codon Usage"><img src="cgi-bin/codon_img.pl?show=true&gene='+i+'" alt="Codon Usage"/></a> \
 					</div> \
 	                <h2>Common Restriction Sites</h2> \
 	                <h3>EcoR1</h3> \
@@ -553,7 +553,6 @@ $(document).ready(function() {
 		$("#show3").live("click" ,function() { 
 			$("#codonusage").slideToggle("fast");
 		});
-
 	//
 	//	Navbar
 	//
