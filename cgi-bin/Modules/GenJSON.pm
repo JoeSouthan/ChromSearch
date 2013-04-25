@@ -19,8 +19,23 @@ sub doSearch {
 sub doSingle {
 	my $json = JSON->new;
 	my ($query)= @_;
-	my $type = "GeneID";
+	my $type = "AccessionNumber";
 	my %result = ChromoDB::GetSearchResults($query,$type,2);
+	#Format for FASTA
+		my $DNAsequence = $result{$query}{"DNASeq"};
+		my $AAsequence = $result{$query}{"AASeq"};
+		#Break it into 70 character Chunks
+		my @DNAmod = $DNAsequence =~ /(.{1,70})/g;
+		my @AAmod = $AAsequence =~ /(.{1,70})/g;
+		#Send it back
+		my $geneName = $result{$query}{"GeneName"};
+		my $pID = $result{$query}{"ProteinId"};
+		my $name = $result{$query}{"ProteinName"};
+		unshift (@DNAmod, ">gi|$geneName|gb|$pID|$name");
+		unshift (@AAmod, ">gi|$geneName|gb|$pID|$name");
+		$result{$query}{"DNASeqFASTA"} = \@DNAmod;
+		$result{$query}{"AASeqFASTA"} = \@AAmod;
+
 	return $json->pretty->encode(\%result);
 
 }

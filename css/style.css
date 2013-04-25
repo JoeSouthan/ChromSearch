@@ -260,9 +260,12 @@ pre {
 	margin:0 0 10px 0;
 	border-bottom: 2px dotted #000;
 }
-
+.singleresult div.centerdiv{
+	margin: 0 !important;
+}
 .sequence {
 	font-family: monospace;
+	line-height: 0%;
 }
 #codonusage  {
 	display:none;

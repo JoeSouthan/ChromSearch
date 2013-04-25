@@ -24,7 +24,7 @@ sub doCut {
 	my @enz = split /[,]/, $_[1];
 	my $query = $_[0];
 
-	if (7 > length($query)){
+	if (5 > length($query)){
 		#Its a pasted sequence
 		$sequence = $query;
 	} else {
@@ -38,7 +38,7 @@ sub doCut {
 	#Process the sequence
 	foreach my $enzymes (@enz) {
 		#Get the cutsite
-		my ($cutsite,%cutresult);
+		my ($cutsite,%cutresult,$cutindex);
 		if ($enzymes=~/[|]/) {
 			#For custom cut sites
 			$cutsite = $enzymes;
@@ -47,6 +47,8 @@ sub doCut {
 		}
 		#Remove the |
 		my $cutsitemodified = $cutsite;
+		#Find it's index
+		$cutindex = index($cutsite, "|");
 		$cutsitemodified =~ s/[|]//;
 
 		my $count = 0;
@@ -55,8 +57,9 @@ sub doCut {
 			my $secondchar = $+[0]-1;
 			my %info;
 
-			my $forwardseq = "$1$2$3";
-			my $reverseseq = reverseSeq($forwardseq);
+
+			my $forwardseq = "$1,$cutsite,$3";
+			my $reverseseq = reverseSeq($1,$2,$3,$cutindex);
 
 			$info{"cut"} = $cutsite;
 			$info{"location"} = "$firstchar,$secondchar";
@@ -79,9 +82,16 @@ sub doCut {
 }
 sub reverseSeq {
 	#http://code.izzid.com/2011/08/25/How-to-reverse-complement-a-DNA-sequence-in-perl.html
-	my $seq = $_[0];
+	my $cutindex = pop @_;
+	my ($before, $middle, $end) = @_;
+	#Find the offset
+	my $offset = length($middle)-$cutindex;
+	#Replace the |
+	substr($middle, $offset, 0) = '|';
+	my $seq = "$before,$middle,$end";
 	$seq =~ tr/acgtrymkbdhvACGTRYMKBDHV/tgcayrkmvhdbTGCAYRKMVHDB/;
 	#$seq = reverse($seq);
+	
 	return $seq;
 }
 1;

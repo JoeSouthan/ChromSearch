@@ -63,7 +63,7 @@ $(document).ready(function() {
 			} else if (searchterms[1] == "single"){ 
 				dataStructure = {selector: searchterms[1], query:searchterms[2] };
 			} else if (searchterms[1] == "browse") {
-				var check = /([aA-zZ])/i;
+				var check = /([aA-zZ1-9])/i;
 				var browseletter = check.exec(searchterms[2]);
 				dataStructure = {selector: searchterms[1], query:browseletter[1]};
 			}
@@ -302,13 +302,13 @@ $(document).ready(function() {
 				var name = i;
 				content.append('\
 					<div class="result" id="'+i+'">\
-						<div class="result-div acc"><span id="acc"><div class="red pointer underline" id="single_open"><a href="#!/single/'+val["GeneName"]+'">'+i+'</a></div><span id="single_id">'+val["GeneName"]+'</span></div> \
+						<div class="result-div acc"><span id="acc"><div class="red pointer underline" id="single_open"><a href="#!/single/'+i+'">'+i+'</a></div><span id="single_id">'+val["GeneName"]+'</span></div> \
 						<div class="result-div product"><span id="product">'+val["ProteinName"]+'</span></div> \
 						<div class="result-div diagram" id="chart_div'+counter+'"></div> \
 						<div class="result-div link"><span id="length">'+val["GeneLength"]+'</span></div> \
 						<div class="result-div link"><span id="location">'+val["ChromosomeLocation"]+'</span></div> \
 					</div>');
-				google.setOnLoadCallback(drawChart(features,counter, name));
+				google.setOnLoadCallback(drawChart(features,counter, name, "search"));
 				counter++;
 			});
 			content.prepend('<div class="center result-spacer"><h2>'+counter+' Results</h2></div>');
@@ -359,25 +359,34 @@ $(document).ready(function() {
 	            	<h2>Sequences</h2> \
 	            	<div class="bold underline red pointer" id="show1">Click to reveal DNA Sequence</div> \
 	            	<div id="SequenceDNA"> \
-						<span class="sequence"></span> \
+	            		<span id="DNASeq"></span> \
 					</div> \
 	                <br /> \
 	                <div class="bold underline red pointer" id="show2">Click to reveal Translated Amino Acid Sequence</div> \
 	                <div id="SequenceAA"> \
-						<span></span> \
+						<span id="AASeq"></span> \
 					</div> \
 					<br /> \
 					<div class="bold underline red pointer" id="show3">Codon usage</div> \
 					<div id="codonusage"> \
-						<span></span> \
+						<span id="CUsage"></span> \
 					</div> \
 	            </div> \
 	        </div> \
 	    </div>');
+
+		//Put in the sequences
+			for (var i = 0; i < val["DNASeqFASTA"].length; i++){
+					$("#DNASeq").append('<p class="sequence">'+val["DNASeqFASTA"][i]+'</p>');
+			}
+			for (var i =0; i < val["AASeqFASTA"].length; i++){
+					$("#AASeq").append('<p class="sequence">'+val["AASeqFASTA"][i]+'</p>');
+			}
+			
 			$("#EnzCutter_currentGene").html("<p class=\"bold\">"+i+"</p>");
 			$("#EnzCutter_welcome").html("<p>Please choose enzymes to cleave with.</p>");
 			$("textarea#EnzCutter_textarea").remove();
-			google.setOnLoadCallback(drawChart(features,counter, name));
+			google.setOnLoadCallback(drawChart(features,counter, name, "single"));
 			});
 		}
 		//Output help
@@ -428,7 +437,7 @@ $(document).ready(function() {
 		
 		//Google Charts API
 		//Draw charts
-		function drawChart (features, counter, name) {
+		function drawChart (features, counter, name, context) {
 			//Split up features array strings into separate arrays
 			var feats = [name];
 			var numbers = [name];
@@ -451,15 +460,28 @@ $(document).ready(function() {
 				} 
 			});
 			
-			var options = {
-				isStacked: true,
-				hAxis : {},
-				legend: { position: 'none'},
-				chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'},
-				width: 420,
-				height: 50,
-				colors: colours,
-			};
+			var options;
+			if (context == "single") {
+				options = {
+					isStacked: true,
+					hAxis : {},
+					legend: {},
+					chartArea : {left:5, top: 5 ,'width':'80%', 'height':'80%'},
+					width: 850,
+					height: 100,
+					colors: colours,
+				};
+			} else {
+				options = {
+					isStacked: true,
+					hAxis : {},
+					legend: { position: 'none'},
+					chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'},
+					width: 420,
+					height: 50,
+					colors: colours,
+				};
+			}
 		
 			var data1 = google.visualization.arrayToDataTable([
 				feats,
