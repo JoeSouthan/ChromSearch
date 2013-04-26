@@ -52,6 +52,7 @@ pre {
 	padding: 10px;
 	margin:10px;
 }
+
 /*--------*/
 
 /*Navbar*/
@@ -458,6 +459,14 @@ pre {
 	padding:5px;
 }
 /*------*/
+table{
+	border-collapse: collapse;
+}
+.commits {
+	border: 2px solid #000;
+	margin: 10px;
+}
+
 /*Colours*/
 .red {
 	color:#763227;
