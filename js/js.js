@@ -28,7 +28,8 @@ $(document).ready(function() {
 			searchbox	 = $("#searchbox"),
 			welcome 	 = $("#welcome"),
 			validation   = $("#validation"),
-			EnzC_CB 	 = $("#EnzCutter_cb")
+			EnzC_CB 	 = $("#EnzCutter_cb"),
+			defaultCuts  = "EcoRI,BsuMI,BamHI";
 			;
 	//
 	//	Ajax
@@ -99,11 +100,15 @@ $(document).ready(function() {
 		}
 
 		//JSON for EnzCutter
-		function EnzCutter (submit) {
+		function EnzCutter (submit, context) {
 			if (submit[0] == "GetRES"){
 				dataStructure = {mode:"GetRES"};
 			} else if (submit[0] == "CalcRES") {
-				dataStructure = {mode:"CalcRES", query:submit[1], gene:submit[3], sequence: submit[2]};
+				if (context == "single"){ 
+					dataStructure = {mode:"CalcRES", query:submit[2], gene:defaultCuts };
+				} else {
+					dataStructure = {mode:"CalcRES", query:submit[1], gene:submit[3], sequence: submit[2]};
+				}
 			}
 			var result = $.ajax ({
 				url:"cgi-bin/json.pl?selector=res",
@@ -118,23 +123,31 @@ $(document).ready(function() {
 					if (submit[0] == "GetRES"){
 						populateEnzCutter(data);
 					} else if (submit[0] == "CalcRES") {
-						outputEnzCutter(data);
+						outputEnzCutter(data,context);
 					}
 					loader.fadeOut("fast");
 					overlay.fadeOut("fast");
 				}
 			});
 		}
-		function outputEnzCutter (data){
-			$("#EnzCutter_Results").append('<div id="closepopup">Close?</div>');
+		function outputEnzCutter (data, context){
+			var outputDiv;
+			if (context == "single") {
+				outputDiv = $("#EnzCutter_Results_single");
+			} else {
+				outputDiv = $("#EnzCutter_Results");
+				outputDiv.append('<div id="closepopup">Close?</div>');
+				outputDiv.append('<h2 class="center" id="EnzCutter_results_h2">Results</h2>');
+			}
+			console.log
+			
 			$.each(data, function(i,val) {
-				$("#EnzCutter_Results").append('<h2 class="center" id="EnzCutter_results_h2">Results</h2>');
 					$.each(val, function (key,value){
 						var count =1;
-						$("#EnzCutter_Results").append('<h3 id="EnzCutter_results_h3">'+key+'</h3>');
+						outputDiv.append('<h3 id="EnzCutter_results_h3">'+key+'</h3>');
 							$.each(value, function (cut, details){
 								if (cut == "error") {
-									$("#EnzCutter_Results").append('<div class="EnzCutter_results_div"><h4>No Cuts</h4></div>');
+									outputDiv.append('<div id="EnzCutter_results_div"><h4>No Cuts</h4></div>');
 								} else {
 									var regex_enzcutter = /[\||,]/g;
 									var seqfor = details["sequence-forward"];
@@ -147,7 +160,7 @@ $(document).ready(function() {
 									var seqfor_display = '<span class="red-b">'+seqfor_split[0]+'</span><span class="blue">'+seqfor_split[1]+'</span><span class="bold">'+spaces_display+'|</span><span class="blue">'+seqfor_split[2]+'</span><span class="red-b">'+seqfor_split[3]+'</span>';
 									var seqrev_display = '<span class="red-b">'+seqrev_split[0]+'</span><span class="blue">'+seqrev_split[1]+'</span><span class="bold">|'+spaces_display+'</span><span class="blue">'+seqrev_split[2]+'</span><span class="red-b">'+seqrev_split[3]+'</span>';
 
-									$("#EnzCutter_Results").append('<div id="EnzCutter_results_div"><h4>Cut '+count+'</h4>\
+									outputDiv.append('<div id="EnzCutter_results_div"><h4>Cut '+count+'</h4>\
 										<div id="seq-for" class="sequence">5\''+seqfor_display+'3\'</div> \
 										<div id="seq-rev" class="sequence">3\''+seqrev_display+'5\'</div> \
 										<div id="seq-cut"><span>Cut used </span><span class="bold">'+details["cut"]+'</span></div> \
@@ -159,8 +172,14 @@ $(document).ready(function() {
 						
 					});
 			});
-			$("#EnzCutter_Results").slideDown("fast");
-			$("#EnzCutter").slideUp("fast");
+			if (context == "single"){ 
+				$("#EnzCutter_Results_single").slideDown("fast");
+				$("#EnzCutter_spinner").fadeOut("fast");
+			} else {
+				$("#EnzCutter_Results").slideDown("fast");
+				$("#EnzCutter").slideUp("fast");
+			};
+			
 		}
 		//Load help
 		function doHelp (page) {
@@ -356,11 +375,12 @@ $(document).ready(function() {
 		//Outputs the Single page HTML
 		function outputSingleHTML (data) {
 			var counter = 0;
+			var name;
 			$.each(data, function (i,val) {
 				var features = val["SeqFeat"];
 				var pnamel = val["ProteinName"].length;
 				var pname = val["ProteinName"];
-				var name = i;
+				name = i;
 				if (pnamel < 1) {
 					pname = "Unknown";
 				}
@@ -382,12 +402,8 @@ $(document).ready(function() {
 						<a href="cgi-bin/codon_img.pl?download=true&gene='+i+'" alt="Codon Usage"><img src="cgi-bin/codon_img.pl?show=true&gene='+i+'" alt="Codon Usage"/></a> \
 					</div> \
 	                <h2>Common Restriction Sites</h2> \
-	                <h3>EcoR1</h3> \
-	                <p>Some Text</p> \
-	                <h3>BamH1</h3> \
-	                <p>Some Text</p> \
-	                <h3>BsuMI</h3> \
-	                <p>Some Text</p> \
+	                <div id="EnzCutter_spinner" class="center"><p class="bold center">Loading common restriction sites</p><img src="img/pacman.gif" class="center" alt="Loading" height="24" width="24" /> </div>\
+	                <div id="EnzCutter_Results_single"></div> \
 	                <h2>EnzCutter</h2> \
 	                <div class="bold underline red pointer" id="EnzCutter_open">Would you like to cut your own?</div> \
 	            </div> \
@@ -423,6 +439,7 @@ $(document).ready(function() {
 			$("#EnzCutter_currentGene").html("<p class=\"bold\">"+i+"</p>");
 			$("#EnzCutter_welcome").html("<p>Please choose enzymes to cleave with.</p>");
 			$("textarea#EnzCutter_textarea").remove();
+			EnzCutter(["CalcRES", "", i],"single");
 			google.setOnLoadCallback(drawChart(features,counter, name, "single"));
 			});
 		}

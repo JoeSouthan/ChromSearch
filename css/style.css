@@ -23,7 +23,7 @@ h1 {
 h3 {
 	font-size:16px;
 	font-weight:500;
-	margin:0 0 10px;
+	margin:15px 0 10px;
 	background-color:#E3E3E3;
 	clear:both;
 	padding:5px;
@@ -306,7 +306,8 @@ pre {
 #browse, #timeout,
 #EnzCutter, #help,
 #contact, #SequenceDNA,
-#SequenceAA, #EnzCutter_Results {
+#SequenceAA, #EnzCutter_Results,
+#EnzCutter_Results_single {
 	display:none;
 }
 #EnzCutter_currentGene {
@@ -323,6 +324,9 @@ pre {
 }
 #EnzCutter_results_div {
 	margin-left: 10px;
+}
+#EnzCutter_Results_single {
+	padding-bottom: 10px;
 }
 #seq-for, #seq-rev{
 	line-height: 1;
