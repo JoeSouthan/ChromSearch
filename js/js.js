@@ -118,12 +118,49 @@ $(document).ready(function() {
 					if (submit[0] == "GetRES"){
 						populateEnzCutter(data);
 					} else if (submit[0] == "CalcRES") {
-						//
+						outputEnzCutter(data);
 					}
 					loader.fadeOut("fast");
 					overlay.fadeOut("fast");
 				}
 			});
+		}
+		function outputEnzCutter (data){
+			$("#EnzCutter_Results").append('<div id="closepopup">Close?</div>');
+			$.each(data, function(i,val) {
+				$("#EnzCutter_Results").append('<h2 class="center" id="EnzCutter_results_h2">Results</h2>');
+					$.each(val, function (key,value){
+						var count =1;
+						$("#EnzCutter_Results").append('<h3 id="EnzCutter_results_h3">'+key+'</h3>');
+							$.each(value, function (cut, details){
+								if (cut == "error") {
+									$("#EnzCutter_Results").append('<div class="EnzCutter_results_div"><h4>No Cuts</h4></div>');
+								} else {
+									var regex_enzcutter = /[\||,]/g;
+									var seqfor = details["sequence-forward"];
+									var seqrev = details["sequence-reverse"];
+									var seqfor_split = seqfor.split(regex_enzcutter);
+									var seqrev_split = seqrev.split(regex_enzcutter);
+									var spaces = seqfor_split[2].length;
+
+									var spaces_display = Array(spaces).join("&nbsp;");
+									var seqfor_display = '<span class="red-b">'+seqfor_split[0]+'</span><span class="blue">'+seqfor_split[1]+'</span><span class="bold">'+spaces_display+'|</span><span class="blue">'+seqfor_split[2]+'</span><span class="red-b">'+seqfor_split[3]+'</span>';
+									var seqrev_display = '<span class="red-b">'+seqrev_split[0]+'</span><span class="blue">'+seqrev_split[1]+'</span><span class="bold">|'+spaces_display+'</span><span class="blue">'+seqrev_split[2]+'</span><span class="red-b">'+seqrev_split[3]+'</span>';
+
+									$("#EnzCutter_Results").append('<div id="EnzCutter_results_div"><h4>Cut '+count+'</h4>\
+										<div id="seq-for" class="sequence">5\''+seqfor_display+'3\'</div> \
+										<div id="seq-rev" class="sequence">3\''+seqrev_display+'5\'</div> \
+										<div id="seq-cut"><span>Cut used </span><span class="bold">'+details["cut"]+'</span></div> \
+										<div id="seq-location"><span>Location </span><span class="bold">'+details["location"]+'</span></div> \
+										</div>');
+									count++;
+								}
+							});
+						
+					});
+			});
+			$("#EnzCutter_Results").slideDown("fast");
+			$("#EnzCutter").slideUp("fast");
 		}
 		//Load help
 		function doHelp (page) {
@@ -376,13 +413,13 @@ $(document).ready(function() {
 	    </div>');
 
 		//Put in the sequences
-			for (var i = 0; i < val["DNASeqFASTA"].length; i++){
-					$("#DNASeq").append('<p class="sequence">'+val["DNASeqFASTA"][i]+'</p>');
+			for (var j = 0; j < val["DNASeqFASTA"].length; j++){
+					$("#DNASeq").append('<p class="sequence">'+val["DNASeqFASTA"][j]+'</p>');
 			}
-			for (var i =0; i < val["AASeqFASTA"].length; i++){
-					$("#AASeq").append('<p class="sequence">'+val["AASeqFASTA"][i]+'</p>');
+			for (var k =0; k < val["AASeqFASTA"].length; k++){
+					$("#AASeq").append('<p class="sequence">'+val["AASeqFASTA"][k]+'</p>');
 			}
-			
+
 			$("#EnzCutter_currentGene").html("<p class=\"bold\">"+i+"</p>");
 			$("#EnzCutter_welcome").html("<p>Please choose enzymes to cleave with.</p>");
 			$("textarea#EnzCutter_textarea").remove();
@@ -509,6 +546,7 @@ $(document).ready(function() {
 			titleHandler(urlState);
 			replaceTextbox();
 			$("#EnzCutter").slideUp("fast");
+			$("#EnzCutter_Results").slideUp("fast");
 			help.slideUp("fast");
 		}
 		//Handles search calls
@@ -624,6 +662,7 @@ $(document).ready(function() {
 				if (sequence.length < 5) {
 					$("#EnzCutter_number").html('<span class="red">Sequence must be longer than 10 characters.</span>');
 				} else {
+					$("#EnzCutter_Results").html('');
 					EnzCutter(["CalcRES", enzymes, sequence]);
 				}
 			} else { 

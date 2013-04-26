@@ -306,7 +306,7 @@ pre {
 #browse, #timeout,
 #EnzCutter, #help,
 #contact, #SequenceDNA,
-#SequenceAA {
+#SequenceAA, #EnzCutter_Results {
 	display:none;
 }
 #EnzCutter_currentGene {
@@ -314,6 +314,20 @@ pre {
 }
 #EnzCutter_sequence {
 	padding-bottom: 10px;
+}
+#EnzCutter_Results{
+	overflow-y:scroll;
+	width: 600px;
+	bottom: 10%;
+	left: 31% !important;
+}
+#EnzCutter_results_div {
+	margin-left: 10px;
+}
+#seq-for, #seq-rev{
+	line-height: 1;
+	font-family: monospace;
+	letter-spacing: 8px;
 }
 .error { 
     background: #F8DBDB;
@@ -444,6 +458,12 @@ pre {
 .red {
 	color:#763227;
 	font-weight:bold;
+
+}
+.red-b {
+	background-color:#763227;
+	font-weight:bold;
+	color: #fff;
 
 }
 .brown {

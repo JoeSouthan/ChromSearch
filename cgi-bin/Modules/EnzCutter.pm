@@ -52,7 +52,7 @@ sub doCut {
 		$cutsitemodified =~ s/[|]//;
 
 		my $count = 0;
-		while ($sequence =~ /(.?)($cutsitemodified)(.?)/g){
+		while ($sequence =~ /(.{1,5}?)($cutsitemodified)(.{5}?)/g){
 			my $firstchar = $-[0]+2;
 			my $secondchar = $+[0]-1;
 			my %info;
@@ -69,8 +69,10 @@ sub doCut {
 			$cutresult{"cut".$count} = \%info;
 			$count++;
 		}
+
 		unless (%cutresult) {
-			$result{"result"}{$enzymes} = "No Cuts";
+			my %error = ("error" => "No Cuts");
+			$result{"result"}{$enzymes} = \%error;
 		} else {
 			$result{"result"}{$enzymes} = \%cutresult;
 		}
