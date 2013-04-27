@@ -746,3 +746,15 @@ $(document).ready(function() {
 		});
 		
 });
+//A Secret
+var kkeys = [], secret = "38,38,40,40,37,39,37,39,66,65";
+$(document).keydown(function(e) {
+  kkeys.push( e.keyCode );
+  if ( kkeys.toString().indexOf( secret ) >= 0 ) {
+    $(document).unbind('keydown',arguments.callee);
+        $("#seq-for, #seq-rev").prepend('<div class="pacman" style="position:relative; top:-5px; left:0px; height:0px; width:0px;"><img src="img/pacman.gif" /></div>');
+       	$(".pacman").animate({"left":"2000px"}, {duration:10000,queue: false});
+       	$("#seq-for, #seq-rev").animate({"left":"-400px"},{duration:4000, queue:false});
+
+  }
+});

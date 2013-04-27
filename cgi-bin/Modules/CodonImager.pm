@@ -4,6 +4,7 @@ package CodonImager;
 use Image::Magick;
 use CGI;
 use Data::Dumper;
+use ChromoDB;
 use Time::HiRes qw ( time );
 use MIME::Base64;
 

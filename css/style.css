@@ -325,6 +325,7 @@ pre {
 }
 #EnzCutter_results_div {
 	margin-left: 10px;
+	overflow: hidden;
 }
 #EnzCutter_Results_single {
 	padding-bottom: 10px;
@@ -333,6 +334,7 @@ pre {
 	line-height: 1;
 	font-family: monospace;
 	letter-spacing: 8px;
+	position: relative;
 }
 .error { 
     background: #F8DBDB;
