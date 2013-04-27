@@ -323,6 +323,14 @@ print "\n************************** TEST: 'QuerySequence' **********************
 	#print $seq,"\n";
 }
 
+# CONDITION: valid entry with sequence data that is in complement form
+{
+	my $seq = QuerySequence('AF416705', 'GeneSeq');
+	ok( $seq, "with valid argument accession number 'AB002805'");
+	print $seq,"\n";
+}
+
+
 ################################ TEST: 'CalculateCodonUsage' ################################
 
 # TEST 'CalculateCodonUsage'
