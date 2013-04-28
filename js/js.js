@@ -334,11 +334,11 @@ $(document).ready(function() {
 		//Change the page title based on context
 		function titleHandler (urlState){
 			if (urlState) {
-				if (urlState[1] == "single") {
+				if (urlState[1] == "single" && urlState[2] >= 1) {
 					document.title = "12Chrom - viewing \""+urlState[2]+"\"";
-				} else if (urlState[1] == "search") {
+				} else if (urlState[1] == "search" && urlState[2] >= 1) {
 					document.title = "12Chrom - searching \""+urlState[2]+"\"";
-				} else if (urlState[1] == "browse") {
+				} else if (urlState[1] == "browse" && urlState[2] >= 1) {
 					document.title ="12Chrom - Browsing \""+urlState[2]+"\"";
 				} else {
 					document.title ="12Chrom - Chromosome 12 Analysis Tool";
