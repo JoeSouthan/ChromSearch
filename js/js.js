@@ -102,18 +102,18 @@ $(document).ready(function() {
 		//JSON for EnzCutter
 		function EnzCutter (submit, context) {
 			if (submit[0] == "GetRES"){
-				dataStructure = {mode:"GetRES"};
+				dataStructure = {selector: "res" , mode:"GetRES"};
 			} else if (submit[0] == "CalcRES") {
 				if (context == "single"){ 
-					dataStructure = {mode:"CalcRES", gene:defaultCuts,  query:submit[2]};
+					dataStructure = {selector: "res", mode:"CalcRES", gene:defaultCuts, query:submit[2]};
 				} else {
-					dataStructure = {mode:"CalcRES", gene:submit[1], query:submit[2]};
+					dataStructure = {selector: "res", mode:"CalcRES", gene:submit[1], query:submit[2]};
 				}
 			}
 			var result = $.ajax ({
-				url:"cgi-bin/json.pl?selector=res",
+				url:"cgi-bin/json.pl",
 				//url:"res.json",
-				type:"GET",
+				type:"POST",
 				data: dataStructure,
 				dataType:"json",
 				beforeSend: function() {
