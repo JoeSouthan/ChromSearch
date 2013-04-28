@@ -638,7 +638,7 @@ $(document).ready(function() {
 			$.History.go("!/");
 		});
 		//Open EnzCutter
-		$("#EnzCutter_open").live("click", function(event){
+		$("#EnzCutter_open , #EnzCutter_frontbox").live("click", function(event){
 			event.preventDefault();	
 			$("#EnzCutter").slideToggle("fast");
 		});
@@ -712,7 +712,7 @@ $(document).ready(function() {
 		//Touch Enzcutter to load RES
 		EnzCutter(["GetRES"]);
 		//Hide JS Alert for good users
-		$("#no-js-alert").hide();
+		$("#no-js-alert").slideUp("fast");
 	
 		//jQueryUi
 		$("#searchType").buttonset();
@@ -752,8 +752,11 @@ $(document).keydown(function(e) {
   kkeys.push( e.keyCode );
   if ( kkeys.toString().indexOf( secret ) >= 0 ) {
     $(document).unbind('keydown',arguments.callee);
-        $("#seq-for, #seq-rev").prepend('<div class="pacman" style="position:relative; top:-5px; left:0px; height:0px; width:0px;"><img src="img/pacman.gif" /></div>');
+        $("#seq-for, #seq-rev").prepend('<div class="pacman" style="position:relative; top:-5px; left:0px; height:0px; width:0px;"><img width="24" height="24" src="img/pacman.gif" /></div>');
        	$(".pacman").animate({"left":"2000px"}, {duration:10000,queue: false});
+       	$("#EnzCutter_open").append('<div style="position:relative; top:4px; opacity:1; height:0;"><img width="24" height="24" src="img/pacman.gif" /></div>');
+       	$("div#EnzCutter_frontbox>span.boxspan").remove();
+       	$("#EnzCutter_fronttext").html('<div style="height:0;"><img width="50" height="50" src="img/pacman.gif" /></div>')
        	$("#seq-for, #seq-rev").animate({"left":"-400px"},{duration:4000, queue:false});
 
   }

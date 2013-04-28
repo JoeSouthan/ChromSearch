@@ -297,7 +297,7 @@ pre {
 	opacity:0.7;
 }
 #no-js-alert {
-	z-index:5;
+	z-index:6;
 	top:-10px;
 	left:35%;
 	border:1px solid #E77776;
@@ -393,8 +393,8 @@ pre {
 	padding: 10px;
 	margin: 10px;
 	float: left;
-	width: 28%;
-	text-shadow:3px 3px 20px #000;
+	width: 20%;
+	text-shadow:2px 1px 3px #000;
 	font-size: 25px;
 	cursor: pointer;
 	color: #fff;
@@ -490,8 +490,11 @@ table{
 	background-color:#9cd7be;
 }
 .yellow {
-	background-color: #fff2cb;
+	background-color: #feb;
 }
 .blue {
 	background-color: #aac1d2;
+}
+.red-box {
+	background-color: #be8278;
 }

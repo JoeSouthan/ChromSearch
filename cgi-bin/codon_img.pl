@@ -31,7 +31,8 @@ unless (@params){
 }
 
 #Debug
-$gene = "UUU:0.1,UUC:0.2,UUA:0.3,UUG:0.4,CUU:0.5,CUC:0.6,CUA:0.7,CUG:0.8,AUU:0.9,AUC:1.0,AUA:0.1,AUG:0.2,GUU:0.3,GUC:0.4,GUA:0.5,GUG:0.6,";
+#$gene = "UUU:0.1,UUC:0.2,UUA:0.3,UUG:0.4,CUU:0.5,CUC:0.6,CUA:0.7,CUG:0.8,AUU:0.9,AUC:1.0,AUA:0.1,AUG:0.2,GUU:0.3,GUC:0.4,GUA:0.5,GUG:0.6,";
+#$gene = "AB002805";
 # $show = 1;
 
 if (defined($download) and $download == 1){
