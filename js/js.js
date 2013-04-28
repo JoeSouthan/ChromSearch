@@ -245,11 +245,11 @@ $(document).ready(function() {
 				validation.fadeIn("fast");
 				validation.html("<p>Query must be greater than 3 characters</p>");
 				textBox.addClass("error");
-				return false;
+				return 0;
 			} else {
 				validation.fadeOut("fast");
 				textBox.removeClass("error");
-				return true;
+				return 1;
 			} 
 		}
 		//Set Breadcrumbs for current location
@@ -619,9 +619,12 @@ $(document).ready(function() {
 		//Search Submit
 		$("#searchsubmit").live("click", function(event){ 
 			event.preventDefault();
+			var validate = validateSearch();
 			var radioVal = $("input[name=searchType]:checked", "#mainSearch").val();
 			var query = textBox.val();
-			$.History.go("!/search/"+radioVal+"/"+query);
+			if (validate == 1) {
+				$.History.go("!/search/"+radioVal+"/"+query);
+			} 
 		});
 	//
 	//	Single
