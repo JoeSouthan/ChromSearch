@@ -258,7 +258,7 @@ $(document).ready(function() {
 			var selector;
 			var location;
 			if (urlState) {
-				if (urlState[1] == "search") {
+				if (urlState[1] == "search" && urlState[2].length >1 ) {
 					selector = "Search Result";
 					location = urlState[3];
 					breadcrumbs.html('<a href="" id="home">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
@@ -266,7 +266,7 @@ $(document).ready(function() {
 					location = urlState[2];
 					selector = "Single Result";
 					breadcrumbs.html('<a href="" id="home">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
-				} else if (urlState[1] == "browse") {
+				} else if (urlState[1] == "browse" && urlState[2].length>1) {
 					location = urlState[2];
 					selector = "Browsing";
 					breadcrumbs.html('<a href="" id="home">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
@@ -576,6 +576,9 @@ $(document).ready(function() {
 			$("#EnzCutter").slideUp("fast");
 			$("#EnzCutter_Results").slideUp("fast");
 			help.slideUp("fast");
+			overlay.fadeOut("fast");
+			error.fadeOut("fast");
+
 		}
 		//Handles search calls
 		function searchHandler (urlState) {
@@ -601,16 +604,11 @@ $(document).ready(function() {
 	//
 		//Shows the Browse form 
 		$("#browsebox").live("click", function() {
-			browse.show();
-			welcome.hide();
+			$.History.go("!/browse/");
 		});
 		//Show the search form
 		$("#searchbox, #showSearch").live("click", function() {
-			resetIndex();
-			overlay.fadeOut("fast");
-			error.slideUp("fast");
-			welcome.hide();
-			searchID.show();
+			$.History.go("!/search/");
 		});
 		//Browse Submit
 		$("#browsesubmit").live("click", function(event) {
@@ -625,7 +623,6 @@ $(document).ready(function() {
 			var query = textBox.val();
 			$.History.go("!/search/"+radioVal+"/"+query);
 		});
-
 	//
 	//	Single
 	//
@@ -645,7 +642,8 @@ $(document).ready(function() {
 	//	Navbar
 	//
 		//Set home
-		$("#home").live("click", function() {
+		$("#home").live("click", function(event) {
+			event.preventDefault();
 			$.History.go("!/");
 		});
 		//Open EnzCutter
@@ -738,13 +736,25 @@ $(document).ready(function() {
 					//Need to work something out for this
 					break;
 				case(urlState[1] == "search"):
-					searchHandler(urlState);
+					if (urlState[2].length > 1){
+						searchHandler(urlState);
+					} else {
+						resetIndex(urlState);
+						welcome.hide();
+						searchID.show();
+					}
 					break;
 				case(urlState[1] == "single"):
 					searchHandler(urlState);
 					break;
 				case(urlState[1] == "browse"):
-					searchHandler(urlState);
+					if (urlState[2].length > 1){
+						searchHandler(urlState);
+					} else {
+						resetIndex(urlState);
+						browse.show();
+						welcome.hide();
+					}
 					break;
 				default:
 					if (urlState == undefined) {
