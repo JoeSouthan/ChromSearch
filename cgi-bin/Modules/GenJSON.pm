@@ -58,7 +58,7 @@ sub CalcRES {
 	my ($query, $enz) = @_;
 	#Remove %2C's 
 	if ($enz =~s/%2C/\,/g) {
-			#Need logic for duplicates
+		#Need logic for duplicates
 	}
 	my %result = EnzCutter::doCut($query,$enz);	
 	return $json->pretty->encode(\%result);

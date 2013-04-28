@@ -24,15 +24,20 @@ sub doCut {
 	my @enz = split /[,]/, $_[1];
 	my $query = $_[0];
 
-	if (5 > length($query)){
-		#Its a pasted sequence
-		$sequence = $query;
-	} else {
+	if ($query =~/^\w{1,4}\d{1,6}/i){
 		#Its a known gene
 		#Get it's sequence
-		
 		my %search = ChromoDB::GetSearchResults($query,"AccessionNumber", 2);
 		$sequence = $search{$query}{"DNASeq"};
+	} elsif ($query =~/^>/) {
+		#It's a FASTA sequence
+		$sequence = $query;
+	} elsif ($query =~/\d+?/g) {
+		$result{"result"} = {"error" => "Numbers detected"};
+		return %result;
+	} else {
+		#Its a pasted sequence
+		$sequence = $query;
 	}
 
 	#Process the sequence

@@ -105,9 +105,9 @@ $(document).ready(function() {
 				dataStructure = {mode:"GetRES"};
 			} else if (submit[0] == "CalcRES") {
 				if (context == "single"){ 
-					dataStructure = {mode:"CalcRES", query:submit[2], gene:defaultCuts };
+					dataStructure = {mode:"CalcRES", gene:defaultCuts,  query:submit[2]};
 				} else {
-					dataStructure = {mode:"CalcRES", query:submit[1], gene:submit[3], sequence: submit[2]};
+					dataStructure = {mode:"CalcRES", gene:submit[1], query:submit[2]};
 				}
 			}
 			var result = $.ajax ({
@@ -143,32 +143,36 @@ $(document).ready(function() {
 			
 			$.each(data, function(i,val) {
 					$.each(val, function (key,value){
-						var count =1;
-						outputDiv.append('<h3 id="EnzCutter_results_h3">'+key+'</h3>');
-							$.each(value, function (cut, details){
-								if (cut == "error") {
-									outputDiv.append('<div id="EnzCutter_results_div"><h4>No Cuts</h4></div>');
-								} else {
-									var regex_enzcutter = /[\||,]/g;
-									var seqfor = details["sequence-forward"];
-									var seqrev = details["sequence-reverse"];
-									var seqfor_split = seqfor.split(regex_enzcutter);
-									var seqrev_split = seqrev.split(regex_enzcutter);
-									var spaces = seqfor_split[2].length;
+						if (key == "error") {
+							outputDiv.append('<h3 id="EnzCutter_results_h3>Error</h3><p>'+value+'</p>');
+						} else {
+							var count =1;
+							outputDiv.append('<h3 id="EnzCutter_results_h3">'+key+'</h3>');
+								$.each(value, function (cut, details){
+									if (cut == "error") {
+										outputDiv.append('<div id="EnzCutter_results_div"><h4>No Cuts</h4></div>');
+									} else {
+										var regex_enzcutter = /[\||,]/g;
+										var seqfor = details["sequence-forward"];
+										var seqrev = details["sequence-reverse"];
+										var seqfor_split = seqfor.split(regex_enzcutter);
+										var seqrev_split = seqrev.split(regex_enzcutter);
+										var spaces = seqfor_split[2].length;
 
-									var spaces_display = Array(spaces).join("&nbsp;");
-									var seqfor_display = '<span class="red-b">'+seqfor_split[0]+'</span><span class="blue">'+seqfor_split[1]+'</span><span class="bold">'+spaces_display+'|</span><span class="blue">'+seqfor_split[2]+'</span><span class="red-b">'+seqfor_split[3]+'</span>';
-									var seqrev_display = '<span class="red-b">'+seqrev_split[0]+'</span><span class="blue">'+seqrev_split[1]+'</span><span class="bold">|'+spaces_display+'</span><span class="blue">'+seqrev_split[2]+'</span><span class="red-b">'+seqrev_split[3]+'</span>';
+										var spaces_display = Array(spaces).join("&nbsp;");
+										var seqfor_display = '<span class="red-b">'+seqfor_split[0]+'</span><span class="blue">'+seqfor_split[1]+'</span><span class="bold">'+spaces_display+'|</span><span class="blue">'+seqfor_split[2]+'</span><span class="red-b">'+seqfor_split[3]+'</span>';
+										var seqrev_display = '<span class="red-b">'+seqrev_split[0]+'</span><span class="blue">'+seqrev_split[1]+'</span><span class="bold">|'+spaces_display+'</span><span class="blue">'+seqrev_split[2]+'</span><span class="red-b">'+seqrev_split[3]+'</span>';
 
-									outputDiv.append('<div id="EnzCutter_results_div"><h4>Cut '+count+'</h4>\
-										<div id="seq-for" class="sequence">5\''+seqfor_display+'3\'</div> \
-										<div id="seq-rev" class="sequence">3\''+seqrev_display+'5\'</div> \
-										<div id="seq-cut"><span>Cut used </span><span class="bold">'+details["cut"]+'</span></div> \
-										<div id="seq-location"><span>Location </span><span class="bold">'+details["location"]+'</span></div> \
-										</div>');
-									count++;
-								}
-							});
+										outputDiv.append('<div id="EnzCutter_results_div"><h4>Cut '+count+'</h4>\
+											<div id="seq-for" class="sequence">5\''+seqfor_display+'3\'</div> \
+											<div id="seq-rev" class="sequence">3\''+seqrev_display+'5\'</div> \
+											<div id="seq-cut"><span>Cut used </span><span class="bold">'+details["cut"]+'</span></div> \
+											<div id="seq-location"><span>Location </span><span class="bold">'+details["location"]+'</span></div> \
+											</div>');
+										count++;
+									}
+								});
+						}
 						
 					});
 			});

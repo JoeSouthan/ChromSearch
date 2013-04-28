@@ -14,7 +14,7 @@ my $cgi = new CGI;
 my $json = JSON->new;
 my @params= $cgi->param();
 
-my ($selector, $query,$type,$mode,$gene, $sequence, $page);
+my ($selector, $query,$type,$mode,$gene, $page);
 foreach my $params (@params) {
 	if ($params eq "query") {
 		$query = $cgi->param($params);
@@ -26,9 +26,7 @@ foreach my $params (@params) {
 		$mode = $cgi->param($params);
 	} elsif ($params eq "gene") {
 		$gene = $cgi->param($params);
-	} elsif ($params eq "sequence") {
-		$sequence = $cgi->param($params);
-	} elsif ($params eq "page") {
+	}  elsif ($params eq "page") {
 		$page = $cgi->param($params);
 	}
 }
@@ -61,20 +59,10 @@ unless (defined ($selector)) {
 				print GenJSON::getRes();
 			} elsif ($mode eq "CalcRES") {
 				if (defined($gene)) {
-					if (defined($sequence)){
-						print GenJSON::error("RES: Please only use one of either gene or sequence");
+					unless (4 <= length($query)) {
+						print GenJSON::error("RES: Gene ID/Sequence length is too small");
 					} else {
-						unless (5 <= length($query)) {
-							print GenJSON::error("RES: Gene ID is too small");
-						} else {
-							print GenJSON::CalcRES($query, $gene);
-						}
-					}
-				} elsif (defined($sequence)) {
-					if (defined($gene)){
-						print GenJSON::error("RES: Please only use one of either gene or sequence");
-					} else {
-						print GenJSON::CalcRES($sequence,$query);
+						print GenJSON::CalcRES($query, $gene);
 					}
 				} else {
 					print GenJSON::error("RES: No sequence or Gene ID");
