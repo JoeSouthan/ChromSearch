@@ -727,7 +727,7 @@ sub CalculateCodonUsage( $ ){
 	while( my($key, $value) = each(%chromoCodonHash) ){
 		$chromoCodonTotal += $value;
 	}
-	print $chromoCodonTotal;
+	#print $chromoCodonTotal;
 	
 	# For all codons in codonHash group into amino acids and calculate the ratio
 	# for each codon to represent the codon usage for each amino acid.
