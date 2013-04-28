@@ -376,10 +376,12 @@ $(document).ready(function() {
 		function outputSingleHTML (data) {
 			var counter = 0;
 			var name;
+			var codon;
 			$.each(data, function (i,val) {
 				var features = val["SeqFeat"];
 				var pnamel = val["ProteinName"].length;
 				var pname = val["ProteinName"];
+				codon = val["CodonUsage"];
 				name = i;
 				if (pnamel < 1) {
 					pname = "Unknown";
@@ -389,7 +391,7 @@ $(document).ready(function() {
 	    	<h2 class="center">Single result for: '+i+'.</h2> \
 	        <div class="singleresult"> \
 	        	<div class="info"> \
-	            	<span>Name: </span><span class="bold">'+val["GeneName"]+'</span><span> | Genbank Accession: </span><span class="bold">'+i+'</span><span> | Chromosomal Location: </span><span class="bold">'+val["ChromosomeLocation"]+'</span> \
+	            	<span>Length: </span><span class="bold">'+val["GeneLength"]+'</span><span> | Gene ID: </span><span class="bold">'+val["GeneName"]+'</span><span> | Genbank Accession: </span><span class="bold">'+i+'</span><span> | Protein ID: </span><span class="bold">'+val["ProteinId"]+'</span><span> | Chromosomal Location: </span><span class="bold">'+val["ChromosomeLocation"]+'</span> \
 	            </div> \
 	            <div class="single-wide"> \
 	            	<h2>Protein Product</h2>\
@@ -422,19 +424,28 @@ $(document).ready(function() {
 					<br /> \
 					<div class="bold underline red pointer" id="show3">Codon usage</div> \
 					<div id="codonusage"> \
-						<span id="CUsage"></span> \
+						<span id="CodonUsageSeq"></span> \
 					</div> \
 	            </div> \
 	        </div> \
 	    </div>');
 
 		//Put in the sequences
+			//Output DNA Sequence
 			for (var j = 0; j < val["DNASeqFASTA"].length; j++){
-					$("#DNASeq").append('<p class="sequence">'+val["DNASeqFASTA"][j]+'</p>');
+				$("#DNASeq").append('<p class="sequence">'+val["DNASeqFASTA"][j]+'</p>');
 			}
+			//Output AA Sequence
 			for (var k =0; k < val["AASeqFASTA"].length; k++){
-					$("#AASeq").append('<p class="sequence">'+val["AASeqFASTA"][k]+'</p>');
+				$("#AASeq").append('<p class="sequence">'+val["AASeqFASTA"][k]+'</p>');
 			}
+			//Output Codon Sequence
+			$.each(codon, function (aa,val) {
+				$("#CodonUsageSeq").append ('<div id="aaname" class="bold">'+aa+'</div>');
+				$.each(val, function(triplet, usage){
+					$("#CodonUsageSeq").append('<p><span class="bold">'+triplet+': </span><span>'+usage+'</span></p>');
+				});
+			});
 
 			$("#EnzCutter_currentGene").html("<p class=\"bold\">"+i+"</p>");
 			$("#EnzCutter_welcome").html("<p>Please choose enzymes to cleave with.</p>");
