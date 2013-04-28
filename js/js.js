@@ -270,7 +270,7 @@ $(document).ready(function() {
 					location = urlState[2];
 					selector = "Single Result";
 					breadcrumbs.html('<a href="" id="home">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
-				} else if (urlState[1] == "browse" && urlState[2].length>1) {
+				} else if (urlState[1] == "browse" && urlState[2].length>=1) {
 					location = urlState[2];
 					selector = "Browsing";
 					breadcrumbs.html('<a href="" id="home">Home &raquo;</a> <span>'+selector+' &raquo;</span> <span>'+location+'</span>');
@@ -755,7 +755,7 @@ $(document).ready(function() {
 					searchHandler(urlState);
 					break;
 				case(urlState[1] == "browse"):
-					if (urlState[2].length > 1){
+					if (urlState[2].length >= 1){
 						searchHandler(urlState);
 					} else {
 						resetIndex(urlState);
