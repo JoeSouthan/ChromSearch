@@ -272,15 +272,15 @@ print "************************** TEST : 'GetCodons' **************************\
 
 # CONDITION: No aguments, none necessary
 {
-	my @Codons = GetCodons('AB002805');
-	ok( @Codons, "with valid accession number");
+	my %Codons = GetCodons('AB002805');
+	ok( %Codons, "with valid accession number");
 	#print Dumper(@Codons);
 }
 
 # CONDITION: Special case for the whole chromosome
 {
-	my @Codons = GetCodons('Chrom_12');
-	ok( @Codons, "with accession for whole of chromosome 12");
+	my %Codons = GetCodons('Chrom_12');
+	ok( %Codons, "with accession for whole of chromosome 12");
 	#print Dumper(@Codons);
 }
 
@@ -326,8 +326,8 @@ print "\n************************** TEST: 'QuerySequence' **********************
 # CONDITION: valid entry with sequence data that is in complement form
 {
 	my $seq = QuerySequence('AF416705', 'GeneSeq');
-	ok( $seq, "with valid argument accession number 'AB002805'");
-	print $seq,"\n";
+	ok( $seq, "with valid argument accession number 'AF416705' that is a compliment sequence");
+	#print $seq,"\n";
 }
 
 
@@ -338,17 +338,11 @@ print "************************** TEST : 'CalculateCodonUsage' *****************
 
 # CONDITION: With valid accession number as argument 
 {
-	my @Codons = GetCodons('AB002805');
-	my %codonData = CalculateCodonUsage(@Codons);
+	#my @Codons = GetCodons('AB002805');
+	my %codonData = CalculateCodonUsage('AB002805');
 	ok( %codonData, "with valid accession number");
-	#print Dumper(%codonData);
+	print Dumper(%codonData);
 }
 
-# CONDITION: With codons for whole chromosome  
-{
-	my @Codons = GetCodons('Chrom_12');
-	my %codonData = CalculateCodonUsage(@Codons);
-	ok( %codonData, "with accession for whole chromosome");
-	#print Dumper(%codonData);
-}
+
 
