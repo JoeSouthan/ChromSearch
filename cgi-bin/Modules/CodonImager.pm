@@ -40,9 +40,9 @@ sub CreateImage {
 		foreach my $key (@usage_AminoAcids){
 			my @codon_usage = keys ($result{$query}{"CodonUsage"}{$key});
 			foreach my $subkey (@codon_usage){
-				$codonUsage{$subkey} = $result{$query}{"CodonUsage"}{$key}{$subkey};
+				#$codonUsage{$subkey} = $result{$query}{"CodonUsage"}{$key}{$subkey};
 				#Will be
-				#$codonUsage{$subkey} = $result{$query}{"CodonUsage"}{$key}{$subkey}[0];
+				$codonUsage{$subkey} = $result{$query}{"CodonUsage"}{$key}{$subkey}->[0];
 			}
 		}
 		#Turn off the buffer

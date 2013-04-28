@@ -447,7 +447,7 @@ $(document).ready(function() {
 			$.each(codon, function (aa,val) {
 				$("#CodonUsageSeq").append ('<div id="aaname" class="bold">'+aa+'</div>');
 				$.each(val, function(triplet, usage){
-					$("#CodonUsageSeq").append('<p><span class="bold">'+triplet+': </span><span>'+usage+'</span></p>');
+					$("#CodonUsageSeq").append('<pre><span class="bold">'+triplet+': </span><span>'+usage+'</span></pre>');
 				});
 			});
 
