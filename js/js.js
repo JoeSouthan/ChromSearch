@@ -373,8 +373,6 @@ $(document).ready(function() {
 			});
 			content.prepend('<div class="center result-spacer"><h2>'+counter+' Results</h2></div>');
 			$(".result").wrapAll('<div id="result-wrapper"/>');
-		
-		
 		}
 		//Outputs the Single page HTML
 		function outputSingleHTML (data) {
@@ -407,6 +405,7 @@ $(document).ready(function() {
 					<div id="codon_img" class="center"> \
 						<a href="cgi-bin/codon_img.pl?download=true&gene='+i+'" alt="Codon Usage"><img src="cgi-bin/codon_img.pl?show=true&gene='+i+'" alt="Codon Usage"/></a> \
 					</div> \
+					<div id= "pie_div" class="center" style="left:18%;"></div> \
 	                <h2>Common Restriction Sites</h2> \
 	                <div id="EnzCutter_spinner" class="center"><p class="bold center">Loading common restriction sites</p><img src="img/pacman.gif" class="center" alt="Loading" height="24" width="24" /> </div>\
 	                <div id="EnzCutter_Results_single"></div> \
@@ -444,18 +443,20 @@ $(document).ready(function() {
 				$("#AASeq").append('<p class="sequence">'+val["AASeqFASTA"][k]+'</p>');
 			}
 			//Output Codon Sequence
+			var pie_data = [["Triplets","Usage"]];
 			$.each(codon, function (aa,val) {
 				$("#CodonUsageSeq").append ('<div id="aaname" class="bold">'+aa+'</div>');
 				$.each(val, function(triplet, usage){
 					$("#CodonUsageSeq").append('<pre><span class="bold">'+triplet+': </span><span>'+usage+'</span></pre>');
+					pie_data.push([triplet, parseFloat(usage[0])]);
 				});
 			});
-
 			$("#EnzCutter_currentGene").html("<p class=\"bold\">"+i+"</p>");
 			$("#EnzCutter_welcome").html("<p>Please choose enzymes to cleave with.</p>");
 			$("textarea#EnzCutter_textarea").remove();
 			EnzCutter(["CalcRES", "", i],"single");
 			google.setOnLoadCallback(drawChart(features,counter, name, "single"));
+			google.setOnLoadCallback(drawPieChart(pie_data));
 			});
 		}
 		//Output help
@@ -531,37 +532,23 @@ $(document).ready(function() {
 			
 			var options;
 			if (context == "single") {
-				options = {
-					isStacked: true,
-					hAxis : {},
-					legend: {},
-					chartArea : {left:5, top: 5 ,'width':'80%', 'height':'80%'},
-					width: 850,
-					height: 100,
-					colors: colours,
-				};
+				options = { isStacked: true, hAxis : {}, legend: {}, chartArea : {left:5, top: 5 ,'width':'80%', 'height':'80%'}, width: 850, height: 100, colors: colours};
 			} else {
-				options = {
-					isStacked: true,
-					hAxis : {},
-					legend: { position: 'none'},
-					chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'},
-					width: 420,
-					height: 50,
-					colors: colours,
-				};
+				options = { isStacked: true, hAxis : {}, legend: { position: 'none'}, chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'}, width: 420, height: 50, colors: colours};
 			}
-		
-			var data1 = google.visualization.arrayToDataTable([
-				feats,
-				numbers
-			]);
+			var data1 = google.visualization.arrayToDataTable([feats,numbers]);
 			var chart = new google.visualization.BarChart(document.getElementById('chart_div'+counter));
 			chart.draw(data1, options );	
 		}
-
-
-
+		function drawPieChart (data) {
+			var wrapper = new google.visualization.ChartWrapper({
+				chartType: 'PieChart',
+				dataTable:  data,
+				options: {'title': 'Codon Usage \(triplets\)',chartArea : {'width':'80%', 'height':'80%'}, width:700, height:600},
+				containerId: 'pie_div'
+			});
+			wrapper.draw();
+		}
 
 	//
 	//	Reset Functions
