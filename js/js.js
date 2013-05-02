@@ -1,10 +1,25 @@
-// 	JavaScript 
+// 
+//
+//	Title: 			12Chrom Javascript Controller 
+//	Description:	Operates on the Model-Viewer-Controller theory of Web programs
+//					Uses the jQuery Library and the History jQuery plugin
+//					Interacts with the JSON API, cgi-bin/json.pl via AJAX
+//					Uses the Google Charts API for data visualisation
+//	Created by: 	Joseph Southan
+//	Email: 			joseph@southanuk.co.uk
+//	Date: 			27/01/2013
+//	
+//
+
 //Load in Google Graphs API
 google.load("visualization", "1", {packages:["corechart"]});
+//When the DOM is ready
 $(document).ready(function() {
-	// 
-	//	Variables
-	//
+	////////////////////////////////
+	//							  //
+	// Variables				  //
+	//							  //
+	/////////////////////////////////////////////////////////////////
 		var textBox 	 = $("#searchquery"),
 			main		 = $("#main"),
 			mainWrapper	 = $("#main_wrapper"),
@@ -29,12 +44,68 @@ $(document).ready(function() {
 			welcome 	 = $("#welcome"),
 			validation   = $("#validation"),
 			EnzC_CB 	 = $("#EnzCutter_cb"),
+			Boxes        = $(".boxes"),
 			defaultCuts  = "EcoRI,BsuMI,BamHI";
 			;
+	/////////////////////////////////////////////////////////////////
+
+	////////////////////////////////
+	//							  //
+	// History.js				  //
+	//							  //
+	/////////////////////////////////////////////////////////////////
+	//History.js
+		//jQuery plugin: History.js 
+		//Looks at the url and does operations based on what it gets	
+	$.History.bind(function(state) {
+		urlState = state.split(/\//g);
+		switch (true) {
+				case(urlState[1] == "help"):
+					//Need to work something out for this
+					break;
+				case(urlState[1] == "search"):
+					if (urlState[2].length > 1){
+						searchHandler(urlState);
+					} else {
+						resetIndex(urlState);
+						welcome.hide();
+						searchID.show();
+					}
+					break;
+				case(urlState[1] == "single"):
+					searchHandler(urlState);
+					break;
+				case(urlState[1] == "browse"):
+					if (urlState[2].length >= 1){
+						searchHandler(urlState);
+					} else {
+						resetIndex(urlState);
+						browse.show();
+						welcome.hide();
+					}
+					break;
+				default:
+					if (urlState == undefined) {
+						alert("Incorrect url.");
+					}
+					resetIndex(urlState);
+					break;
+			}
+				
+		});
+	/////////////////////////////////////////////////////////////////
+
+	////////////////////////////////
+	//							  //
+	// AJAX 					  //
+	//							  //
+	/////////////////////////////////////////////////////////////////
+	
 	//
-	//	Ajax
+	//	AJAX setup
 	//
 		//Global ajax call setup
+		//Defines how AJAX calls work
 		$.ajaxSetup({
 			beforeSend: function(xhr, status) {
 
@@ -55,10 +126,14 @@ $(document).ready(function() {
 			cache:true,
 			timeout:10000
 		});
-		//Search Ajax call
+		//Function: doSearch
+			//Main search Function
+			//Takes searchterms from the History plugin and breaks the string down to search
+				//searchterms eg: !/search/[search type]/[query]
+			//Outputs results and handles errors
 		function doSearch (searchterms) {
-			// eg !,search,GeneID,123p,10,0
-			var dataStructure = {}
+			var dataStructure = {};
+			//Defines how the search will be carried out
 			if (searchterms[1] == "search"){
 				dataStructure = {selector: searchterms[1], searchType: searchterms[2], query:searchterms[3] };
 			} else if (searchterms[1] == "single"){ 
@@ -68,19 +143,22 @@ $(document).ready(function() {
 				var browseletter = check.exec(searchterms[2]);
 				dataStructure = {selector: searchterms[1], query:browseletter[1]};
 			}
+			//Do the AJAX call
 			var result = $.ajax ({
-				//url:"json.json",
 				url:"cgi-bin/json.pl?",
 				type: "GET",
 				dataType: "json",
 				data: dataStructure,
 				beforeSend: function() {			
 					loader.fadeIn("fast");
-					overlay.fadeIn("fast");},
+					overlay.fadeIn("fast");
+				},
 				success: function (data) {
+					//Pass errors to 
 					if (data['error']){
 						errorOut(data, searchterms[1],this.url);
 					} else {
+						//Search is good, send results to appropriate function
 						if (searchterms[1] == "search") {
 							outputSearchHTML(data);		
 						} else if (searchterms[1] == "single") {
@@ -88,31 +166,35 @@ $(document).ready(function() {
 						} else if (searchterms[1] == "browse"){
 							outputSearchHTML(data);
 						} else {
+							//Just incase
 							console.log(searchterms[1]);
 						}
 						overlay.fadeOut("fast");
 					}
 					loader.fadeOut("fast");
-					
 				},
-			
 			});
 		}
-
-		//JSON for EnzCutter
+		//Function: EnzCutter
+			//JSON AJAX function for EnzCutter
+			//Takes (submit,context)
+				//submit = ["GetRES/CalcRES", Enzymes (a comma separated string), Query string/Sequence]
+				//context = Takes "single" for a single page othewise will wait for a sequence to be entered
+			//GetRES returns list of restriction enzymes
 		function EnzCutter (submit, context) {
 			if (submit[0] == "GetRES"){
 				dataStructure = {selector: "res" , mode:"GetRES"};
 			} else if (submit[0] == "CalcRES") {
 				if (context == "single"){ 
+					//defaultcuts will cut the sequence with the cuts required
 					dataStructure = {selector: "res", mode:"CalcRES", gene:defaultCuts, query:submit[2]};
 				} else {
 					dataStructure = {selector: "res", mode:"CalcRES", gene:submit[1], query:submit[2]};
 				}
 			}
+			//Does the search
 			var result = $.ajax ({
 				url:"cgi-bin/json.pl",
-				//url:"res.json",
 				type:"POST",
 				data: dataStructure,
 				dataType:"json",
@@ -120,6 +202,7 @@ $(document).ready(function() {
 					loader.fadeIn("fast");
 				},
 				success: function (data) {
+					//Output the results
 					if (submit[0] == "GetRES"){
 						populateEnzCutter(data);
 					} else if (submit[0] == "CalcRES") {
@@ -129,61 +212,6 @@ $(document).ready(function() {
 					overlay.fadeOut("fast");
 				}
 			});
-		}
-		function outputEnzCutter (data, context){
-			var outputDiv;
-			if (context == "single") {
-				outputDiv = $("#EnzCutter_Results_single");
-			} else {
-				outputDiv = $("#EnzCutter_Results");
-				outputDiv.append('<div id="closepopup">Close?</div>');
-				outputDiv.append('<h2 class="center" id="EnzCutter_results_h2">Results</h2>');
-			}
-			console.log
-			
-			$.each(data, function(i,val) {
-					$.each(val, function (key,value){
-						if (key == "error") {
-							outputDiv.append('<h3 id="EnzCutter_results_h3>Error</h3><p>'+value+'</p>');
-						} else {
-							var count =1;
-							outputDiv.append('<h3 id="EnzCutter_results_h3">'+key+'</h3>');
-								$.each(value, function (cut, details){
-									if (cut == "error") {
-										outputDiv.append('<div id="EnzCutter_results_div"><h4>No Cuts</h4></div>');
-									} else {
-										var regex_enzcutter = /[\||,]/g;
-										var seqfor = details["sequence-forward"];
-										var seqrev = details["sequence-reverse"];
-										var seqfor_split = seqfor.split(regex_enzcutter);
-										var seqrev_split = seqrev.split(regex_enzcutter);
-										var spaces = seqfor_split[2].length;
-
-										var spaces_display = Array(spaces).join("&nbsp;");
-										var seqfor_display = '<span class="red-b">'+seqfor_split[0]+'</span><span class="blue">'+seqfor_split[1]+'</span><span class="bold">'+spaces_display+'|</span><span class="blue">'+seqfor_split[2]+'</span><span class="red-b">'+seqfor_split[3]+'</span>';
-										var seqrev_display = '<span class="red-b">'+seqrev_split[0]+'</span><span class="blue">'+seqrev_split[1]+'</span><span class="bold">|'+spaces_display+'</span><span class="blue">'+seqrev_split[2]+'</span><span class="red-b">'+seqrev_split[3]+'</span>';
-
-										outputDiv.append('<div id="EnzCutter_results_div"><h4>Cut '+count+'</h4>\
-											<div id="seq-for" class="sequence">5\''+seqfor_display+'3\'</div> \
-											<div id="seq-rev" class="sequence">3\''+seqrev_display+'5\'</div> \
-											<div id="seq-cut"><span>Cut used </span><span class="bold">'+details["cut"]+'</span></div> \
-											<div id="seq-location"><span>Location </span><span class="bold">'+details["location"]+'</span></div> \
-											</div>');
-										count++;
-									}
-								});
-						}
-						
-					});
-			});
-			if (context == "single"){ 
-				$("#EnzCutter_Results_single").slideDown("fast");
-				$("#EnzCutter_spinner").fadeOut("fast");
-			} else {
-				$("#EnzCutter_Results").slideDown("fast");
-				$("#EnzCutter").slideUp("fast");
-			};
-			
 		}
 		//Load help
 		function doHelp (page) {
@@ -204,46 +232,27 @@ $(document).ready(function() {
 				}
 			});
 		}
+	/////////////////////////////////////////////////////////////////
 
-	//
-	//	Visual Functions
-	//
+	////////////////////////////////
+	//							  //
+	// Visual 					  //
+	//							  //
+	/////////////////////////////////////////////////////////////////
 
-		//Function to centre a popup
-		//From -http://www.joelpeterson.com/blog/2010/12/quick-and-easy-windowless-popup-overlay-in-jquery/
+		//Function: centerPopup
+			//Function to centre a popup
+			//Adapted from http://www.joelpeterson.com/blog/2010/12/quick-and-easy-windowless-popup-overlay-in-jquery/
 		function centerPopup(){  
 			var winw = $(window).width();  
-			var winh = $(window).height();  
-			var popw = help.width();  
-			var poph = help.height();  
-			help.css({  
+			var popw = Boxes.width();  
+			Boxes.css({  
 				"position" : "absolute",  
-		  //    "top" : winh/2-poph/2,  
 				"left" : winw/2-popw/2  
 			}); 
 		}
-
-		//Main Functions
-		function showMain () {
-			main.show();
-		}
-		function hideMain () {
-			main.hide();
-		}
-
-		//Content Functions
-		function showContent () {
-			content.show();
-		}
-		function hideContent () {
-			content.hide();
-		}
-		//Clears the #content div
-		function clearContent () {
-			content.html("");
-		}
-
-		//Search Validation
+		//Function validateSearch
+			//Search Validation, ensures search is greater than 3 characters
 		function validateSearch () {
 			if (textBox.val().length < 3) {
 				validation.fadeIn("fast");
@@ -256,9 +265,10 @@ $(document).ready(function() {
 				return 1;
 			} 
 		}
-		//Set Breadcrumbs for current location
+		//Function: setBreadcrumbs
+			//Set Breadcrumbs for current location
+			//Takes urlState from the searchHandler
 		function setBreadcrumbs (urlState) {
-			// eg !,search,GeneID,123p,10,0
 			var selector;
 			var location;
 			if (urlState) {
@@ -281,7 +291,13 @@ $(document).ready(function() {
 				breadcrumbs.html("");
 			}
 		}
-
+		//Function: sortIt
+		//Takes parent, childSelector, keySelector, mode, sortid. Will sort asc by default
+			//parent = Div containing the results
+			//childSelector = Div to sort by
+			//keySelector = span title
+			//mode = sort asc/desc
+			//sortid = current class on span
 		//Sorts the results
 		//Adapted from: http://stackoverflow.com/questions/7831712/jquery-sort-divs-by-innerhtml-of-children
 		function sortIt(parent, childSelector, keySelector, mode, sortid) {
@@ -315,9 +331,7 @@ $(document).ready(function() {
 	    	});
 	   		parent.append(items);
 		}
-		//Sort Logic
-
-
+			//Sort Logic
 			$('#namesort, #productsort, #lengthsort, #locationsort').live("click", function() {
 				var spans = { namesort:"span#acc", productsort:"span#product", lengthsort:"span#length", locationsort:"span#location"};
 				var location = spans[$(this).attr("id")];
@@ -330,8 +344,9 @@ $(document).ready(function() {
 				}
 			});
 
-		//
-		//Change the page title based on context
+		//Function: titleHandler 
+			//Takes urlState from searchHandler
+			//Change the page title based on context
 		function titleHandler (urlState){
 			if (urlState) {
 				if (urlState[1] == "single" && urlState[2] >= 1) {
@@ -348,15 +363,20 @@ $(document).ready(function() {
 			}
 
 		}
+	/////////////////////////////////////////////////////////////////
 
-
-	//
-	//	Output HTML
-	//
-		//Output Search JSON to HTML
+	////////////////////////////////
+	//							  //
+	// HTML Output				  //
+	//							  //
+	/////////////////////////////////////////////////////////////////
+		//Function: outputSearchHTML
+			//Takes data from doSearch
+			//Output Search JSON to HTML
 		function outputSearchHTML (data) {
 			var counter = 0;
 			content.html('<div class="titles-fixed" id="titles"><div class="title title-acc unsorted" id="namesort">Accession</div><div class="title title-product unsorted" id="productsort">Protein Product</div><div class="title title-diagram">Gene Layout</div><div class="title title-len unsorted" id="lengthsort">Length</div><div class="title title-loc unsorted" id="locationsort">Location</div>');
+			//Go through each result returned
 			$.each(data, function(i,val) {
 				var features = val["SeqFeat"];
 				var name = i;
@@ -368,13 +388,16 @@ $(document).ready(function() {
 						<div class="result-div link"><span id="length">'+val["GeneLength"]+'</span></div> \
 						<div class="result-div link"><span id="location">'+val["ChromosomeLocation"]+'</span></div> \
 					</div>');
+				//Draw the layout graph
 				google.setOnLoadCallback(drawChart(features,counter, name, "search"));
 				counter++;
 			});
 			content.prepend('<div class="center result-spacer"><h2>'+counter+' Results</h2></div>');
 			$(".result").wrapAll('<div id="result-wrapper"/>');
 		}
-		//Outputs the Single page HTML
+		//Function: outputSingleHTML
+			//Takes data from doSearch
+			//Outputs the Single page HTML
 		function outputSingleHTML (data) {
 			var counter = 0;
 			var name;
@@ -389,51 +412,51 @@ $(document).ready(function() {
 					pname = "Unknown";
 				}
 				content.html(' \
-	    <div class="searchform"> \
-	    	<h2 class="center">Single result for: '+i+'.</h2> \
-	        <div class="singleresult"> \
-	        	<div class="info"> \
-	            	<span>Length: </span><span class="bold">'+val["GeneLength"]+'</span><span> | Gene ID: </span><span class="bold">'+val["GeneName"]+'</span><span> | Genbank Accession: </span><span class="bold">'+i+'</span><span> | Protein ID: </span><span class="bold">'+val["ProteinId"]+'</span><span> | Chromosomal Location: </span><span class="bold">'+val["ChromosomeLocation"]+'</span> \
-	            </div> \
-	            <div class="single-wide"> \
-	            	<h2>Protein Product</h2>\
-	            	<p>'+pname+'</p>\
-	            	<h2>Sequence Characteristics</h2> \
-	            	<h3>Gene Layout</h3> \
-	                <div class="diagram centerdiv" id="chart_div0"></div>\
-	                <h3>Codon Usage</h3> \
-					<div id="codon_img" class="center"> \
-						<a href="cgi-bin/codon_img.pl?download=true&gene='+i+'" alt="Codon Usage"><img src="cgi-bin/codon_img.pl?show=true&gene='+i+'" alt="Codon Usage"/></a> \
-					</div> \
-					<div id= "pie_div" class="center" style="left:18%;"></div> \
-	                <h2>Common Restriction Sites</h2> \
-	                <div id="EnzCutter_spinner" class="center"><p class="bold center">Loading common restriction sites</p><img src="img/pacman.gif" class="center" alt="Loading" height="24" width="24" /> </div>\
-	                <div id="EnzCutter_Results_single"></div> \
-	                <h2>EnzCutter</h2> \
-	                <div class="bold underline red pointer" id="EnzCutter_open">Would you like to cut your own?</div> \
-	            </div> \
-	            <div class="clearfix"></div> \
-	            <div class="single-wide"> \
-	            	<h2>Sequences</h2> \
-	            	<div class="bold underline red pointer" id="show1">Click to reveal DNA Sequence</div> \
-	            	<div id="SequenceDNA"> \
-	            		<span id="DNASeq"></span> \
-					</div> \
-	                <br /> \
-	                <div class="bold underline red pointer" id="show2">Click to reveal Translated Amino Acid Sequence</div> \
-	                <div id="SequenceAA"> \
-						<span id="AASeq"></span> \
-					</div> \
-					<br /> \
-					<div class="bold underline red pointer" id="show3">Codon usage</div> \
-					<div id="codonusage"> \
-						<span id="CodonUsageSeq"></span> \
-					</div> \
-	            </div> \
-	        </div> \
-	    </div>');
+			    <div class="searchform"> \
+			    	<h2 class="center">Single result for: '+i+'.</h2> \
+			        <div class="singleresult"> \
+			        	<div class="info"> \
+			            	<span>Length: </span><span class="bold">'+val["GeneLength"]+'</span><span> | Gene ID: </span><span class="bold">'+val["GeneName"]+'</span><span> | Genbank Accession: </span><span class="bold">'+i+'</span><span> | Protein ID: </span><span class="bold">'+val["ProteinId"]+'</span><span> | Chromosomal Location: </span><span class="bold">'+val["ChromosomeLocation"]+'</span> \
+			            </div> \
+			            <div class="single-wide"> \
+			            	<h2>Protein Product</h2>\
+			            	<p>'+pname+'</p>\
+			            	<h2>Sequence Characteristics</h2> \
+			            	<h3>Gene Layout</h3> \
+			                <div class="diagram centerdiv" id="chart_div0"></div>\
+			                <h3>Codon Usage</h3> \
+							<div id="codon_img" class="center"> \
+								<a href="cgi-bin/codon_img.pl?download=true&gene='+i+'" alt="Codon Usage"><img src="cgi-bin/codon_img.pl?show=true&gene='+i+'" alt="Codon Usage" width="500" height="324" /></a> \
+							</div> \
+							<div id= "pie_div" class="center" style="left:18%;"></div> \
+			                <h2>Common Restriction Sites</h2> \
+			                <div id="EnzCutter_spinner" class="center"><p class="bold center">Loading common restriction sites</p><img src="img/pacman.gif" class="center" alt="Loading" height="24" width="24" /> </div>\
+			                <div id="EnzCutter_Results_single"></div> \
+			                <h2>EnzCutter</h2> \
+			                <div class="bold underline red pointer" id="EnzCutter_open">Would you like to cut your own?</div> \
+			            </div> \
+			            <div class="clearfix"></div> \
+			            <div class="single-wide"> \
+			            	<h2>Sequences</h2> \
+			            	<div class="bold underline red pointer" id="show1">Click to reveal DNA Sequence</div> \
+			            	<div id="SequenceDNA"> \
+			            		<span id="DNASeq"></span> \
+							</div> \
+			                <br /> \
+			                <div class="bold underline red pointer" id="show2">Click to reveal Translated Amino Acid Sequence</div> \
+			                <div id="SequenceAA"> \
+								<span id="AASeq"></span> \
+							</div> \
+							<br /> \
+							<div class="bold underline red pointer" id="show3">Codon usage</div> \
+							<div id="codonusage"> \
+								<span id="CodonUsageSeq"></span> \
+							</div> \
+			            </div> \
+			        </div> \
+			    </div>');
 
-		//Put in the sequences
+			//Put in the sequences
 			//Output DNA Sequence
 			for (var j = 0; j < val["DNASeqFASTA"].length; j++){
 				$("#DNASeq").append('<p class="sequence">'+val["DNASeqFASTA"][j]+'</p>');
@@ -451,22 +474,87 @@ $(document).ready(function() {
 					pie_data.push([triplet, parseFloat(usage[0])]);
 				});
 			});
+			//Change EnzCutter to single mode
 			$("#EnzCutter_currentGene").html("<p class=\"bold\">"+i+"</p>");
 			$("#EnzCutter_welcome").html("<p>Please choose enzymes to cleave with.</p>");
 			$("textarea#EnzCutter_textarea").remove();
 			EnzCutter(["CalcRES", "", i],"single");
+			//Draw charts
 			google.setOnLoadCallback(drawChart(features,counter, name, "single"));
 			google.setOnLoadCallback(drawPieChart(pie_data));
 			});
 		}
-		//Output help
+		//Function: outputHelp
+			//Takes data from doHelp
+			//Output help
 		function outputHelp (data) {
 			$.each(data, function (i,val) {
 				return true;
 			});
 		}
-		//Write RES to Enzcutter
-		//Textex
+		//Function: outputEnzCutter
+			//Handles the output of EnzCutter 
+			//Takes (data,context)
+				//data = JSON data returned
+				//context = Set by the searchHandler, single will output on the single page
+		function outputEnzCutter (data, context){
+			var outputDiv;
+			//Change the div for the context
+			if (context == "single") {
+				outputDiv = $("#EnzCutter_Results_single");
+			} else {
+				outputDiv = $("#EnzCutter_Results");
+				outputDiv.append('<div id="closepopup">Close?</div>');
+				outputDiv.append('<h2 class="center" id="EnzCutter_results_h2">Results</h2>');
+			}
+			//Run through each cut returned and display the results appropriately 	
+			$.each(data, function(i,val) {
+					$.each(val, function (key,value){
+						if (key == "error") {
+							outputDiv.append('<h3 id="EnzCutter_results_h3>Error</h3><p>'+value+'</p>');
+						} else {
+							var count =1;
+							outputDiv.append('<h3 id="EnzCutter_results_h3">'+key+'</h3>');
+								$.each(value, function (cut, details){
+									if (cut == "error") {
+										outputDiv.append('<div id="EnzCutter_results_div"><h4>No Cuts</h4></div>');
+									} else {
+										//Cut the results so spans can be applied
+										var regex_enzcutter = /[\||,]/g;
+										var seqfor = details["sequence-forward"];
+										var seqrev = details["sequence-reverse"];
+										var seqfor_split = seqfor.split(regex_enzcutter);
+										var seqrev_split = seqrev.split(regex_enzcutter);
+										var spaces = seqfor_split[2].length;
+
+										var spaces_display = Array(spaces).join("&nbsp;");
+										var seqfor_display = '<span class="red-b">'+seqfor_split[0]+'</span><span class="blue">'+seqfor_split[1]+'</span><span class="bold">'+spaces_display+'|</span><span class="blue">'+seqfor_split[2]+'</span><span class="red-b">'+seqfor_split[3]+'</span>';
+										var seqrev_display = '<span class="red-b">'+seqrev_split[0]+'</span><span class="blue">'+seqrev_split[1]+'</span><span class="bold">|'+spaces_display+'</span><span class="blue">'+seqrev_split[2]+'</span><span class="red-b">'+seqrev_split[3]+'</span>';
+
+										outputDiv.append('<div id="EnzCutter_results_div"><h4>Cut '+count+'</h4>\
+											<div id="seq-for" class="sequence">5\''+seqfor_display+'3\'</div> \
+											<div id="seq-rev" class="sequence">3\''+seqrev_display+'5\'</div> \
+											<div id="seq-cut"><span>Cut used </span><span class="bold">'+details["cut"]+'</span></div> \
+											<div id="seq-location"><span>Location </span><span class="bold">'+details["location"]+'</span></div> \
+											</div>');
+										count++;
+									}
+								});
+						}
+					});
+			});
+			if (context == "single"){ 
+				$("#EnzCutter_Results_single").slideDown("fast");
+				$("#EnzCutter_spinner").fadeOut("fast");
+			} else {
+				$("#EnzCutter_Results").slideDown("fast");
+				$("#EnzCutter").slideUp("fast");
+			};
+		}
+		//Function: populateEnzCutter
+			//Takes JSON data from search
+			//Ouputs the avaliavle restriction enzymes to the EnzCutter box
+			//Uses Textex to provide suggestions
 		function populateEnzCutter (data){
 			var counter = 0 ;
 			var dataArray = [];
@@ -475,23 +563,27 @@ $(document).ready(function() {
 				counter++;
 			});
 			$("#EnzCutter_number").html("<span>"+counter+" Enzymes avaliable</span>");
+			//This section is mostly based off example code from the plugin
 			$('#EnzCutter_autocomplete').textext({
 	            plugins : 'autocomplete tags filter arrow'
 	        })
 	        .bind('getSuggestions', function(e, data){
 	            var list = dataArray,
 	                textext = $(e.target).textext()[0],
-	                query = (data ? data.query : '') || ''
-	                ;
-
+	                query = (data ? data.query : '') || '';
 	            $(this).trigger(
 	                'setSuggestions',
 	                { result : textext.itemManager().filter(list, query) }
 	            );
 	        });
 		}
-
-		//Print errors to div
+		//Function: errorOut
+			//Takes data, context, url, (m)
+			//Print errors to div
+			//data = JSON data
+			//context = context where the error occoured
+			//url = json.pl url where error occoured
+			//m = type of error
 		function errorOut (data, context, url, m){
 			if (context == "search" || context == "browse" || context =="single"){
 				$("div#errorbox.boxes>div#closepopup").hide();
@@ -504,9 +596,14 @@ $(document).ready(function() {
 			error.fadeIn("fast");
 		}
 		
-		
-		//Google Charts API
-		//Draw charts
+		//Function: drawChart
+			//Google Charts API
+			//Draws layout charts
+			//Takes features, counter, name, context
+			//features = JSON value containing the sequence features
+			//counter = Current div number
+			//name = Name of the gene
+			//context = Where the chart appears, affects the size and positioning
 		function drawChart (features, counter, name, context) {
 			//Split up features array strings into separate arrays
 			var feats = [name];
@@ -529,7 +626,6 @@ $(document).ready(function() {
 					colours.push(ColINTRON);
 				} 
 			});
-			
 			var options;
 			if (context == "single") {
 				options = { isStacked: true, hAxis : {}, legend: {}, chartArea : {left:5, top: 5 ,'width':'80%', 'height':'80%'}, width: 850, height: 100, colors: colours};
@@ -540,6 +636,9 @@ $(document).ready(function() {
 			var chart = new google.visualization.BarChart(document.getElementById('chart_div'+counter));
 			chart.draw(data1, options );	
 		}
+		//Function: drawPieChart
+			//Takes data from outputSingleHTML
+			//Draws a pie chart of codon usage
 		function drawPieChart (data) {
 			var wrapper = new google.visualization.ChartWrapper({
 				chartType: 'PieChart',
@@ -549,46 +648,59 @@ $(document).ready(function() {
 			});
 			wrapper.draw();
 		}
+	/////////////////////////////////////////////////////////////////
 
-	//
-	//	Reset Functions
-	//	
-		//Resets the page	
+	////////////////////////////////
+	//							  //
+	// Reset			 		  //
+	//							  //
+	/////////////////////////////////////////////////////////////////
+		//Function: resetIndex
+			//Takes urlState from History.js
+			//Resets the page	
 		function resetIndex (urlState) {
+			//Show
+			main.show();
 			welcome.show();
+			//Hide
 			searchID.hide();
 			browse.hide();
-			showMain();
-			hideContent();
-			clearContent();
-			setBreadcrumbs(urlState);
-			titleHandler(urlState);
-			replaceTextbox();
-			$("#EnzCutter").slideUp("fast");
-			$("#EnzCutter_Results").slideUp("fast");
-			help.slideUp("fast");
+			content.hide();
+			Boxes.slideUp("fast");
 			overlay.fadeOut("fast");
 			error.fadeOut("fast");
-
-		}
-		//Handles search calls
-		function searchHandler (urlState) {
-			clearContent();
-			doSearch(urlState);
+			//Blank out the Content ID and replace the textbox in EnzCutter
+			content.html("");
+			replaceTextbox();
+			//Functions
 			setBreadcrumbs(urlState);
-			hideMain();
-			help.slideUp("fast");
-			showContent();
 			titleHandler(urlState);
 		}
-		//Replaces textarea in enzcutter
+		//Function: searchHandler
+			//Takes urlState from History.js
+			//Handles search calls
+		function searchHandler (urlState) {
+			content.html("");
+			doSearch(urlState);
+			setBreadcrumbs(urlState);
+			main.hide();
+			Boxes.slideUp("fast");
+			content.show();
+			titleHandler(urlState);
+		}
+		//Function: replaceTextbox
+			//Replaces textarea in enzcutter if the user had already visited a single page
 		function replaceTextbox () {
 			$("#EnzCutter_autocompleteWrapper").html('<textarea type="text" name="query" id="EnzCutter_textarea" autofocus="autofocus" cols="40" rows="4" style="width:400px"></textarea>');
 			$("#EnzCutter_currentGene").html("");
-		}	
+		}
+	/////////////////////////////////////////////////////////////////
 
-
-
+	////////////////////////////////
+	//							  //
+	// Clicky bits				  //
+	//							  //
+	/////////////////////////////////////////////////////////////////
 
 	//
 	//	Welcome / Search
@@ -697,7 +809,8 @@ $(document).ready(function() {
 		$(window).resize(function() {  
 			centerPopup();  
 		}); 
-		//Move the headers down with the page
+		//Function: moveTitle
+			//Moves the headers for the search results down with the page
 		function moveTitle () {
 			var offset = $(window).scrollTop()+110;
 			if ($(window).scrollTop() > 2) {
@@ -720,46 +833,7 @@ $(document).ready(function() {
 		//jQueryUi
 		$("#searchType").buttonset();
 		$('input[type="submit"], input[type="reset"]').button();
-	
-	//jQuery plugin: History.js 
-	//Looks at the url and does operations based on what it gets	
-	$.History.bind(function(state) {
-		urlState = state.split(/\//g);
-		switch (true) {
-				case(urlState[1] == "help"):
-					//Need to work something out for this
-					break;
-				case(urlState[1] == "search"):
-					if (urlState[2].length > 1){
-						searchHandler(urlState);
-					} else {
-						resetIndex(urlState);
-						welcome.hide();
-						searchID.show();
-					}
-					break;
-				case(urlState[1] == "single"):
-					searchHandler(urlState);
-					break;
-				case(urlState[1] == "browse"):
-					if (urlState[2].length >= 1){
-						searchHandler(urlState);
-					} else {
-						resetIndex(urlState);
-						browse.show();
-						welcome.hide();
-					}
-					break;
-				default:
-					if (urlState == undefined) {
-						alert("Incorrect url.");
-					}
-					resetIndex(urlState);
-					break;
-			}
-				
-		});
-		
+	/////////////////////////////////////////////////////////////////////////
 });
 //A Secret
 var kkeys = [], secret = "38,38,40,40,37,39,37,39,66,65";
