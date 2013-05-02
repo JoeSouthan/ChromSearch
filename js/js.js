@@ -8,7 +8,7 @@
 //	Created by: 	Joseph Southan
 //	Email: 			joseph@southanuk.co.uk
 //	Date: 			27/01/2013
-//	
+//	Updated: 		3/5/2013
 //
 
 //Load in Google Graphs API
@@ -375,7 +375,7 @@ $(document).ready(function() {
 			//Output Search JSON to HTML
 		function outputSearchHTML (data) {
 			var counter = 0;
-			content.html('<div class="titles-fixed" id="titles"><div class="title title-acc unsorted" id="namesort">Accession</div><div class="title title-product unsorted" id="productsort">Protein Product</div><div class="title title-diagram">Gene Layout</div><div class="title title-len unsorted" id="lengthsort">Length</div><div class="title title-loc unsorted" id="locationsort">Location</div>');
+			content.html('<div class="titles-fixed" id="titles"><div class="title title-acc unsorted" id="namesort">Accession</div><div class="title title-product unsorted" id="productsort">Protein Product</div><div class="title title-diagram">Gene Layout</div><div class="title title-len unsorted" id="lengthsort">Length</div><div class="title title-loc unsorted" id="locationsort">Location</div></div>');
 			//Go through each result returned
 			$.each(data, function(i,val) {
 				var features = val["SeqFeat"];
@@ -504,7 +504,7 @@ $(document).ready(function() {
 				outputDiv = $("#EnzCutter_Results_single");
 			} else {
 				outputDiv = $("#EnzCutter_Results");
-				outputDiv.append('<div id="closepopup">Close?</div>');
+				outputDiv.append('<div class="closepopup">Close?</div>');
 				outputDiv.append('<h2 class="center" id="EnzCutter_results_h2">Results</h2>');
 			}
 			//Run through each cut returned and display the results appropriately 	
@@ -586,10 +586,10 @@ $(document).ready(function() {
 			//m = type of error
 		function errorOut (data, context, url, m){
 			if (context == "search" || context == "browse" || context =="single"){
-				$("div#errorbox.boxes>div#closepopup").hide();
+				$("div#errorbox.boxes>div.closepopup").hide();
 				errordiv.html('<span class="bold">Error: </span>'+data['error']+'<br />Please <span class="bold underline red pointer" id="showSearch">try again.</span>');
 			} else if (context =="ajax") {
-				$("div#errorbox.boxes>div#closepopup").show();
+				$("div#errorbox.boxes>div.closepopup").show();
 				errordiv.html('<span class="bold">Ajax error: </span>'+data.status+'<br /><span class="bold">Error: </span>'+m+'<br /><span class="bold">URL: </span>'+url);
 			}
 			overlay.fadeIn("fast");
@@ -771,7 +771,7 @@ $(document).ready(function() {
 	//
 	//	Boxes
 	//
-		$("#closepopup").live("click", function() {
+		$(".closepopup").live("click", function() {
 			$(this).parent().slideUp();
 			overlay.fadeOut("fast");
 		});

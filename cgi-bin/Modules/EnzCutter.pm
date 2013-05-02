@@ -1,8 +1,12 @@
 #! /usr/bin/perl -w
 #
-#
-#	EnzCutter.pm - Module to enzymatically cleave DNA Sequences
-#
+#	EnzCutter.pm - Cleaves a sequence
+#	Written by: Joseph Southan
+#	Date: 		15/2/13
+#	Email:		joseph@southanuk.co.uk
+#	Usage: 		*See Functions*
+#	Requires:	ChromoDB
+#	Updated:	3/5/13
 #
 package EnzCutter;
 use strict;

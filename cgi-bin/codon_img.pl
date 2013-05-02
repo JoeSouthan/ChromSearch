@@ -1,4 +1,14 @@
 #! /usr/bin/perl -w
+#
+#	codon_img.pl - Serves an image of codon usage
+#	Written by: Joseph Southan
+#	Date: 		5/2/13
+#	Email:		joseph@southanuk.co.uk
+#	Usage: 		codon_img.pl?&gene=[Accession]&(download/show=true)
+#	Requires:	CodonImager, CGI, CGI::Carp
+#	Updated:	2/5/13
+#
+use strict;
 use lib 'Modules';
 use CodonImager;
 use Data::Dumper;

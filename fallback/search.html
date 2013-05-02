@@ -1,0 +1,74 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<!-- 
+	search.html
+	Written by: Joseph Southan
+	Date: 		2/5/13
+	Email:		joseph@southanuk.co.uk
+	Updated:	2/5/13
+	-->
+	<meta charset="utf-8">
+	<title>12Chrom - Search</title>
+	<link href="../css/style.css" rel="stylesheet" type="text/css">
+    <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/smoothness/jquery-ui.css">
+	<link rel="icon" type="image/png" href="../img/favicon.png" />
+</head>
+
+<body>
+<div class="navbar-wrapper">
+	<div class="navbar-inner-wrapper">
+		<div id="home" class="header pointer">
+			<h1>12Chrom</h1>
+		</div>
+		<span class="subheader">Chromosome 12 Analysis Tool</span>
+		<div class="navbar">
+					<div class="item" id="home">
+						<a href="">Home</a>
+					</div>
+					<div class="item">
+						<a href="cgi-bin/enz_cutter.pl" id="EnzCutter_open">EnzCutter</a>
+					</div>
+					<div class="item">
+						<a href="help" id="help_open">Help</a>
+					</div>
+					<div class="item">
+						<a href="contact" id="contact_open">Contact </a>
+					</div>
+					
+		</div>
+	</div>
+</div>
+<div class="wrapper">
+	<div id="main">
+		<div class="welcome_wrapper" id="searchform" style="display:block;">
+					<div class="left"><img src="../img/clippy.gif" alt="Clippy" width="94" height="87" /></div>
+					<h2 class="center">It looks like you're about to search.</h2>
+			<form method="get" action="../cgi-bin/search_results.pl" id="mainSearch">
+				<div class="search_wrapper">
+					<span>Search Query:</span><input type="text" name="query" id="searchquery" autofocus="autofocus" size="60" placeholder="Enter your search"/>
+					<br />
+					<br />
+					<div id="searchType">
+						<input type="radio" id="r1" name="searchType" value="GeneID" checked="checked"/><label for="r1">Gene Identifier</label>
+						<input type="radio" id="r2" name="searchType" value="ProteinProduct" /><label for="r2">Protein Product</label>
+						<input type="radio" id="r3" name="searchType" value="AccessionNumber" /><label for="r3">GenBank Accession</label>
+						<input type="radio" id="r4" name="searchType" value="ChromosomeLocation" /><label for="r4">Chromosomal Location</label>
+					</div>
+					<br />
+					<br />
+					<input type="hidden" value="search" name="search" />
+					<input type="submit" value="Submit" id="searchsubmit" />
+					<input type="reset" value="Reset" />
+				</div>
+			</form>
+		</div>
+
+		<div class="footer">Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
+
+	</div>
+	<div id="content">
+	</div>
+</div>
+</body>
+</html>

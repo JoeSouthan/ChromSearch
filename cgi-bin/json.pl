@@ -1,17 +1,32 @@
 #! /usr/bin/perl -w
 #
-#	Script to serve JSON with logic to prevent wrong usage
+#	json.pl - Serves generated JSON
+#	Written by: Joseph Southan
+#	Date: 		18/3/13
+#	Email:		joseph@southanuk.co.uk
+#	Usage: 		json.pl?selector=[selector]
+#				Selectors:
+#					GET:
+#						"single" 	&query=[Accession]
+#						"search"	&searchType=[Search Type]&query=[query]
+#						"browse" 	&query=[A-Z]
+#						"res" 		-
+#							"GetRES"; 	&mode=GetRES
+#						"help"		?
+#					POST:
+#						"res" 
+#							"CalcRES";	&query=[sequence]&gene
+#	Requires:	CGI, CGI::Carp, GenJSON
+#	Updated:	3/5/13
 #
 use strict;
-use JSON;
 use CGI;
 use CGI::Carp qw(warningsToBrowser fatalsToBrowser); 
-use Data::Dumper;#Debug
+use Data::Dumper;
 use lib 'Modules';
 use GenJSON;
 
 my $cgi = new CGI;
-my $json = JSON->new;
 my @params= $cgi->param();
 
 my ($selector, $query,$type,$mode,$gene, $page);

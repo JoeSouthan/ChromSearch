@@ -1,6 +1,13 @@
 <!DOCTYPE HTML>
 <html>
 <head>
+	<!-- 
+	index.html
+	Written by: Joseph Southan
+	Date: 		24/1/13
+	Email:		joseph@southanuk.co.uk
+	Updated:	2/5/13
+	-->
 	<meta charset="utf-8">
 	<title>12Chrom - Chromosome 12 Analysis Tool</title>
 	<link href="css/style.css" rel="stylesheet" type="text/css">
@@ -17,10 +24,10 @@
 <body>
 <div class="boxes" id="no-js-alert">
 	<h2>Reduced functionality</h2>
-	<p>This site requires JavaScript. Please enable it.</p>
+	<p>This site requires JavaScript. Please enable it or use the <a href="fallback/" title="Fallback Site">fallback site.</a></p>
 </div>
 <div class="boxes" id="help">
-	<div id="closepopup">Close?</div>
+	<div class="closepopup">Close?</div>
 	<h2 class="center">Help</h2>
 	<div id="Help_text">
 	</div>
@@ -31,7 +38,7 @@
 	<span class="inlinetext">Please Wait...</span>
 </div>
 <div class="boxes" id="errorbox">
-	<div id="closepopup">Close?</div>
+	<div class="closepopup">Close?</div>
 	<h2 class="center">There was an error...</h2>
 	<p id="errordiv"></p>
 </div>
@@ -40,12 +47,12 @@
 	<p>Seems the data is taking a while to come back. Try refreshing!</p>
 </div>
 <div class="boxes" id="contact">
-	<div id="closepopup">Close?</div>
+	<div class="closepopup">Close?</div>
 	<h2 class="center">Contact</h2>
 	<p>Maybe later</p>
 </div> 
 <div class="boxes" id="EnzCutter"> 
-	<div id="closepopup">Close?</div>
+	<div class="closepopup">Close?</div>
 	<h2 class="center">EnzCutter</h2>
 	<div id="intro_text">
 		<p id="EnzCuttter_welcome">Please paste in your sequence to be enzymatically cleaved in the box and submit</p>
@@ -101,19 +108,19 @@
 		<div class="welcome_wrapper" id="welcome">
 			<div class="welcome" >
 				<h2>Welcome to the Chromosome 12 Search Engine</h2>
-				<div class="frontbox yellow" id="browsebox"> 
+				<div class="frontbox yellow pointer" id="browsebox"> 
 					<p>Browse &raquo;</p>
 					<span class="boxspan">Browse by Protein product</span>
 				</div>
-				<div class="frontbox blue" id="searchbox">
+				<div class="frontbox blue pointer" id="searchbox">
 					<p>Search &raquo;</p>
 					<span class="boxspan">Search the database</span>
 				</div>
-				<div class="frontbox red-box" id="EnzCutter_frontbox"> 
+				<div class="frontbox red-box pointer" id="EnzCutter_frontbox"> 
 					<p id="EnzCutter_fronttext">EnzCutter &raquo;</p>
 					<span class="boxspan">Cleave a sequence</span>
 				</div>
-				<div class="frontbox green" id="helpbox">
+				<div class="frontbox green pointer" id="helpbox">
 					<p>Help &raquo;</p>
 					<span class="boxspan">Not sure where to start?</span>
 				</div>
@@ -168,7 +175,7 @@
 		<div class="welcome_wrapper" id="searchform">
 					<div class="left"><img src="img/clippy.gif" alt="Clippy" width="94" height="87" /></div>
 					<h2 class="center">It looks like you're about to search.</h2>
-			<form method="post" action="cgi-bin/search_results.pl" id="mainSearch">
+			<form method="post" action="cgi-bin/search_results.pl?search=search" id="mainSearch">
 				<div class="search_wrapper">
 					<span>Search Query:</span><input type="text" name="query" id="searchquery" autofocus="autofocus" size="60" placeholder="Enter your search"/>
 					<br />
@@ -181,10 +188,6 @@
 					</div>
 					<br />
 					<br />
-					<!--<p class="right"><a href="#" id="showadvanced">Advanced search options</a></p>
-					<div id="advanced">
-						<span>Number of results per page</span><input id="perpage" type="text" name="perpage" value="10" size="2" />
-					</div>-->
 					<div class="red" id="validation"></div>
 					<input type="submit" value="Submit" id="searchsubmit" />
 					<input type="reset" value="Reset" />
@@ -192,7 +195,7 @@
 			</form>
 		</div>
 
-		<div class="footer">Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
+		<div class="footer">If you are having trouble, please use the <a href="fallback/" title="Fallback Site">fallback site.</a> <br />Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
 
 	</div>
 	<div id="content">

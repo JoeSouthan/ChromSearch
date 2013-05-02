@@ -1,13 +1,20 @@
 #! /usr/bin/perl -w
-use strict;
+#
+#	CodonImager.pm - Creates images dynamically
+#	Written by: Joseph Southan
+#	Date: 		5/2/13
+#	Email:		joseph@southanuk.co.uk
+#	Usage: 		*See Functions*
+#	Requires:	Image::Magick, CGI, CGI::Carp, ChromoDB
+#	Updated:	3/5/13
+#
 package CodonImager;
+use strict;
 use Image::Magick;
 use CGI;
+use CGI::Carp qw(warningsToBrowser fatalsToBrowser); 
 use Data::Dumper;
 use ChromoDB;
-use Time::HiRes qw ( time );
-use CGI::Carp qw(warningsToBrowser fatalsToBrowser); 
-use MIME::Base64;
 
 #Initialise CGI
 my $cgi = new CGI;
