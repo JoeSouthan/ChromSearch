@@ -15,10 +15,6 @@
 </head>
 
 <body>
-<div class="boxes" id="no-js-alert">
-	<h3>Reduced functionality</h3>
-	<p>This site requires JavaScript. Please enable it.</p>
-</div>
 <div class="boxes" id="contact">
 	<div id="closepopup">Close?</div>
 	<h2 class="center">Contact</h2>
@@ -31,8 +27,8 @@
 		</div>
 		<span class="subheader">Chromosome 12 Analysis Tool</span>
 		<div class="navbar">
-					<div class="item" id="home">
-						<a href="">Home</a>
+					<div class="item">
+						<a href="../">Home</a>
 					</div>
 					<div class="item">
 						<a href="contact" id="contact_open">Contact </a>
@@ -45,114 +41,226 @@
 		<h2 class="center">Help</h2>
 		<span class="bold">Contents:</span>
 		<ul>
-			<li>Main</li>
-			<li>Search</li>
-			<li>Single</li>
-			<li>EnzCutter</li>
-			<li>Codon Usage</li>
-			<li>Gene Layout</li>
-			<li>API</li>
+			<li><a href="#help_main">Main</a></li>
+			<li><a href="#help_search">Search</a></li>
+			<li><a href="#help_single">Single</a></li>
+			<li><a href="#help_enzcutter">EnzCutter</a></li>
+			<li><a href="#help_api">API</a></li>
 		</ul>
-		<h3>Main</h3>
-			<div class="help_wrapper">
-				<p>Text</p>
-			</div>
-		<h3>Search Results</h3>
-			<div class="help_wrapper">
-				<p>Text</p>
-			</div>
-		<h3>Single Page</h3>
-			<div class="help_wrapper">
-				<p>Text</p>
-			</div>
-		<h3>EnzCutter</h3>
-			<div class="help_wrapper">
-				<p>Text</p>
-			</div>
-		<h3>Codon Usage</h3>
-			<div class="help_wrapper">
-				<p>Text</p>
-			</div>
-		<h3>Gene Layout</h3>
-			<div class="help_wrapper">
-				<p>Text</p>
-			</div>
+		<span class="anchor" id="help_main"></span>
+		<div>
+			<h3>Main</h3>
+				<div class="help_wrapper">
+					<img style="margin:0 auto; display:block;" src="../img/help/1.png" title="Front page" />
+					<p class="center">Above: Front page.</p>
+					<p>Choose from:</p>
+					<ul>
+						<li>Browse, to browse by protein product name</li>
+						<li>Search, to search the database via 4 different methods</li>
+						<li>EnzCutter, to enzymaticaly cleave a protein</li>
+						<li>Help, to get here</li>
+					</ul>
+					<p>At any time, press the "Home" button to reset the page and start again, also pressing the "EnzCutter" button will bring up the EnzCutter over any page</p>
+					<p>12Chrom is built on; Javascript using the jQuery library, HTML5 and CSS3. All modern browsers support this site (Firefox 18+, Chrome, IE8+).</p>
+					<p>If for any reason you cannot use the site as it is, please use the <a href="../fallback">fallback version.</a></p>
+				</div>
+		</div>
+		<span class="anchor" id="help_search"></span>
+		<div>
+			<h3>Search Results</h3>
+				<div class="help_wrapper">
+					<img style="margin:0 auto; display:block;" src="../img/help/2.jpg" title="Search Results" />
+					<p class="center">Above: Search Results for q13</p>
+					<p>The search results returned will show the Accession number, the protein name, a diagram of the layout of the gene, location and length.</p>
+					<p>The legend for layout is as follows:</p>
+					<ul>
+						<li>Dark blue: Non Coding sequences (NCS)</li>
+						<li>Light blue: Exons</li>
+						<li>Red: Introns</li>
+					</ul>
+					<p>Use the title headings to sort by ascending or descending order.</p>
+				</div>
+		</div>
+		<span class="anchor" id="help_single"></span>
+		<div>
+			<h3>Single Page</h3>
+				<div class="help_wrapper">
+					<img style="margin:0 auto; display:block;" src="../img/help/3.jpg" title="Search Results" />
+					<p class="center">Above: Single page for AB055802</p>
+					<p>The single page will detail everything to do with the gene.</p>
+					<h4>Gene layout</h4>
+					<p>The gene layout diagram has the same legend as the <a href="#help_search">search page.</a></p>
+					<h4>Codon Usage</h4>
+					<p>A heatmap showing codon usage, the more red the triplet, the more used in the gene it is. Click to download the image.</p>
+					<p>Also avaliable is a pie chart showing the data as percentages</p>
+					<h4>Common Restriction sites</h4>
+					<p>The page will automatically cut with the 3 most popular enzymatic cleavage sites and display the results. To cut your own, please click the EnzCutter link on the page or at the top. <br />To interpret these results please see <a href="#help_enzcutter">EnzCutter</a></p>
+				</div>
+		</div>
+		<span class="anchor" id="help_enzcutter"></span>
+		<div>
+			<h3>EnzCutter</h3>
+				<div class="help_wrapper">
+					<img style="margin:0 auto; display:block;" src="../img/help/4.jpg" title="EnzCutter Results" />
+					<p class="center">Above: EnzCutter Results</p>
+					<h4>Results</h4>
+					<p>The above image shows the results for an EnzCutter cut.</p>
+					<p>The titles describe the enzyme used while the subheading describes the cut number.</p>
+					<p>The sequence along with the cut is shown, along with the overhang and the location of the cut.</p>
+					<h4>Cut</h4>
+					<img style="margin:0 auto; display:block;" src="../img/help/5.jpg" title="EnzCutter Results" />
+					<p class="center">Above: EnzCutter submission form</p>
+					<p>EnzCutter will accept any sequence entered and perform a cut on it, including FASTA sequences.</p>
+					<p>Enter the sequences (if you are on a Single page, it will be entered automatically) and choose enzymes from the dropdown list or by typing a couple of letters from the sequence name.<br />If you don't see an enzyme in the list, then enter the sequence in the following format: <span class="bold">A|TTTT</span>. Please note currently EnzCutter does not support any other nucleotide but ATGC.</p>
+				</div>
+		</div>
+		<span class="anchor" id="help_api"></span>
+		<div>
 		<h3>API</h3>
 		<div class="help_wrapper">
 			<p>This site has an avaiable JSON API that is very easily called.</p>
 			<p>All requests must be directed toward:</p>
 				<pre>cgi-bin/json.pl</pre>
-			<h4>Search</h4>
-				<p>To search the database 3 flags must be set:</p>
+			<h4 class="underline">Search for a Gene</h4>
+				<p>To search the database 3 GET flags must be set:</p>
 				<ul>
-					<li>selector: <span class="bold">"search"</span></li>
-					<li>type: Either <span class="bold">GeneID, ProteinProduct, AccessionNumber, ChromosomeLocation</span></li>
-					<li>query: <span class="bold">Your query</span></li>
+					<li>"selector": <span class="bold">"search"</span></li>
+					<li>"searchType": One of: 
+						<ul>
+							<li class="bold">GeneID</li>
+							<li class="bold">ProteinProduct</li>
+							<li class="bold">AccessionNumber</li>
+							<li class="bold">ChromosomeLocation</li>
+						</ul>
+					<li>"query": <span class="bold">Your query</span></li>
 				</ul>
+				<p>The order of these values do not matter, however, the flags and the search types are context sensitive.</p>
 				<p>For example, a GeneID search for a gene with the Accession number of "1914776"</p>
-				<pre>cgi-bin/json.pl?<span class="bold">&amp;selector=search&amp;type=GeneID&amp;query=1914776</span></pre>
+				<pre>cgi-bin/json.pl?<span class="bold">selector</span>=search&amp;<span class="bold">searchType</span>=GeneID&amp;<span class="bold">query</span>=2780780
+				</pre>
+				<a href="../cgi-bin/json.pl?selector=search&amp;searchType=GeneID&amp;query=2780780" target="_blank">Try it!</a>
 				<p>The above would return:</p>
+				<p>(Please mouse over the links for an explanation of each element.)</p>
+
 				<pre>
 {
-   "Y12331" : {
-      "GeneName" : "1914776",
-      "GeneLength" : "2261",
-      "ChromosomeLocation" : "q13",
-      "ProteinId" : "CAA72999.1",
-      "SeqFeat" : [
-         "NCS;0:1164",
-         "EXON;1165:1197",
-         "NCS;1198:2188",
-         "EXON;2189:2261",
-         "NCS;2262:2261"
+   "<a href="#" title="Accession Number">AB002805</a>" : {
+      "<a href="#" title="GeneInfo Identifier">GeneName</a>" : "2780780",
+      "<a href="#" title="Length of the gene in base pairs">GeneLength</a>" : "1249",
+      "<a href="#" title="Location on Chromosome 12">ChromosomeLocation</a>" : "12q13",
+      "<a href="#" title="Protein ID">ProteinId</a>" : "BAA24362.1",
+      "<a href="#" title="An array of sequence features for the DNA sequence">SeqFeat</a>" : [
+         "<a href="#" title="Non Coding Sequence">NCS</a>;0:1051",
+         "<a href="#" title="Exonic sequence">EXON</a>;1052:1213",
+         "<a href="#" title="Non Coding Sequence">NCS</a>;1214:1249"
       ],
-      "ProteinName" : "mitochondrial serine hydroxymethyltransferase"
+      "<a href="#" title="Name of the protein">ProteinName</a>" : ""
    }
 }</pre>
-			<h4>Single</h4>
-			<p>To show a single gene record</p>
-			<ul>
-				<li>selector: <span class="bold">"single"</span></li>
-				<li>query: <span class="bold">Your query</span></li>
-			</ul>
-			<p>For example:</p>
-			<pre>cgi-bin/json.pl?<span class="bold">&amp;selector=single&amp;query=1914776</span></pre>
-			<h4>Help</h4>
-			<p>Not done</p>
-			<h4>Browse</h4>
+			<hr />
+			<h4 class="underline">Browse by letter</h4>
 			<p>To browse for Protein product names:</p>
 			<ul>
-				<li>selector: <span class="bold">"browse"</span></li>
-				<li>query: <span class="bold">Your query</span></li>
+				<li>"selector": <span class="bold">"browse"</span></li>
+				<li>"query": <span class="bold">Your query, a letter A-Z (case insensitive)</span></li>
 			</ul>
 			<p>For example:</p>
-			<pre>cgi-bin/json.pl?<span class="bold">&amp;selector=single&amp;query=a</span></pre>
-			<h4>Restriction Enzymes</h4>
+			<pre>cgi-bin/json.pl?<span class="bold">selector</span>=single&amp;<span class="bold">query</span>=a</pre>
+			<a href="../cgi-bin/json.pl?selector=browse&amp;query=a" target="_blank">Try it!</a>
+			<p>Will return the same as "search" above.</p>
+			<hr />
+			<h4 class="underline">Single Gene</h4>
+			<p>To show a single gene record</p>
+			<ul>
+				<li>"selector": <span class="bold">"single"</span></li>
+				<li>"query": <span class="bold">Your query, assumes an Accession Number (case sensitive).</span></li>
+			</ul>
+			<p>For example:</p>
+			<pre>cgi-bin/json.pl?<span class="bold">selector</span>=single&amp;<span class="bold">query</span>=AB002805</pre>
+			<a href="../cgi-bin/json.pl?selector=single&amp;query=AB002805" target="_blank">Try it!</a>
+			<p>Will return:</p>
+			<p>(Please mouse over the links for an explanation of each element, "(...)" denotes truncated sequences)</p>
+			<pre>
+{
+   "<a href="#" title="GenBank Accession Number">AB002805</a>" : {
+      "<a href="#" title="GeneInfo Identifier">GeneName</a>" : "2780780",
+      "<a href="#" title="DNA Sequence in a single string">DNASeq</a>" : "GGAATT(...)",
+      "<a href="#" title="Protein ID">ProteinId</a>" : "BAA24362.1",
+      "<a href="#" title="An array of sequence features for the DNA sequence">SeqFeat</a>" : [
+         "<a href="#" title="Non Coding Sequence">NCS</a>;0:1051",
+         "<a href="#" title="Exonic sequence">EXON</a>;1052:1213",
+         "<a href="#" title="Non Coding Sequence">NCS</a>;1214:1249"
+      ],
+      "<a href="#" title="A DNA FASTA sequence">DNASeqFASTA</a>" : [
+         ">gi|2780780|gb|BAA24362.1|",
+         (...)
+      ],
+      "<a href="#" title="Codon usage statistics">CodonUsage</a>" : {
+        "<a href="#" title="Amino Acid">Leu</a>" : {
+            "<a href="#" title="Triplet">CUA</a>" : [
+               "<a href="#" title="Ratio">0.00</a>",
+               "<a href="#" title="Percentage">0.83</a>"
+            ],
+      },
+      "<a href="#" title="Translated amino acid sequence">AASeq</a>" : "MAAETLLSSLLGLLLLGLLLPASLTGGVGSLNLEELSEMRYGIEILPLPVMGGQ",
+      "<a href="#" title="FASTA sequence">AASeqFASTA</a>" : [
+         ">gi|2780780|gb|BAA24362.1|",
+         "MAAETLLSSLLGLLLLGLLLPASLTGGVGSLNLEELSEMRYGIEILPLPVMGGQ"
+      ],
+      "<a href="#" title="Location on Chromosome 12">ChromosomeLocation</a>" : "12q13",
+      "<a href="#" title="Length of the gene in base pairs">GeneLength</a>" : "1249",
+      "<a href="#" title="Name of the protein">ProteinName</a>" : ""
+   }
+}</pre>
+			<hr />
+			<h4 class="underline">Restriction Enzymes</h4>
 			<p>To list all the avaliable restriciton enzymes in the database:</p>
 			<ul>
-				<li>selector: <span class="bold">"res"</span></li>
-				<li>mode: <span class="bold">"GetRES"</span></li>
+				<li>"selector": <span class="bold">"res"</span></li>
+				<li>"mode": <span class="bold">"GetRES"</span></li>
 			</ul>
 			<p>For example:</p>
-			<pre>cgi-bin/json.pl?<span class="bold">&amp;selector=res&amp;mode=GetRES</span></pre>
+			<pre>cgi-bin/json.pl?<span class="bold">selector</span>=res&amp;<span class="bold">mode</span>=GetRES</pre>
+			<a href="../cgi-bin/json.pl?selector=res&amp;mode=GetRES" target="_blank">Try it!</a>
 			<p>Would return:</p>
 			<pre>{
-   "BamHI" : "G|GATCC",
+   "<a href="#" title="Restriction enzyme">BamHI</a>" : "<a href="#" title="Cut">G|GATCC</a>",
    "EcoRI" : "G|AATTC",
    "BsuMI" : "C|TCGAG"
 }</pre>
-			<h4>EnzCutter</h4>
-			<p>To cut a sequence or specific gene with a restriction enzyme, use EnzCutter</p>
+			<hr />
+			<h4 class="underline">EnzCutter</h4>
+			<p>To cut a sequence or specific gene with a restriction enzyme, use EnzCutter.</p>
+			<p>EnzCutter CalcRES is a <span class="bold">POST</span> service.</p>
 			<ul>
-				<li>selector: <span class="bold">"res"</span></li>
-				<li>mode: <span class="bold">"CalcRES"</span></li>
-				<li>Either, query: <span class="bold">"Nucleic acid sequnce"</span></li>
-				<li>Or, gene: <span class="bold">"Gene ID"</span></li>
+				<li>"selector": <span class="bold">"res"</span></li>
+				<li>"mode": <span class="bold">"CalcRES"</span></li>
+				<li>"query": <span class="bold">Nucleic acid sequnce or Accession Number</span></li>
+				<li>"gene": </li>
+				<ul>
+					<li>An avaliable RES from "GetRES" as a comma separated list eg "EcoRI,BamHI"</li> 
+					<li>Sequence formatted as such: A|TTTT, can be multiple separated with commas</li>
+				</ul>
 			</ul>
-			<pre>cgi-bin/json.pl?<span class="bold">selector=res&amp;mode=CalcRES&amp;query=EcoRI%2CBamHI&amp;gene=TestSequence</span></pre>
+			<pre>cgi-bin/json.pl?selector=<span class="bold">res</span>&amp;mode=<span class="bold">CalcRES</span>&amp;query=<span class="bold">AB002805</span>&amp;gene=<span class="bold">EcoRI</span></pre>
+			<a href="../cgi-bin/json.pl?selector=res&amp;mode=CalcRES&amp;query=AB002805&amp;gene=EcoRI" target="_blank">Try it</a>
 			<p>Will return:</p>
-			<pre>Not yet!</pre>
+			<pre>
+{
+   "result" : {
+      "<a href="#" title="Restriction enzyme">EcoRI</a>" : {
+         "<a href="#" title="Cut Number">cut0</a>" : {
+            "<a href="#" title="Reverse cut sequence">sequence-reverse</a>" : "C,CTTAA|G,TAAGA",
+            "<a href="#" title="Cut">cut</a>" : "G|AATTC",
+            "<a href="#" title="Cut Location">location</a>" : "2,11",
+            "<a href="#" title="Forward cut sequence">sequence-forward</a>" : "G,G|AATTC,ATTCT"
+         }
+      }
+   }
+}
+</pre>
 		</div>
+	</div>
 	</div>	
 </div>
 </body>

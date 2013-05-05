@@ -5,7 +5,7 @@
 #	Date: 		18/3/13
 #	Email:		joseph@southanuk.co.uk
 #	Usage: 		*See functions*
-#	Requres:	JSON, ChromoDB, EnzCutter
+#	Requires:	JSON, ChromoDB, EnzCutter
 #	Updated:	3/5/13
 #
 package GenJSON;

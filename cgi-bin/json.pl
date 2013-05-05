@@ -15,7 +15,7 @@
 #						"help"		?
 #					POST:
 #						"res" 
-#							"CalcRES";	&query=[sequence]&gene
+#							"CalcRES";	&query=[sequence/Accession]
 #	Requires:	CGI, CGI::Carp, GenJSON
 #	Updated:	3/5/13
 #

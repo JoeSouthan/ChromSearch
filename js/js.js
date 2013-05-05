@@ -416,7 +416,7 @@ $(document).ready(function() {
 			    	<h2 class="center">Single result for: '+i+'.</h2> \
 			        <div class="singleresult"> \
 			        	<div class="info"> \
-			            	<span>Length: </span><span class="bold">'+val["GeneLength"]+'</span><span> | Gene ID: </span><span class="bold">'+val["GeneName"]+'</span><span> | Genbank Accession: </span><span class="bold">'+i+'</span><span> | Protein ID: </span><span class="bold">'+val["ProteinId"]+'</span><span> | Chromosomal Location: </span><span class="bold">'+val["ChromosomeLocation"]+'</span> \
+			            	<span>Length: </span><span class="bold">'+val["GeneLength"]+'</span><span> | Gene ID: </span><span class="bold">'+val["GeneName"]+'</span><span> <br />Genbank Accession: </span><span class="bold">'+i+'</span><span> | Protein ID: </span><span class="bold">'+val["ProteinId"]+'</span><span> | Chromosomal Location: </span><span class="bold">'+val["ChromosomeLocation"]+'</span> \
 			            </div> \
 			            <div class="single-wide"> \
 			            	<h2>Protein Product</h2>\
@@ -833,6 +833,7 @@ $(document).ready(function() {
 		//jQueryUi
 		$("#searchType").buttonset();
 		$('input[type="submit"], input[type="reset"]').button();
+		$( document ).tooltip();
 	/////////////////////////////////////////////////////////////////////////
 });
 //A Secret

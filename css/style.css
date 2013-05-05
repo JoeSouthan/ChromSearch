@@ -54,9 +54,18 @@ li{
 	padding:5px;
 }
 pre {
-	background-color: #C4C4C4;
+	background-color: #ddd;
 	padding: 10px;
 	margin:10px;
+}
+pre a {
+	color: #000 !important;
+	font-family: monospace;
+	border-bottom: 2px dotted #000;
+	text-decoration: none;
+}
+pre a:hover{
+	text-decoration: none;
 }
 
 /*--------*/
@@ -464,6 +473,13 @@ pre {
 .float-left {
 	float:left;
 	padding:5px;
+}
+/*This fixes the anchor links hiding under the navbar*/
+.anchor {
+	display: block;
+	visibility: hidden;
+	margin-top: -50px;
+	height: 50px;
 }
 /*------*/
 table{
