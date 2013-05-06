@@ -21,14 +21,17 @@ my $lastErrorMessage = '';
 
 ##########################################################################################################
 #
-# GetSearchResults - Takes input string for an identifier from the webpage and searches the database for matches
+# GetSearchResults - Takes input string (search string), identifier(type i.e. gene, chromosome 
+# location), and mode of search from the webpage and searches the database for matches. Returns hash
+# of matches and extra info. or hash with error message
 #
 ##########################################################################################################
 sub GetSearchResults( $$$ ){
 	
-	# Get and store the input arguments, $class because of SOAP calling it.
+	# Get and store the input arguments
 	my ($searchString, $idType, $browseMode) = @_;
 	
+	# Initialise hash for any error messages
 	my %error = ();
 	
 	# Check for blank arguments passed in
@@ -37,8 +40,9 @@ sub GetSearchResults( $$$ ){
 		return %error;
 	}
 	
-	# Convert requested identifier type to a DB column name
+	# Convert requested identifier type to a database column name
 	my $id = GetIdentifier($idType);
+	# If id is undefinded pass back last error
 	unless( $id ){
 		$error{'error'} = GetLastErrorMessage();
 		return %error;
@@ -59,11 +63,12 @@ sub GetSearchResults( $$$ ){
 		# Hash to hold the data associated with each search results accessionNo
 		my %searchResults;
 	
+		# Iterate over array, extracting and packaging the data in to the relevent hash key 
 		for(my $i = 0; $i < @queryResult; $i++){
-			# Name each entry by accession number
+			# Name each key entry by accession number
 			my $accessionNumber = $queryResult[$i]->[0];
 			
-			# Fill out the hash entry with all the data associated with the accessionNo
+			# Fill out the hash entry with all the data associated with the accessionNo query results
 			$searchResults{$accessionNumber}{'GeneName'} = $queryResult[$i]->[1];
 			$searchResults{$accessionNumber}{'ChromosomeLocation'} = $queryResult[$i]->[2];
 			$searchResults{$accessionNumber}{'ProteinName'} = $queryResult[$i]->[3];
@@ -71,11 +76,18 @@ sub GetSearchResults( $$$ ){
 			$searchResults{$accessionNumber}{'GeneLength'} = $queryResult[$i]->[5];
 			
 			# Retrieve coding sequence data for given accession number
-			# Need error checking for below and a messge to indicate if there
-			# is no data.
 			my @sequence = BuildCodingSeq($queryResult[$i]->[0]);
-			$searchResults{$accessionNumber}{'SeqFeat'} = [@sequence];
+			# Check that data was returned.
+			unless( @sequence ){
+				# Set to N/A as it is not crucial
+				$searchResults{$accessionNumber}{'SeqFeat'} = 'N/A'
+			}else{
+				# Copy array content to the hash to be sent back to caller
+				$searchResults{$accessionNumber}{'SeqFeat'} = [@sequence];
+			}
 			
+			# If browse mode is set to 2 then the user is probably looking at the individual data for the
+			# gene in this case send back extra data for the accession number associated with the gene
 			if( 2 == $browseMode ){
 			
 				# Get the DNA seq
@@ -93,28 +105,15 @@ sub GetSearchResults( $$$ ){
 				}else{
 					$searchResults{$accessionNumber}{'AASeq'} = 'N/A'
 				}
-			
-				# Retrieve codon usage data
 	
-				# Attempt to retrieve the codons for the given accession number
-				#my @codons = GetCodons( $queryResult[$i]->[0] );
-			
-				#unless( @codons ){
-				# No codons returned list as empty
-				#$searchResults{$accessionNumber}{'CodonUsage'} = 'N/A';
-				#}else{
-					# Valid array of codons converted to percentages and packaged in to hash
-				#$searchResults{$accessionNumber}{'CodonUsage'} = {CalculateCodonUsage(@codons)};
-				$searchResults{$accessionNumber}{'CodonUsage'} = {CalculateCodonUsage($queryResult[$i]->[0])};
-				#}
+				# Retrieve codon usage data and package in to hash, no need to error set N/A as hash is already initialsed to 0 for each codon
+				$searchResults{$accessionNumber}{'CodonUsage'} = {CalculateCodonUsage($queryResult[$i]->[0])};	
 			}
 		}
 
 		# Return the hash to JSON
 		return %searchResults;
-
 	}
-	
 }
 
 ##########################################################################################################
@@ -127,6 +126,7 @@ sub GetRES{
 	# Attempt to retrieve all REsites from the DB
 	my @reSites = FindRES();
 	
+	# Initialise hash for any errors
 	my %error = ();
 	
 	# Chech that something was entered in to the array of sites
@@ -140,7 +140,7 @@ sub GetRES{
 	my %restrictionSites;
 	
 	foreach my $res (@reSites){
-		# Assignb name for hash key
+		# Assign name for hash key
 		my $resName = $res->[0];
 		# Assign cut site for hash value
 		$restrictionSites{$resName} = $res->[1];
@@ -154,22 +154,22 @@ sub GetRES{
 
 ##########################################################################################################
 #
-# DatabaseConnect - Takes database name, username, password and server name, returns handle to DB or undef.
+# DatabaseConnect - Take no arguments and returns handle to database or undef.
 # let the caller handle success and fail of connect.
 #
 ##########################################################################################################
 sub DatabaseConnect{
 	
 	#Defined the connection details to the database
-	# my $dbname = 'scouls01'; 
-	# my $user = 'scouls01';
-	# my $password = 'iwr8sh8vb'; 
-	# my $dbserver = 'localhost';
-	
-	my $dbname = 'biocomp2'; 
-	my $user = 'c2';
-	my $password = 'coursework123'; 
+	my $dbname = 'scouls01'; 
+	my $user = 'scouls01';
+	my $password = 'iwr8sh8vb'; 
 	my $dbserver = 'localhost';
+	
+	#my $dbname = 'biocomp2'; 
+	#my $user = 'c2';
+	#my $password = 'coursework123'; 
+	#my $dbserver = 'localhost';
 	
 	# Specify the location and name of the database
 	my $datasource = "dbi:mysql:database=$dbname;host=$dbserver;";
@@ -194,7 +194,8 @@ sub DatabaseConnect{
 
 ##########################################################################################################
 #
-# GetIdentifier - Takes an indentifer and returns an indentifer that complies with the DB column names.
+# GetIdentifier - Takes an indentifer form the website and returns an indentifer that complies with 
+# the database column names.
 #
 ##########################################################################################################
 sub GetIdentifier{
@@ -287,7 +288,8 @@ sub DoQuery( $ ){
 
 ##########################################################################################################
 #
-# QuerySearch - Takes a search string and type, returns comma separated list of search results
+# QuerySearch - Takes a search string, identifier type and browse mode, returns an array containing the 
+# search results.
 #
 ##########################################################################################################
 sub QuerySearch( $$$ ){
@@ -295,6 +297,7 @@ sub QuerySearch( $$$ ){
 	# Get the function parameters, assumes valid non-zero string and valid identifier input
 	my ($searchString, $idType, $browseMode) = @_;
 	
+	# Initialise string for sql query
 	my $sqlQuery = '';
 	
 	# If the search is in default mode, then find everything if associated with the 
@@ -321,7 +324,7 @@ sub QuerySearch( $$$ ){
 
 ##########################################################################################################
 #
-# IsArrayEmpty - Takes an array as input and returns true if it is empty or false if not empty
+# IsArrayEmpty - Takes an array as input and returns 0 if it is empty or 1 if not empty
 #
 ##########################################################################################################
 sub IsArrayEmpty( @ ){
@@ -350,19 +353,20 @@ sub IsArrayEmpty( @ ){
 
 ###############################################################################################
 #
-# BuildCodingSeq - Takes an accession number and returns an array with all the introns and exons in sequence.
+# BuildCodingSeq - Takes an accession number and returns an array with all the introns and exons 
+# in sequence.
 #
 ###############################################################################################
 sub BuildCodingSeq{
 
-	# Get accession number for DB lookup
+	# Get accession number for database lookup
 	my $accessionNo = $_[0];
 	
 	# Specify query includes start position and end position of exons from give accessionNo.
 	my $sqlQuery = "SELECT featStart, featEnd FROM seqFeat WHERE accessionNo='$accessionNo'
 	ORDER BY LENGTH(featStart)";
 	
-	# Fetch the exon coding sequence information from DB, array will progress as 
+	# Fetch the exon coding sequence information from database, array will progress as 
 	# Type, start, stop then repeat for next item.
 	my @tableRows = DoQuery($sqlQuery);
 	unless( @tableRows ){
@@ -374,7 +378,7 @@ sub BuildCodingSeq{
 	# Specify query includes start position and end position of exons from give accessionNo.
 	my $sqlQuerySeqlength = "SELECT geneSeqLen FROM gene WHERE accessionNo='$accessionNo'";
 	
-	
+	# Run the query
 	my @sequenceLength = DoQuery($sqlQuerySeqlength);
 	unless( @sequenceLength ){
 		SetLastErrorMessage('ERROR:DB_COLUMN_EMPTY');
@@ -454,28 +458,14 @@ sub BuildCodingSeq{
 
 ##########################################################################################################
 #
-# GetCodons - Takes an accession number for a gene and returns a hash of codons with frequency value from the DB
+# GetCodons - Takes an accession number for a gene and returns a hash of codons with frequency value for 
+# each one from the database
 #
 ##########################################################################################################
 sub GetCodons( $ ){
 
 	# Grab the accesion number for the genes codons we want
 	my $accessionNo = $_[0];
-	
-	# Query for codons given the accession number
-	my $sqlQuery = "SELECT codonCount FROM codonBias WHERE accessionNo = '$accessionNo'";
-	
-	# Run the query and save the result in a array
-	my @accessionCodons = DoQuery($sqlQuery);
-	
-	# In the DB condons for all entries are just one long comma separated string so
-	# split out all individual codons in string to unique array entries.
-	my @codonArray = split(/,/, $accessionCodons[0]->[0] );
-	
-	# Search and replace any T's with U's, as the DB has codons stored as using Thymine.
-	foreach my $codonEntry (@codonArray){
-		$codonEntry =~ s/T/U/g;
-	}
 	
 	# Prepare and initialise all hash elements for all 64 possible codons
 	# this will store the values for each codon from codonArray.
@@ -564,6 +554,26 @@ sub GetCodons( $ ){
 	$codonHash{'CAG'} = 0; #64
 	
 	
+	# Query for codons given the accession number
+	my $sqlQuery = "SELECT codonCount FROM codonBias WHERE accessionNo = '$accessionNo'";
+	
+	# Run the query and save the result in a array
+	my @accessionCodons = DoQuery($sqlQuery);
+	
+	unless( @accessionCodons ){
+		# Return hash initialised to zero as caller expects a hash 
+		return %codonHash;
+	}
+	
+	# In the DB condons for all entries are just one long comma separated string so
+	# split out all individual codons in string to unique array entries.
+	my @codonArray = split(/,/, $accessionCodons[0]->[0] );
+	
+	# Search and replace any T's with U's, as the DB has codons stored as using Thymine.
+	foreach my $codonEntry (@codonArray){
+		$codonEntry =~ s/T/U/g;
+	}
+	
 	# Loop through array split out 3 letter codon from number, assign number to codon 
 	# respective hash entry above 
 	foreach my $codon (@codonArray){
@@ -584,7 +594,7 @@ sub GetCodons( $ ){
 
 ##########################################################################################################
 #
-# GetlastErrorMessage - Takes no arguments and retruns the last error set in the global variables
+# GetlastErrorMessage - Takes no arguments and returns the last error set in the global variable
 #
 ##########################################################################################################
 sub GetLastErrorMessage{
@@ -593,7 +603,8 @@ sub GetLastErrorMessage{
 
 ##########################################################################################################
 #
-# SetLastErrorMessage - Takes an error string contining a message and set the global error message variable to this
+# SetLastErrorMessage - Takes an error string contining a message and set the global error message variable 
+# to this
 #
 ##########################################################################################################
 sub SetLastErrorMessage( $ ){
@@ -609,7 +620,7 @@ sub SetLastErrorMessage( $ ){
 
 ###############################################################################################
 #
-# FindRES -  Returns a list RES (names and cut sites) in the DB.  
+# FindRES -  Returns a list RES (names and cut sites) in the database.  
 #
 ###############################################################################################
 sub FindRES{
@@ -705,7 +716,8 @@ sub CalculatePercent($$){
 
 ###########################################################################################################
 #
-# CalculateCodonUsage - Takes an array of codons and returns a hash with the percentage for each amino acid
+# CalculateCodonUsage - Takes an accession number and returns a hash with the ratio's for each amino acid 
+# and the percetange for each codon across the whole chromosome.
 #
 ##########################################################################################################
 sub CalculateCodonUsage( $ ){
@@ -713,11 +725,23 @@ sub CalculateCodonUsage( $ ){
 	# Expects an accession number
 	my $accessionNo = $_[0];
 
+	my %error = ();
+
 	# Retrieve the codons for the given accession number
 	my %codonHash = GetCodons($accessionNo);
+	unless( %codonHash ){
+	
+		# Return empty hash initialised to 0 as caller function expects a hash
+		return %codonHash; 
+	}
 	
 	# Retrieve the codons for the whole chromosome
 	my %chromoCodonHash = GetCodons('Chrom_12');
+	unless( %chromoCodonHash ){
+	
+		# Return empty hash initialised to 0 as caller function expects a hash
+		return %codonHash; 
+	}
 	
 	# Variable to save the total nnumber of codons in the chromosome, this is used for calculating percentages
 	# for codon usages over the whole chromosome.
@@ -727,7 +751,6 @@ sub CalculateCodonUsage( $ ){
 	while( my($key, $value) = each(%chromoCodonHash) ){
 		$chromoCodonTotal += $value;
 	}
-	#print $chromoCodonTotal;
 	
 	# For all codons in codonHash group into amino acids and calculate the ratio
 	# for each codon to represent the codon usage for each amino acid.

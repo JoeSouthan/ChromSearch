@@ -338,10 +338,9 @@ print "************************** TEST : 'CalculateCodonUsage' *****************
 
 # CONDITION: With valid accession number as argument 
 {
-	#my @Codons = GetCodons('AB002805');
 	my %codonData = CalculateCodonUsage('AB002805');
 	ok( %codonData, "with valid accession number");
-	print Dumper(%codonData);
+	#print Dumper(%codonData);
 }
 
 
