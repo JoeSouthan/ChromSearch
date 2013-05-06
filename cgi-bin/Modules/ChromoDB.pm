@@ -107,7 +107,7 @@ sub GetSearchResults( $$$ ){
 				}
 	
 				# Retrieve codon usage data and package in to hash, no need to error set N/A as hash is already initialsed to 0 for each codon
-				$searchResults{$accessionNumber}{'CodonUsage'} = {CalculateCodonUsage($queryResult[$i]->[0])};	
+				$searchResults{$accessionNumber}{'CodonUsage'} = {CalculateCodonUsage($queryResult[$i]->[0])};
 			}
 		}
 
@@ -161,15 +161,15 @@ sub GetRES{
 sub DatabaseConnect{
 	
 	#Defined the connection details to the database
-	my $dbname = 'scouls01'; 
-	my $user = 'scouls01';
-	my $password = 'iwr8sh8vb'; 
-	my $dbserver = 'localhost';
-	
-	#my $dbname = 'biocomp2'; 
-	#my $user = 'c2';
-	#my $password = 'coursework123'; 
+	#my $dbname = 'scouls01'; 
+	#my $user = 'scouls01';
+	#my $password = 'iwr8sh8vb'; 
 	#my $dbserver = 'localhost';
+	
+	my $dbname = 'biocomp2'; 
+	my $user = 'c2';
+	my $password = 'coursework123'; 
+	my $dbserver = 'localhost';
 	
 	# Specify the location and name of the database
 	my $datasource = "dbi:mysql:database=$dbname;host=$dbserver;";
@@ -369,7 +369,7 @@ sub BuildCodingSeq{
 	# Fetch the exon coding sequence information from database, array will progress as 
 	# Type, start, stop then repeat for next item.
 	my @tableRows = DoQuery($sqlQuery);
-	unless( @tableRows ){
+	unless( $tableRows[0]->[0] ){
 		SetLastErrorMessage('ERROR:DB_COLUMN_EMPTY');
 		return undef;
 	}
@@ -380,7 +380,7 @@ sub BuildCodingSeq{
 	
 	# Run the query
 	my @sequenceLength = DoQuery($sqlQuerySeqlength);
-	unless( @sequenceLength ){
+	unless( $sequenceLength[0]->[0] ){
 		SetLastErrorMessage('ERROR:DB_COLUMN_EMPTY');
 		return undef;
 	}
@@ -560,10 +560,12 @@ sub GetCodons( $ ){
 	# Run the query and save the result in a array
 	my @accessionCodons = DoQuery($sqlQuery);
 	
-	unless( @accessionCodons ){
-		# Return hash initialised to zero as caller expects a hash 
-		return %codonHash;
-	}
+	unless( $accessionCodons[0]->[0] ){
+		# Return hash with error key to indicate no codons 
+		my %errorHash;
+		$errorHash{'error'} = '';
+		return %errorHash;
+	}	
 	
 	# In the DB condons for all entries are just one long comma separated string so
 	# split out all individual codons in string to unique array entries.
@@ -655,7 +657,7 @@ sub QuerySequence{
 	# Run query and handle empty data
 	my @seq = DoQuery($sqlQuery);
 	
-	unless( @seq ){
+	unless( $seq[0]->[0] ){
 		return undef;
 	}else{
 		#If the sequence is a compliment then it needs to be converted back to a 5 prime sequence.
@@ -726,21 +728,31 @@ sub CalculateCodonUsage( $ ){
 	my $accessionNo = $_[0];
 
 	my %error = ();
+	
+	# Hash to store all the amino acid residue ratios and percentages in a
+	# two element array, function will return this when finished.
+	my %residueHash = ();
 
 	# Retrieve the codons for the given accession number
-	my %codonHash = GetCodons($accessionNo);
-	unless( %codonHash ){
+	my %codonHash = GetCodons( $accessionNo );
 	
+	# Check to see if an error hash has been returned and pass back 'N/A' indicating no codon data
+	if( exists($codonHash{'error'}) ){
+		$residueHash{'error'}{'error'}[0] = 'N/A';
+		$residueHash{'error'}{'error'}[1] = 'N/A';
 		# Return empty hash initialised to 0 as caller function expects a hash
-		return %codonHash; 
+		return %residueHash; 
 	}
 	
 	# Retrieve the codons for the whole chromosome
-	my %chromoCodonHash = GetCodons('Chrom_12');
-	unless( %chromoCodonHash ){
+	my %chromoCodonHash = GetCodons( 'Chrom_12' );
 	
+	# Check to see if an error hash has been returned and pass back 'N/A' indicating no codon data
+	if( exists($codonHash{'error'}) ){
+		$residueHash{'error'}{'error'}[0] = 'N/A';
+		$residueHash{'error'}{'error'}[1] = 'N/A';
 		# Return empty hash initialised to 0 as caller function expects a hash
-		return %codonHash; 
+		return %residueHash; 
 	}
 	
 	# Variable to save the total nnumber of codons in the chromosome, this is used for calculating percentages
@@ -754,10 +766,6 @@ sub CalculateCodonUsage( $ ){
 	
 	# For all codons in codonHash group into amino acids and calculate the ratio
 	# for each codon to represent the codon usage for each amino acid.
-	
-	# Hash to store all the amino acid residue ratios and percentages in a
-	# two element array, function will return this when finished.
-	my %residueHash = ();
 	
 	# Initialise variable for keeping track of the total numebr of condons per residue
 	# this gets reset each time an amino acid codon usage is calculated.

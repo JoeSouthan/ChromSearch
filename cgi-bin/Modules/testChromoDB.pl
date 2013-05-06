@@ -1,6 +1,6 @@
 #!/usr/bin/perl
 
-use Test::Simple tests => 40;
+use Test::Simple tests => 42;
 use Data::Dumper;
 use strict;
 use warnings;
@@ -76,8 +76,15 @@ print "************************** TEST : 'GetSearchResults' ********************
 }
 
 # CONDITION With return everything mode on i.e. 2.
+#{
+	#my %results = GetSearchResults('AB002805','AccessionNumber',2);
+	#ok( %results, "with return everything mode on");
+	#print Dumper(%results);
+#}
+
+# CONDITION With return everything mode on i.e. 2.
 {
-	my %results = GetSearchResults('AB002805','AccessionNumber',2);
+	my %results = GetSearchResults('AC048352','AccessionNumber',2);
 	ok( %results, "with return everything mode on");
 	#print Dumper(%results);
 }
@@ -185,7 +192,7 @@ print "\n************************** TEST: 'QuerySearch' ************************
 {
 	my @results = QuerySearch('HEX5','proteinName',0);
 	ok( @results, "with valid parameters but not in DB");
-	#print Dumper( @results );
+	print Dumper( @results );
 }
 # CONDITION: Valid arguments but only partial name
 {
@@ -270,10 +277,17 @@ print "\n************************** TEST: 'BuildCodingSeq' *********************
 # TEST 'GetCodons'
 print "************************** TEST : 'GetCodons' **************************\n";
 
-# CONDITION: No aguments, none necessary
+# CONDITION: Valid accession number
 {
 	my %Codons = GetCodons('AB002805');
 	ok( %Codons, "with valid accession number");
+	#print Dumper(@Codons);
+}
+
+# CONDITION: Valid accession number with no codons
+{
+	my %Codons = GetCodons('AC048352');
+	ok( %Codons, "with valid accession number with no codons");
 	#print Dumper(@Codons);
 }
 
@@ -343,5 +357,10 @@ print "************************** TEST : 'CalculateCodonUsage' *****************
 	#print Dumper(%codonData);
 }
 
-
+# CONDITION: With valid accession number as argument but no codons 
+{
+	my %codonData = CalculateCodonUsage('AC048352');
+	ok( %codonData, "with valid accession number but no codons");
+	#print Dumper(%codonData);
+}
 
