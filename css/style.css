@@ -132,10 +132,10 @@ pre a:hover{
 	border-right:3px solid rgba(51, 51, 51, 0.7);
 	border-bottom:3px solid rgba(51, 51, 51, 0.7);
 	border-radius:0 0 10px 10px;
-	overflow:auto;
 	position:relative;
 	top:30px;
 	min-height:310px;
+	overflow: hidden;
 
 }
 .footer {

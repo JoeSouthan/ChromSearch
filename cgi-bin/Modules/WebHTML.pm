@@ -180,6 +180,7 @@ sub EnzCutter_HTML {
 		print "<textarea type=\"text\" name=\"gene\" id=\"EnzCutter_textarea\" autofocus=\"autofocus\" cols=\"40\" rows=\"4\" style=\"width:400px\"></textarea><br />\n";
 	} elsif (1 == $context) {
 		print "<h3>Sequence</h3><p>Using <span class=\"bold\">$gene</span></p>\n";
+		print "<input type=\"hidden\" value=\"$gene\" name=\"gene\" />\n";
 	}
 	#Get the res
 	print "<h3>Avaliable Restriction Enzymes</h3>\n";
