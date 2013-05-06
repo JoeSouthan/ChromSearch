@@ -6,7 +6,7 @@
 #	Email:		joseph@southanuk.co.uk
 #	Usage: 		*See functions*
 #	Requires:	JSON, ChromoDB, EnzCutter
-#	Updated:	3/5/13
+#	Updated:	6/5/13
 #
 package GenJSON;
 use strict;
@@ -21,39 +21,51 @@ our @EXPORT = qw ();
 sub doSearch {
 	my $json = JSON->new;
 	my ($query,$type)= @_;
-	my %result = ChromoDB::GetSearchResults($query,$type,0);
-	return $json->pretty->encode(\%result);
+	unless (defined($query) or defined($type)) {
+		error("Search: Parameters missing");
+	} else {
+		my %result = ChromoDB::GetSearchResults($query,$type,0);
+		return $json->pretty->encode(\%result);
+	}
 
 }
 sub doSingle {
 	my $json = JSON->new;
 	my ($query)= @_;
-	my $type = "AccessionNumber";
-	my %result = ChromoDB::GetSearchResults($query,$type,2);
-	#Format for FASTA
-		my $DNAsequence = $result{$query}{"DNASeq"};
-		my $AAsequence = $result{$query}{"AASeq"};
-		#Break it into 70 character Chunks
-		my @DNAmod = $DNAsequence =~ /(.{1,70})/g;
-		my @AAmod = $AAsequence =~ /(.{1,70})/g;
-		#Send it back
-		my $geneName = $result{$query}{"GeneName"};
-		my $pID = $result{$query}{"ProteinId"};
-		my $name = $result{$query}{"ProteinName"};
-		unshift (@DNAmod, ">gi|$geneName|gb|$pID|$name");
-		unshift (@AAmod, ">gi|$geneName|gb|$pID|$name");
-		$result{$query}{"DNASeqFASTA"} = \@DNAmod;
-		$result{$query}{"AASeqFASTA"} = \@AAmod;
+	unless (defined($query)) {
+		error("Single: Query not defined");
+	} else {
+		my $type = "AccessionNumber";
+		my %result = ChromoDB::GetSearchResults($query,$type,2);
+		#Format for FASTA
+			my $DNAsequence = $result{$query}{"DNASeq"};
+			my $AAsequence = $result{$query}{"AASeq"};
+			#Break it into 70 character Chunks
+			my @DNAmod = $DNAsequence =~ /(.{1,70})/g;
+			my @AAmod = $AAsequence =~ /(.{1,70})/g;
+			#Send it back
+			my $geneName = $result{$query}{"GeneName"};
+			my $pID = $result{$query}{"ProteinId"};
+			my $name = $result{$query}{"ProteinName"};
+			unshift (@DNAmod, ">gi|$geneName|gb|$pID|$name");
+			unshift (@AAmod, ">gi|$geneName|gb|$pID|$name");
+			$result{$query}{"DNASeqFASTA"} = \@DNAmod;
+			$result{$query}{"AASeqFASTA"} = \@AAmod;
 
-	return $json->pretty->encode(\%result);
+		return $json->pretty->encode(\%result);
+	}
 
 }
 sub doBrowse {
 	my $json = JSON->new;
 	my ($query)= @_;
-	my $type = "AccessionNumber";
-	my %result = ChromoDB::GetSearchResults($query,$type,1);
-	return $json->pretty->encode(\%result);
+	unless (defined ($query)) {
+		error("Browse: No query defined");
+	} else {
+		my $type = "AccessionNumber";
+		my %result = ChromoDB::GetSearchResults($query,$type,1);
+		return $json->pretty->encode(\%result);
+	}
 
 }
 #Gets the restriction enzymes and their cut sites
@@ -65,12 +77,16 @@ sub getRes {
 sub CalcRES {
 	my $json = JSON->new;
 	my ($query, $enz) = @_;
-	#Remove %2C's 
-	if ($enz =~s/%2C/\,/g) {
-		#Need logic for duplicates
+	unless (defined($query) or defined($enz)) {
+		error("CalcRES: Not enough queries");
+	} else {
+		#Remove %2C's 
+		if ($enz =~s/%2C/\,/g) {
+			#Need logic for duplicates
+		}
+		my %result = EnzCutter::doCut($query,$enz);	
+		return $json->pretty->encode(\%result);
 	}
-	my %result = EnzCutter::doCut($query,$enz);	
-	return $json->pretty->encode(\%result);
 
 }
 sub help {
