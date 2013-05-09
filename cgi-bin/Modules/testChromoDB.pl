@@ -1,5 +1,12 @@
 #!/usr/bin/perl
 
+###########################################################################################################
+#
+#	testChromoDB.pl - Functional tests for all functions contained in ChromoDB.pm
+#	Author: Sam Coulson
+#
+###########################################################################################################
+
 use Test::Simple tests => 42;
 use Data::Dumper;
 use strict;

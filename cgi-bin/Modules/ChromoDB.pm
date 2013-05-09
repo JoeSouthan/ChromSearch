@@ -1,3 +1,9 @@
+###########################################################################################################
+#
+#	ChromoDB.pm - All functions contained within this file comprise the complete middle-layer
+#	Author: Sam Coulson
+#
+###########################################################################################################
 package ChromoDB;
 
 use strict;
