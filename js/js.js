@@ -421,7 +421,7 @@ $(document).ready(function() {
                             <h3>Sequence Features</h3> \
                             <div class="seq-feats" id="seq-feats-span"> \
                             </div> \
-                            <div class="seq-feats-show" id="seq-feats-show">Click to show sequence features.</div> \
+                            <div class="seq-feats-show underline pointer" id="seq-feats-show">Click to show sequence features.</div> \
                             <h3>Codon Usage</h3> \
                             <div id="codon_img" class="center"> \
                                 <a href="cgi-bin/codon_img.pl?download=true&gene='+i+'" alt="Codon Usage"><img src="cgi-bin/codon_img.pl?show=true&gene='+i+'" alt="Codon Usage" width="500" height="324" /></a> \
@@ -764,6 +764,7 @@ $(document).ready(function() {
         //Open EnzCutter
         $("#EnzCutter_open , #EnzCutter_frontbox").live("click", function(event){
             event.preventDefault(); 
+            $("html, body").animate({ scrollTop: 0 }, "fast");
             $("#EnzCutter").slideToggle("fast");
         });
         //Contact
@@ -803,7 +804,7 @@ $(document).ready(function() {
                     EnzCutter(["CalcRES", enzymes, sequence]);
                     $("#help_open").attr("href", "help/#help_enzcutter");
                     $('#help_open').parent('div').animate({opacity: 1}, 500).delay(1000).animate({opacity:0.4},2000);
-
+                    $("html, body").animate({ scrollTop: 0 }, "fast");
                 }
             } else { 
                 $("#EnzCutter_number").html('<span class="red">Please choose an enzyme or enter your own: A|TTTT (5\').</span>');
