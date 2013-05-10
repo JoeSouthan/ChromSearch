@@ -370,7 +370,7 @@ sub BuildCodingSeq{
 	
 	# Specify query includes start position and end position of exons from give accessionNo.
 	my $sqlQuery = "SELECT featStart, featEnd FROM seqFeat WHERE accessionNo='$accessionNo'
-	ORDER BY LENGTH(featStart)";
+	ORDER BY CAST(featStart AS SIGNED INTEGER) ASC";
 	
 	# Fetch the exon coding sequence information from database, array will progress as 
 	# Type, start, stop then repeat for next item.

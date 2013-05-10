@@ -7,7 +7,7 @@
 #
 ###########################################################################################################
 
-use Test::Simple tests => 42;
+use Test::Simple tests => 43;
 use Data::Dumper;
 use strict;
 use warnings;
@@ -265,7 +265,7 @@ print "\n************************** TEST: 'BuildCodingSeq' *********************
 	#print Dumper(@seq);
 }
 
-# CONDITION: with valid accession number that has more than one exon
+# CONDITION: With valid accession number that has more than one exon
 {
 	my @seq = BuildCodingSeq('AB005990');
 	ok( @seq, "with valid argument accession number 'AB005990' with more than one exon");
@@ -276,6 +276,13 @@ print "\n************************** TEST: 'BuildCodingSeq' *********************
 {
 	my @seq = BuildCodingSeq('GU994024');
 	ok( @seq, "with valid argument accession number 'GU994024' with more than one exon");
+	#print Dumper(@seq);
+}
+
+# CONDITION: Has many exons, chekcing for consistency in output
+{
+	my @seq = BuildCodingSeq('U29700');
+	ok( @seq, "With 'U29700' as accession, has many exons, chekcing for consistency in output  ");
 	#print Dumper(@seq);
 }
 
