@@ -6,7 +6,7 @@
 #   Email:      joseph@southanuk.co.uk
 #   Usage:      *See Functions*
 #   Requires:   Image::Magick, CGI, CGI::Carp, ChromoDB
-#   Updated:    3/5/13
+#   Updated:    10/5/13
 #
 package CodonImager;
 use strict;
