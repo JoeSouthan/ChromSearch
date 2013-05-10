@@ -22,7 +22,6 @@ use Test::Simple tests => 20;
 #GenJSON tests
 
 my $enzymes = "EcoRI,BamHI,BsuMI";
-#doSearch doSingle doBrowse getRES CalcRES error
 print "\nGenJSON Tests \n";
 GenJSON_t_doSearch();
 GenJSON_t_doSingle();
@@ -77,13 +76,13 @@ sub GenJSON_t_doSingle {
 sub EnzCutter_t_doCut {
     print "\n\nEnzCutter - doCut\n";
     my %t1 = EnzCutter::doCut("ATTTT", "AA|AA");
-    ok ($t1{"result"}{"AA|AA"}{"error"} eq  "No Cuts", "Correct Cut");
+    ok ($t1{"result"}{"AA|AA"}{"result"} eq  "No cuts", "Correct Cut");
 
     my %t2 = EnzCutter::doCut("ATTTT", "|AAAA");
     ok ($t2{"result"}{"|AAAA"}{"error"} eq "EnzCutter: Incorrect Cut format", "Bad cut detected");
     
     my %t3 = EnzCutter::doCut("ATTTT", "at|Ta");
-    ok ($t3{"result"}{"AT|TA"}{"error"} eq "No Cuts", "Mixed caps corrected");
+    ok ($t3{"result"}{"AT|TA"}{"result"} eq "No cuts", "Mixed caps corrected");
 
     my %t4 = EnzCutter::doCut("ATTTT", "A|TT");
     ok ($t4{"result"}{"A|TT"}{"cut1"}{"location"} eq "1,4", "Correct Cut, good results");
