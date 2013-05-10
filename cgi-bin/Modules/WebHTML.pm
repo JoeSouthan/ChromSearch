@@ -117,7 +117,7 @@ sub outputSingleHTML {
                             <h3>Sequence Features</h3> 
                             <div class="seq-feats" id="seq-feats-span" style="overflow:auto; height:auto;">
 __HTML
-                            if (@featsWithSeqs > 1) {
+                            if (@featsWithSeqs >= 1) {
                                 foreach my $seqs_f (@featsWithSeqs) {
                                     if ($seqs_f =~ /(.*)\|(.*)/){
                                         print "<span class=\"seq-".$1."\">$2</span>";
