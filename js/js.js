@@ -24,7 +24,6 @@ $(document).ready(function() {
 			main		 = $("#main"),
 			mainWrapper	 = $("#main_wrapper"),
 			content		 = $("#content"),
-			help		 = $("#help"),
 			overlay		 = $("#overlay"),
 			loader		 = $("#loader"),
 			radioName	 = $("input[name=searchType]:radio"),
@@ -60,9 +59,6 @@ $(document).ready(function() {
 	$.History.bind(function(state) {
 		urlState = state.split(/\//g);
 		switch (true) {
-				case(urlState[1] == "help"):
-					//Need to work something out for this
-					break;
 				case(urlState[1] == "search"):
 					if (urlState[2].length > 1){
 						searchHandler(urlState);
@@ -117,6 +113,8 @@ $(document).ready(function() {
 			error: function(jqXHR, exception, m) {	
 				if (exception === "timeout") {
 					$("#timeout").slideDown("fast");
+					$("html, body").animate({ scrollTop: 0 }, "fast");
+					overlay.fadeIn("slow");
 				} else {
 					loader.fadeOut("fast");
 					errorOut(jqXHR, "ajax", this.url,m);
@@ -208,25 +206,6 @@ $(document).ready(function() {
 					} else if (submit[0] == "CalcRES") {
 						outputEnzCutter(data,context);
 					}
-					loader.fadeOut("fast");
-					overlay.fadeOut("fast");
-				}
-			});
-		}
-		//Load help
-		function doHelp (page) {
-			var result = $.ajax ({
-				url:"cgi-bin/json.pl?selector=help",
-				//url:"help.json",
-				type:"GET",
-				data: page[0],
-				dataType:"json",
-				beforeSend: function() {
-					loader.fadeIn("fast");
-				},
-				success: function (data) {
-					outputHelp(data);
-					help.slideDown("fast");
 					loader.fadeOut("fast");
 					overlay.fadeOut("fast");
 				}
@@ -394,6 +373,8 @@ $(document).ready(function() {
 			});
 			content.prepend('<div class="center result-spacer"><h2>'+counter+' Results</h2></div>');
 			$(".result").wrapAll('<div id="result-wrapper"/>');
+			$("#help_open").attr("href", "help/#help_search");
+			$('#help_open').parent('div').animate({opacity: 1}, 500).delay(1000).animate({opacity:0.4},2000);
 		}
 		//Function: outputSingleHTML
 			//Takes data from doSearch
@@ -415,9 +396,19 @@ $(document).ready(function() {
 			    <div class="searchform"> \
 			    	<h2 class="center">Single result for: '+i+'.</h2> \
 			        <div class="singleresult"> \
-			        	<div class="info"> \
-			            	<span>Length: </span><span class="bold">'+val["GeneLength"]+'</span><span> | Gene ID: </span><span class="bold">'+val["GeneName"]+'</span><span> <br />Genbank Accession: </span><span class="bold">'+i+'</span><span> | Protein ID: </span><span class="bold">'+val["ProteinId"]+'</span><span> | Chromosomal Location: </span><span class="bold">'+val["ChromosomeLocation"]+'</span> \
-			            </div> \
+			        	<div class="single-left"> \
+			        		<ul> \
+			        			<li>Length: <span class="bold">'+val["GeneLength"]+'</span></li> \
+			        			<li>Gene ID: <span class="bold">'+val["GeneName"]+'</span></li> \
+			        			<li>Genbank Accession: <span class="bold">'+i+'</span></li> \
+			        		</ul> \
+			        		</div> \
+			        		<div class="single-left"> \
+			        		<ul> \
+			        			<li>Protein ID: <span class="bold">'+val["ProteinId"]+'</span></li> \
+			        			<li>Chromosomal Location: <span class="bold">'+val["ChromosomeLocation"]+'</span></li> \
+			        		</ul> \
+			        		</div> \
 			            <div class="single-wide"> \
 			            	<h2>Protein Product</h2>\
 			            	<p>'+pname+'</p>\
@@ -479,17 +470,11 @@ $(document).ready(function() {
 			$("#EnzCutter_welcome").html("<p>Please choose enzymes to cleave with.</p>");
 			$("textarea#EnzCutter_textarea").remove();
 			EnzCutter(["CalcRES", "", i],"single");
+			$("#help_open").attr("href", "help/#help_single");
+			$('#help_open').parent('div').animate({opacity: 1}, 500).delay(1000).animate({opacity:0.4},2000);
 			//Draw charts
 			google.setOnLoadCallback(drawChart(features,counter, name, "single"));
 			google.setOnLoadCallback(drawPieChart(pie_data));
-			});
-		}
-		//Function: outputHelp
-			//Takes data from doHelp
-			//Output help
-		function outputHelp (data) {
-			$.each(data, function (i,val) {
-				return true;
 			});
 		}
 		//Function: outputEnzCutter
@@ -565,7 +550,8 @@ $(document).ready(function() {
 			$("#EnzCutter_number").html("<span>"+counter+" Enzymes avaliable</span>");
 			//This section is mostly based off example code from the plugin
 			$('#EnzCutter_autocomplete').textext({
-	            plugins : 'autocomplete tags filter arrow'
+	            plugins : 'tags prompt focus autocomplete arrow',
+	            prompt: "Type a letter..."
 	        })
 	        .bind('getSuggestions', function(e, data){
 	            var list = dataArray,
@@ -606,35 +592,39 @@ $(document).ready(function() {
 			//context = Where the chart appears, affects the size and positioning
 		function drawChart (features, counter, name, context) {
 			//Split up features array strings into separate arrays
-			var feats = [name];
-			var numbers = [name];
-			$.each(features,function() {
-				var f1 = this.split(";");
-				feats.push(f1[0]);
-				var difference = f1[1].split(":");
-				var glength = Math.abs(parseInt(difference[0])-parseInt(difference[1]));
-				numbers.push(glength);
-			});
-			//Set the colours based on the sequence feature
-			var colours = [];
-			$.each(feats, function () {
-				if (this == "NCS"){
-					colours.push(ColNCS);
-				} else if (this == "EXON") {
-					colours.push(ColEXON);
-				} else if (this == "INTRON") {
-					colours.push(ColINTRON);
-				} 
-			});
-			var options;
-			if (context == "single") {
-				options = { isStacked: true, hAxis : {}, legend: {}, chartArea : {left:5, top: 5 ,'width':'80%', 'height':'80%'}, width: 850, height: 100, colors: colours};
+			if (features[0] === null){ 
+				return;
 			} else {
-				options = { isStacked: true, hAxis : {}, legend: { position: 'none'}, chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'}, width: 420, height: 50, colors: colours};
-			}
-			var data1 = google.visualization.arrayToDataTable([feats,numbers]);
-			var chart = new google.visualization.BarChart(document.getElementById('chart_div'+counter));
-			chart.draw(data1, options );	
+				var feats = [name];
+				var numbers = [name];
+				$.each(features,function() {
+					var f1 = this.split(";");
+					feats.push(f1[0]);
+					var difference = f1[1].split(":");
+					var glength = Math.abs(parseInt(difference[0])-parseInt(difference[1]));
+					numbers.push(glength);
+				});
+				//Set the colours based on the sequence feature
+				var colours = [];
+				$.each(feats, function () {
+					if (this == "NCS"){
+						colours.push(ColNCS);
+					} else if (this == "EXON") {
+						colours.push(ColEXON);
+					} else if (this == "INTRON") {
+						colours.push(ColINTRON);
+					} 
+				});
+				var options;
+				if (context == "single") {
+					options = { isStacked: true, hAxis : {}, legend: {}, chartArea : {left:5, top: 5 ,'width':'80%', 'height':'80%'}, width: 850, height: 100, colors: colours};
+				} else {
+					options = { isStacked: true, hAxis : {}, legend: { position: 'none'}, chartArea : {left:5, top: 5 ,'width':'80%', 'height':'90%'}, width: 420, height: 50, colors: colours};
+				}
+				var data1 = google.visualization.arrayToDataTable([feats,numbers]);
+				var chart = new google.visualization.BarChart(document.getElementById('chart_div'+counter));
+				chart.draw(data1, options );
+			}	
 		}
 		//Function: drawPieChart
 			//Takes data from outputSingleHTML
@@ -672,6 +662,8 @@ $(document).ready(function() {
 			//Blank out the Content ID and replace the textbox in EnzCutter
 			content.html("");
 			replaceTextbox();
+			//Change the help link
+			$("#help_open").attr("href", "help/#help_main");
 			//Functions
 			setBreadcrumbs(urlState);
 			titleHandler(urlState);
@@ -757,11 +749,6 @@ $(document).ready(function() {
 			event.preventDefault();	
 			$("#EnzCutter").slideToggle("fast");
 		});
-		//Help
-		$("#help_open, #helpbox").live("click", function(event){
-			event.preventDefault();
-			doHelp("test");
-		});
 		//Contact
 		$("#contact_open").live("click", function(event) {
 			event.preventDefault();
@@ -784,9 +771,10 @@ $(document).ready(function() {
 			event.preventDefault();
 			var sequence = $("textarea#EnzCutter_textarea").val();
 			var enzymes = $("input[name=autocomplete]").val();
-			var regex = /\w+/g;
+			var regex = /"(.+)"/g;
 			enzymes = enzymes.match(regex);
 			enzymes = enzymes.join(',');
+			enzymes = enzymes.replace(/"/g, '');
 			if (sequence === undefined) {
 				sequence = $("#EnzCutter_currentGene").text();
 			}
@@ -796,9 +784,12 @@ $(document).ready(function() {
 				} else {
 					$("#EnzCutter_Results").html('');
 					EnzCutter(["CalcRES", enzymes, sequence]);
+					$("#help_open").attr("href", "help/#help_enzcutter");
+					$('#help_open').parent('div').animate({opacity: 1}, 500).delay(1000).animate({opacity:0.4},2000);
+
 				}
 			} else { 
-				$("#EnzCutter_number").html('<span class="red">Please choose an enzyme.</span>');
+				$("#EnzCutter_number").html('<span class="red">Please choose an enzyme or enter your own: A|TTTT (5\').</span>');
 			}
 		});
 
@@ -809,6 +800,7 @@ $(document).ready(function() {
 		$(window).resize(function() {  
 			centerPopup();  
 		}); 
+		centerPopup();
 		//Function: moveTitle
 			//Moves the headers for the search results down with the page
 		function moveTitle () {

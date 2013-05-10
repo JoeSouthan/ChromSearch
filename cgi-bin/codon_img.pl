@@ -1,12 +1,12 @@
 #! /usr/bin/perl -w
 #
-#	codon_img.pl - Serves an image of codon usage
-#	Written by: Joseph Southan
-#	Date: 		5/2/13
-#	Email:		joseph@southanuk.co.uk
-#	Usage: 		codon_img.pl?&gene=[Accession]&(download/show=true)
-#	Requires:	CodonImager, CGI, CGI::Carp
-#	Updated:	2/5/13
+#   codon_img.pl - Serves an image of codon usage
+#   Written by: Joseph Southan
+#   Date:       5/2/13
+#   Email:      joseph@southanuk.co.uk
+#   Usage:      codon_img.pl?&gene=[Accession]&(download/show=true)
+#   Requires:   CodonImager, CGI, CGI::Carp
+#   Updated:    10/5/13
 #
 use strict;
 use lib 'Modules';
@@ -22,22 +22,22 @@ my @params= $cgi->param();
 
 my ($download, $show, $gene) = (0, 0, "");
 unless (@params){ 
-	CodonImager::error();
+    #Throw an error
+    CodonImager::error();
 } else {
-	foreach my $params (@params) {
-		if ($params eq "show" and $params eq "download") {
-			CodonImager::error();
-		} elsif ($params eq "download") {
-			$download = 1;
-		} elsif ($params eq "show") {
-			$show = 1;
-			#$type = $cgi->param($params);
-		} elsif ($params eq "gene") {
-			$gene = $cgi->param($params);
-		} else {
-			CodonImager::error();
-		}
-	}
+    foreach my $params (@params) {
+        if ($params eq "show" and $params eq "download") {
+            CodonImager::error();
+        } elsif ($params eq "download") {
+            $download = 1;
+        } elsif ($params eq "show") {
+            $show = 1;
+        } elsif ($params eq "gene") {
+            $gene = $cgi->param($params);
+        } else {
+            CodonImager::error();
+        }
+    }
 }
 
 #Debug
@@ -45,16 +45,17 @@ unless (@params){
 #$gene = "AB002805";
 # $show = 1;
 
+#Output the Image
 if (defined($download) and $download == 1){
-	if (length($gene) > 1){
-		CodonImager::downloadImg($gene);
-	} else {
-		CodonImager::error();
-	}
+    if (length($gene) > 1){
+        CodonImager::downloadImg($gene);
+    } else {
+        CodonImager::error();
+    }
 } elsif (defined($show) and $show == 1) {
-	if (length($gene) > 1){
-		CodonImager::displayImg($gene);
-	} else {
-		CodonImager::error();
-	}
+    if (length($gene) > 1){
+        CodonImager::displayImg($gene);
+    } else {
+        CodonImager::error();
+    }
 }

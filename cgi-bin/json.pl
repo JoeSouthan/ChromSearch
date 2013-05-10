@@ -12,12 +12,11 @@
 #						"browse" 	&query=[A-Z]
 #						"res" 		-
 #							"GetRES"; 	&mode=GetRES
-#						"help"		?
 #					POST:
 #						"res" 
 #							"CalcRES";	&query=[sequence/Accession]
 #	Requires:	CGI, CGI::Carp, GenJSON
-#	Updated:	3/5/13
+#	Updated:	10/5/13
 #
 use strict;
 use CGI;
@@ -104,12 +103,6 @@ unless (defined ($selector)) {
 			} else {
 				print GenJSON::error("Search: Invalid selector");
 			}
-		}
-	} elsif	($selector eq "help"){
-		unless (defined($page)){
-			print GenJSON::error("Help: No page") ;
-		} else {
-			print GenJSON::help($page);
 		}
 	} else {
 		print GenJSON::error("General: Invalid selector");

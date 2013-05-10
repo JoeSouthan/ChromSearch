@@ -5,8 +5,8 @@
 #   Date:       24/1/13
 #   Email:      joseph@southanuk.co.uk
 #   Usage:      return_single?gene=[accession]
-#	Requires:	CGI, CGI::Carp, ChromoDB, WebHTML
-#   Updated:    2/5/13
+#   Requires:   CGI, CGI::Carp, ChromoDB, WebHTML
+#   Updated:    10/5/13
 #
 use strict;
 use CGI;
@@ -20,7 +20,6 @@ my @params= $cgi->param();
 #Do search, Take post
 #Declaring variables for search
 my ($gene, %results);
-
 
 #Take the Params from the GET
 foreach my $params (@params) {

@@ -28,7 +28,7 @@ print "GenJSON Tests \n";
 GenJSON_t_doSearch();
 GenJSON_t_doSingle();
 GenJSON_t_doBrowse();
-
+GenJSON_t_EnzCutter();
 sub GenJSON_t_doSearch {
 	my $json = new JSON;
 	my $result = GenJSON::doSearch("AF164120","AccessionNumber");
@@ -72,3 +72,10 @@ sub GenJSON_t_doBrowse {
 #	my $json_decode = $json->decode($result);
 	print $number_results;
 }
+sub GenJSON_t_EnzCutter {
+	print Dumper EnzCutter::doCut("ATTTT", "AA|AA");
+	print Dumper EnzCutter::doCut("ATTTT", "|AAAA");
+	print Dumper EnzCutter::doCut("ATTTT", "at|Ta");
+	print Dumper EnzCutter::doCut("ATTTT", "A|TT");
+}
+	print Dumper GenJSON::Sanitise("Te\$\$st\|\"\'\.\,\$\£");

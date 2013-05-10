@@ -6,7 +6,7 @@
 #   Email:      joseph@southanuk.co.uk
 #   Usage:      *See Functions*
 #   Requires:   ChromoDB
-#   Updated:    6/5/13
+#   Updated:    10/5/13
 #
 package EnzCutter;
 use strict;
@@ -61,7 +61,16 @@ sub doCut {
         my ($cutsite,%cutresult,$cutindex);
         if ($enzymes=~/[|]/) {
             #For custom cut sites
-            $cutsite = $enzymes;
+            #Make sure it's correct
+            if ($enzymes =~ /^\|/){ 
+                my %error = ("error" => "EnzCutter: Incorrect Cut format");
+                $result{"result"}{$enzymes} = \%error;
+                return %result;
+            } else {
+                #Make it upper case
+                $enzymes =~ s/(.*)/uc($1)/eg;
+                $cutsite = $enzymes;
+            }
         } else {
             $cutsite = $currentRES{$enzymes};
         }

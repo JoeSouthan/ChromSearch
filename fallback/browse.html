@@ -1,99 +1,99 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-	<!-- 
-	browse.html
-	Written by: Joseph Southan
-	Date: 		2/5/13
-	Email:		joseph@southanuk.co.uk
-	Updated:	2/5/13
-	-->
-	<meta charset="utf-8">
-	<title>12Chrom - Browse</title>
-	<link href="../css/style.css" rel="stylesheet" type="text/css">
+    <!-- 
+    browse.html
+    Written by: Joseph Southan
+    Date:       2/5/13
+    Email:      joseph@southanuk.co.uk
+    Updated:    10/5/13
+    -->
+    <meta charset="utf-8">
+    <title>12Chrom - Browse</title>
+    <link href="../css/style.css" rel="stylesheet" type="text/css">
     <link rel="stylesheet" type="text/css" href="http://ajax.googleapis.com/ajax/libs/jqueryui/1/themes/smoothness/jquery-ui.css">
-	<link rel="icon" type="image/png" href="../img/favicon.png" />
+    <link rel="icon" type="image/png" href="../img/favicon.png" />
 </head>
 
 <body>
 <div class="navbar-wrapper">
-	<div class="navbar-inner-wrapper">
-		<div id="home" class="header pointer">
-			<h1>12Chrom</h1>
-		</div>
-		<span class="subheader">Chromosome 12 Analysis Tool</span>
-		<div class="navbar">
-					<div class="item" id="home">
-						<a href="">Home</a>
-					</div>
-					<div class="item">
-						<a href="cgi-bin/enz_cutter.pl" id="EnzCutter_open">EnzCutter</a>
-					</div>
-					<div class="item">
-						<a href="help" id="help_open">Help</a>
-					</div>
-					<div class="item">
-						<a href="contact" id="contact_open">Contact </a>
-					</div>
-					
-		</div>
-	</div>
+    <div class="navbar-inner-wrapper">
+        <div id="home" class="header pointer">
+            <h1>12Chrom</h1>
+        </div>
+        <span class="subheader">Chromosome 12 Analysis Tool</span>
+        <div class="navbar">
+                    <div class="item" id="home">
+                        <a href="">Home</a>
+                    </div>
+                    <div class="item">
+                        <a href="cgi-bin/enz_cutter.pl" id="EnzCutter_open">EnzCutter</a>
+                    </div>
+                    <div class="item">
+                        <a href="../help/#help_main" id="help_open" target="_blank">Help</a>
+                    </div>
+                    <div class="item">
+                        <a href="contact.html" id="contact_open">Contact </a>
+                    </div>
+                    
+        </div>
+    </div>
 </div>
 <div class="wrapper">
-	<div id="main">
-		<div class="welcome_wrapper" id="browse" style="display:block;"> 
-			<div class="browse">
-				<h2>Browse</h2>
-				<div>
-					<h3>Browse by Gene Name</h3>
-						<div>
-							<p>Please select a letter</p>
-							<form method="get" action="../cgi-bin/search_results.pl" id ="browseGene">
-								<select name="selection">
-									<option value="a">A</option>
-									<option value="b">B</option>
-									<option value="c">C</option>
-									<option value="d">D</option>
-									<option value="e">E</option>
-									<option value="f">F</option>
-									<option value="g">G</option>
-									<option value="h">H</option>
-									<option value="i">I</option>
-									<option value="j">J</option>
-									<option value="k">K</option>
-									<option value="l">L</option>
-									<option value="m">M</option>
-									<option value="n">N</option>
-									<option value="o">O</option>
-									<option value="p">P</option>
-									<option value="q">Q</option>
-									<option value="r">R</option>
-									<option value="s">S</option>
-									<option value="t">T</option>
-									<option value="u">U</option>
-									<option value="v">V</option>
-									<option value="w">W</option>
-									<option value="x">X</option>
-									<option value="y">Y</option>
-									<option value="z">Z</option>
+    <div id="main">
+        <div class="welcome_wrapper" id="browse" style="display:block;"> 
+            <div class="browse">
+                <h2>Browse</h2>
+                <div>
+                    <h3>Browse by Gene Name</h3>
+                        <div>
+                            <p>Please select a letter</p>
+                            <form method="get" action="../cgi-bin/search_results.pl" id ="browseGene">
+                                <select name="selection">
+                                    <option value="a">A</option>
+                                    <option value="b">B</option>
+                                    <option value="c">C</option>
+                                    <option value="d">D</option>
+                                    <option value="e">E</option>
+                                    <option value="f">F</option>
+                                    <option value="g">G</option>
+                                    <option value="h">H</option>
+                                    <option value="i">I</option>
+                                    <option value="j">J</option>
+                                    <option value="k">K</option>
+                                    <option value="l">L</option>
+                                    <option value="m">M</option>
+                                    <option value="n">N</option>
+                                    <option value="o">O</option>
+                                    <option value="p">P</option>
+                                    <option value="q">Q</option>
+                                    <option value="r">R</option>
+                                    <option value="s">S</option>
+                                    <option value="t">T</option>
+                                    <option value="u">U</option>
+                                    <option value="v">V</option>
+                                    <option value="w">W</option>
+                                    <option value="x">X</option>
+                                    <option value="y">Y</option>
+                                    <option value="z">Z</option>
 
-								</select>
-								<br />
-								<br />	
-									<input type="hidden" value="browse" name="search" />
-									<input type="submit" value="Submit" id="browsesubmit" />
-									<input type="reset" value="Reset" />
-							</form>
-						</div>
-				</div>
-			</div>
-		</div>
+                                </select>
+                                <br />
+                                <br />  
+                                    <input type="hidden" value="browse" name="search" />
+                                    <input type="submit" value="Submit" id="browsesubmit" />
+                                    <input type="reset" value="Reset" />
+                            </form>
+                        </div>
+                </div>
+            </div>
+        </div>
 
-		<div class="footer">Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
+        <div class="footer">Created by Matthew Clarke, Sam Coulson and Joseph Southan - 2013<br />This site requires Javascript and CSS.</div>
 
-	</div>
-	<div id="content">
-	</div>
+    </div>
+    <div id="content">
+    </div>
 </div>
 </body>
 </html>
