@@ -38,23 +38,35 @@ sub doCut {
         #Get it's sequence
         my %search = ChromoDB::GetSearchResults($query,"AccessionNumber", 2);
         $sequence = $search{$query}{"DNASeq"};
-    } elsif ($query =~/^>/) {
+    } elsif ($query =~/(>.*)/g) {
         #It's a FASTA sequence
         #Get rid of the FASTA line and compress
-        my @temp_array = split("\n", $query);
-        shift (@temp_array);
+        my @temp_array = split("\r\n", $query);
+        for (my $i = 0; $i < @temp_array; $i++) {
+            if (length($temp_array[$i]) < 1) {
+                delete $temp_array[$i];
+            } elsif ($temp_array[$i] =~ /^>/) {
+                delete $temp_array[$i];
+            }
+        }
         $sequence = join("", @temp_array);
+        $sequence = Sanitise($sequence);
     } elsif ($query =~/\d+?/g) {
         #The user has entered numbers
-        $result{"result"} = {"error" => "Numbers detected"};
+        $result{"result"}{"error"} = {"error" => "Numbers detected"};
         return %result;
     } else {
         #Its a pasted sequence
         #Flattening the sequence just in case
-        my @temp_array = split("\n", $query);
+        my @temp_array = split("\r\n", $query);
+        for (my $i = 0; $i < @temp_array; $i++) {
+            if (length($temp_array[$i]) < 1) {
+                delete $temp_array[$i];
+            } 
+        }
         $sequence = join("",@temp_array);
+        $sequence = Sanitise($sequence);
     }
-
     #Process the sequence
     foreach my $enzymes (@enz) {
         #Get the cutsite
@@ -118,8 +130,7 @@ sub doCut {
         }
         #Error Handling
         unless (%cutresult) {
-            my %error = ("error" => "No Cuts");
-            $result{"result"}{$enzymes} = \%error;
+            $result{"result"}{$enzymes}{"result"} = "No cuts";
         } else {
             $result{"result"}{$enzymes} = \%cutresult;
         }
@@ -150,5 +161,16 @@ sub reverseSeq {
     #$seq = reverse($seq);
     
     return $seq;
+}
+###############################################################################################################################
+#   Function:       Sanitise                                                                                                  #
+#   Description:    Removes unwanted characters                                                                               #
+#   Usage:          Sanitise([String])                                                                                        #
+#   Returns:        String                                                                                                    #
+########################################################################################################################################################
+sub Sanitise {
+    my $input = $_[0];
+    $input =~ s/[^a-zA-Z0-9\|\.\"\,\']//g;
+    return $input;
 }
 1;

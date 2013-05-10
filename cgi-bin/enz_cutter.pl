@@ -25,11 +25,16 @@ my @params= $cgi->param();
 #Sort the POST
 foreach my $params (@params) {
     if ($params eq "gene") {
-        $gene = Sanitise($cgi->param($params)_;
+        $gene = $cgi->param($params);
     } elsif ($params eq "enzymes") {
-        @enzymes = Sanitise($cgi->param('enzymes'));
+        @enzymes = $cgi->param('enzymes');
     }       
 }
+#Sanitise input
+for (my $i = 0; $i < @enzymes; $i++) {
+    $enzymes[$i] = Sanitise($enzymes[$i]);
+}
+
 #Join up the enzymes
 my $enzymes_joined = join(",", @enzymes);
 

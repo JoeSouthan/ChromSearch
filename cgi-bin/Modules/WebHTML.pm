@@ -279,7 +279,9 @@ sub EnzCutter_Output{
         foreach my $enzymes (keys ($EnzCutter_Result{"result"}{$enz_results})){
             my $count = 1;
             if ($enzymes eq "error"){
-                print "<div id=\"EnzCutter_results_div\"><h4>No Cuts</h4></div>\n";
+                print "<div id=\"EnzCutter_results_div\"><h4>".$EnzCutter_Result{"result"}{"error"}{"error"}."</h4></div>\n";
+            } elsif ($enzymes eq "result") {
+                print "<div id=\"EnzCutter_results_div\"><h4>".$EnzCutter_Result{"result"}{$enz_results}{"result"}."</h4></div>\n";
             } else {
                     my @cut_forw = split (/[,\||]/ , $EnzCutter_Result{"result"}{$enz_results}{$enzymes}{"sequence-forward"});
                     my @cut_rev  = split (/[,\||]/ , $EnzCutter_Result{"result"}{$enz_results}{$enzymes}{"sequence-reverse"});

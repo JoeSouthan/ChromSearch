@@ -516,6 +516,9 @@ $(document).ready(function() {
                                 $.each(value, function (cut, details){
                                     if (cut == "error") {
                                         outputDiv.append('<div id="EnzCutter_results_div"><h4>No Cuts</h4></div>');
+                                    } else if (cut == "result") {
+                                        outputDiv.append('<h3 id="EnzCutter_results_h3>Error</h3><p>'+details+'</p>');
+                                        outputDiv.append('<div id="EnzCutter_results_div"><h4>No Cuts</h4></div>');
                                     } else {
                                         //Cut the results so spans can be applied
                                         var regex_enzcutter = /[\||,]/g;
