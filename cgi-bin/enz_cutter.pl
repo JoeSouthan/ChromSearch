@@ -25,9 +25,9 @@ my @params= $cgi->param();
 #Sort the POST
 foreach my $params (@params) {
     if ($params eq "gene") {
-        $gene = $cgi->param($params);
+        $gene = Sanitise($cgi->param($params)_;
     } elsif ($params eq "enzymes") {
-        @enzymes = $cgi->param('enzymes');
+        @enzymes = Sanitise($cgi->param('enzymes'));
     }       
 }
 #Join up the enzymes
@@ -48,3 +48,14 @@ unless (defined ($gene)) {
 }
 #Output the HTML
 outputEnzCutter($gene, $enzymes_joined, $mode, $cgi);
+###############################################################################################################################
+#   Function:       Sanitise                                                                                                  #
+#   Description:    Removes unwanted characters                                                                               #
+#   Usage:          Sanitise([String])                                                                                        #
+#   Returns:        String                                                                                                    #
+########################################################################################################################################################
+sub Sanitise {
+    my $input = $_[0];
+    $input =~ s/[^a-zA-Z0-9\|\.\"\,\']//g;
+    return $input;
+}

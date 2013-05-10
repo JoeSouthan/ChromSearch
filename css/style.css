@@ -149,7 +149,7 @@ pre a:hover{
 }
 #result-wrapper, #titles {
 	float:left;
-	width:100%;
+	width:900px;
 	background-color:#779399;
 	padding: 0 0 5px;
 }
@@ -210,25 +210,26 @@ pre a:hover{
 .title {
 	float: left;
 	text-align: center;
-	padding: 0 10px;
+	padding: 0 6px;
 	text-decoration: underline;
 	cursor: pointer;
 }
 .title-acc {
-
 	width: 100px;
 }
 .title-product{
 	width: 302px;
 }
 .title-diagram{
-	width: 310px;
+	width: 312px;
+	padding: 0 7px;
 }
 .title-loc{ 
-	width: 10px;
+	width: 51px;
 }
 .title-len{ 
-	width: 34px;
+	width: 71px;
+	padding: 0 0 0 11px;
 }
 /*------*/
 
@@ -267,6 +268,19 @@ pre a:hover{
 #codonusage  {
 	display:none;
 	word-wrap:break-word;
+}
+.seq-feats {
+	word-wrap:break-word;
+	font-size: 14px;
+	font-family: monospace;
+	margin: 0 auto;
+	width: 700px;
+	color: #fff;
+}
+.seq-feats a {
+	color: #fff;
+	text-decoration: none;
+	font-weight: 400;
 }
 
 
@@ -480,9 +494,8 @@ table{
 }
 .red-b {
 	background-color:#763227;
-	font-weight:bold;
 	color: #fff;
-
+	padding: 0 0 0 4px;
 }
 .brown {
 	color:#765D27;
@@ -498,6 +511,18 @@ table{
 .blue {
 	background-color: #aac1d2;
 }
+.blue-b{
+	padding: 0 0 0 4px;
+}
 .red-box {
 	background-color: #be8278;
+}
+.seq-INTRON {
+	background-color: #A65534;
+}
+.seq-EXON {
+	background-color: #AAC1D2;
+}
+.seq-NCS {
+	background-color: #5C6E7C;
 }

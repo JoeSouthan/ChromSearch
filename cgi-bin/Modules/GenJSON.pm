@@ -66,7 +66,20 @@ sub doSingle {
             unshift (@AAmod, ">gi|$geneName|gb|$pID|$name");
             $result{$query}{"DNASeqFASTA"} = \@DNAmod;
             $result{$query}{"AASeqFASTA"} = \@AAmod;
+        #Break sequence into different parts
+            my @featsWithSeqs; 
+            my @seq_feats = qw (NCS;0:262 INTRON;290:300 EXON;301:352);
 
+           # my @seq_feats = @{$result{$query}{"SeqFeat"}};
+            if (@seq_feats){
+                foreach my $feats (@seq_feats) {
+                    if ($feats =~ /(\w+)\;(\d*)\:(\d*)/) {
+                        my $ext_seq = substr($DNAsequence, $2, $3-$2);
+                        push (@featsWithSeqs, "$1|$ext_seq");
+                    }
+                }
+                $result{$query}{"FeatureSequences"} = \@featsWithSeqs;
+            }
         return $json->pretty->encode(\%result);
     }
 
@@ -126,7 +139,7 @@ sub CalcRES {
 #   Function:       Sanitise                                                                                                  #
 #   Description:    Removes unwanted characters                                                                               #
 #   Usage:          Sanitise([String])                                                                                        #
-#   Returns:        JSON Data object                                                                                          #
+#   Returns:        String                                                                                                    #
 ########################################################################################################################################################
 sub Sanitise {
     my $input = $_[0];
@@ -134,7 +147,7 @@ sub Sanitise {
     return $input;
 }
 ###############################################################################################################################
-#   Function:       errpr                                                                                                     #
+#   Function:       error                                                                                                     #
 #   Description:    Returns an error as JSON                                                                                  #
 #   Usage:          doSingle([String])                                                                                        #
 #   Returns:        JSON Data object                                                                                          #

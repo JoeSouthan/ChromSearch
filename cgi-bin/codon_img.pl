@@ -33,7 +33,7 @@ unless (@params){
         } elsif ($params eq "show") {
             $show = 1;
         } elsif ($params eq "gene") {
-            $gene = $cgi->param($params);
+            $gene = Sanitise($cgi->param($params));
         } else {
             CodonImager::error();
         }
@@ -58,4 +58,15 @@ if (defined($download) and $download == 1){
     } else {
         CodonImager::error();
     }
+}
+###############################################################################################################################
+#   Function:       Sanitise                                                                                                  #
+#   Description:    Removes unwanted characters                                                                               #
+#   Usage:          Sanitise([String])                                                                                        #
+#   Returns:        String                                                                                                    #
+########################################################################################################################################################
+sub Sanitise {
+    my $input = $_[0];
+    $input =~ s/[^a-zA-Z0-9\|\.\"\,\']//g;
+    return $input;
 }

@@ -25,13 +25,13 @@ my ($query, $type, $mode, $selection, $switch, %results);
 #Take the Params from the GET
 foreach my $params (@params) {
     if ($params eq "query") {
-        $query = $cgi->param($params);
+        $query = Sanitise($cgi->param($params));
     } elsif ($params eq "searchType") {
-        $type = $cgi->param($params);
+        $type = Sanitise($cgi->param($params));
     } elsif ($params eq "search") {
-        $mode = $cgi->param($params);
+        $mode = Sanitise($cgi->param($params));
     } elsif ($params eq "selection") {
-        $selection = $cgi->param($params);
+        $selection = Sanitise($cgi->param($params));
     }
 }
 
@@ -74,3 +74,15 @@ my $resultRef = \%results;
 
 #Output HTML
 outputSearchHTML($resultRef, $cgi, $query, $mode);
+
+###############################################################################################################################
+#   Function:       Sanitise                                                                                                  #
+#   Description:    Removes unwanted characters                                                                               #
+#   Usage:          Sanitise([String])                                                                                        #
+#   Returns:        String                                                                                                    #
+########################################################################################################################################################
+sub Sanitise {
+    my $input = $_[0];
+    $input =~ s/[^a-zA-Z0-9\|\.\"\,\']//g;
+    return $input;
+}

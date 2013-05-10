@@ -77,7 +77,19 @@ sub outputSingleHTML {
         my $name = $result{$gene}{"ProteinName"};
         unshift (@DNAmod, ">gi|$geneName|gb|$pID|$name");
         unshift (@AAmod, ">gi|$geneName|gb|$pID|$name");
+            
+        my @featsWithSeqs; 
+        my @seq_feats = qw (NCS;0:262 INTRON;290:300 EXON;301:352);
 
+       # my @seq_feats = @{$result{$query}{"SeqFeat"}};
+        if (@seq_feats){
+            foreach my $feats (@seq_feats) {
+                if ($feats =~ /(\w+)\;(\d*)\:(\d*)/) {
+                    my $ext_seq = substr($DNAsequence, $2, $3-$2);
+                    push (@featsWithSeqs, "$1|$ext_seq");
+                }
+            }
+        }
         #Do an EnzCutter Cut
         my %EnzCutter_Result = EnzCutter::doCut($gene,$enz);
         my $EnzCutter_Result_ref = \%EnzCutter_Result;
@@ -87,20 +99,45 @@ sub outputSingleHTML {
     <div class="searchform"> 
                     <h2 class="center">Single result for: $gene </h2> 
                     <div class="singleresult"> 
-                        <div class="info"> 
-                            <span>Length: </span><span class="bold">$result{$gene}{"GeneLength"}</span><span> | Gene ID: </span><span class="bold">$result{$gene}{"GeneName"}</span><span> | Genbank Accession: </span><span class="bold">$gene</span><span> | Protein ID: </span><span class="bold">$result{$gene}{"ProteinId"}</span><span> | Chromosomal Location: </span><span class="bold">$result{$gene}{"ChromosomeLocation"}</span> 
-                        </div> 
+                    <div class="single-left"> 
+                            <ul> 
+                                <li>Length: <span class="bold">$result{$gene}{"GeneLength"}</span></li> 
+                                <li>Gene ID: <a href="http://www.ncbi.nlm.nih.gov/nuccore/$result{$gene}{"GeneName"}" target="_blank" title="NCBI">$result{$gene}{"GeneName"}</a></li> 
+                                <li>Genbank Accession: <a href="http://www.ncbi.nlm.nih.gov/nuccore/$gene" target="_blank" title="NCBI">$gene</a></li> 
+                            </ul> 
+                            </div> 
+                            <div class="single-left"> 
+                            <ul> 
+                                <li>Protein ID: <a href="http://www.uniprot.org/uniprot/$result{$gene}{"ProteinId"}\&sort=score" target="_blank" title="UniProt">$result{$gene}{"ProteinId"}</a></li> 
+                                <li>Chromosomal Location: <span class="bold">$result{$gene}{"ChromosomeLocation"}</span></li> 
+                            </ul> 
+                            </div>
                         <div class="single-wide"> 
                             <h2>Protein Product</h2>
                             <p>$name</p>
                             <h2>Sequence Characteristics</h2> 
+                            <h3>Sequence Features</h3> 
+                            <div class="seq-feats" id="seq-feats-span">
+__HTML
+                            if (@featsWithSeqs > 1) {
+                                foreach my $seqs_f (@featsWithSeqs) {
+                                    if ($seqs_f =~ /(.*)\|(.*)/){
+                                        print "<span class=\"seq-".$1."\">$2</span>";
+                                    }
+                                }
+                            } else {
+                                print "<p class=\"red-b\">No sequence features.</p>";
+                            }
+                            print <<__HTML0;
+                            </div>
+                            <p><span class="seq-INTRON">Intron</span>, <span class="seq-EXON">Exon</span>, <span class="seq-NCS">Non Coding Sequence</span></p>
                             <h3>Codon Usage</h3> 
                             <div id="codon_img" class="center"> 
                                 <a href="../cgi-bin/codon_img.pl?download=true&gene=$gene" alt="Codon Usage" target="_blank"><img src="../cgi-bin/codon_img.pl?show=true&gene=$gene" alt="Codon Usage" width="500" height="324" /></a> 
                             </div> 
                             <h2>Common Restriction Sites</h2> 
                             <div id="EnzCutter_Results_single" style="display:block;">
-__HTML
+__HTML0
                             EnzCutter_Output($EnzCutter_Result_ref);
                             print <<__HTML1;
                             </div> 
@@ -135,11 +172,15 @@ __HTML2
                             <div id="codonusage" style="display:block;"> 
 __HTML3
                             #Output Codon Usage
-                            foreach my $codons (keys ($result{$gene}{"CodonUsage"})){
-                                print "<div id=\"aaname\" class=\"bold\">$codons</div>\n";
-                                foreach my $triplets (keys ($result{$gene}{"CodonUsage"}{$codons})){
-                                    my @tripletArray = @{$result{$gene}{"CodonUsage"}{$codons}{$triplets}};
-                                    print "<pre><span class=\"bold\">$tripletArray[0] </span><span>$tripletArray[1]</span></pre>\n";
+                            if (defined($result{$gene}{"CodonUsage"}{"error"})){
+                                print "<p>No Codons</p>";
+                            } else {
+                                foreach my $codons (keys ($result{$gene}{"CodonUsage"})){
+                                    print "<div id=\"aaname\" class=\"bold\">$codons</div>\n";
+                                    foreach my $triplets (keys ($result{$gene}{"CodonUsage"}{$codons})){
+                                        my @tripletArray = @{$result{$gene}{"CodonUsage"}{$codons}{$triplets}};
+                                        print "<pre><span class=\"bold\">$tripletArray[0] </span><span>$tripletArray[1]</span></pre>\n";
+                                    }
                                 }
                             }
                             print <<__HTML4;
@@ -246,8 +287,8 @@ sub EnzCutter_Output{
                     my @cut_rev  = split (/[,\||]/ , $EnzCutter_Result{"result"}{$enz_results}{$enzymes}{"sequence-reverse"});
                     my $spaces   = "&nbsp;" x (length($cut_forw[2])-1);
 
-                    my $cut_forw_disp = "<span class=\"red-b\">$cut_forw[0]</span><span class=\"blue\">$cut_forw[1]</span><span class=\"bold\">$spaces|</span><span class=\"blue\">$cut_forw[2]</span><span class=\"red-b\">$cut_forw[3]</span>";
-                    my $cut_rev_disp = "<span class=\"red-b\">$cut_rev[0]</span><span class=\"blue\">$cut_rev[1]</span><span class=\"bold\">|$spaces</span><span class=\"blue\">$cut_rev[2]</span><span class=\"red-b\">$cut_rev[3]</span>";
+                    my $cut_forw_disp = "<span class=\"red-b\">$cut_forw[0]</span><span class=\"blue blue-b\">$cut_forw[1]</span><span class=\"bold\">$spaces|</span><span class=\"blue blue-b\">$cut_forw[2]</span><span class=\"red-b\">$cut_forw[3]</span>";
+                    my $cut_rev_disp = "<span class=\"red-b\">$cut_rev[0]</span><span class=\"blue blue-b\">$cut_rev[1]</span><span class=\"bold\">|$spaces</span><span class=\"blue blue-b\">$cut_rev[2]</span><span class=\"red-b\">$cut_rev[3]</span>";
                     print <<__CUT;
                     <div id="EnzCutter_results_div"><h4>Cut $count</h4>
                         <div id="seq-for" class="sequence">5\'$cut_forw_disp 3\'</div> 
@@ -295,7 +336,7 @@ sub header {
                     <a href="../cgi-bin/enz_cutter.pl" id="EnzCutter_open">EnzCutter</a>
                 </div>
                 <div class="item">
-                    <a href="../help/index.html" id="help_open">Help</a>
+                    <a href="../help/index.html" id="help_open" target="_blank">Help</a>
                 </div>
                 <div class="item">
                     <a href="fallback/contact.html" id="contact_open">Contact </a>

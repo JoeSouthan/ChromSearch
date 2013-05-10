@@ -24,7 +24,7 @@ my ($gene, %results);
 #Take the Params from the GET
 foreach my $params (@params) {
     if ($params eq "gene") {
-        $gene = $cgi->param($params);
+        $gene = Sanitise($cgi->param($params));
     } 
 }
 
@@ -41,3 +41,14 @@ unless (defined($gene)) {
 
 my $resultRef = \%results;
 outputSingleHTML($resultRef, $cgi, $gene);
+###############################################################################################################################
+#   Function:       Sanitise                                                                                                  #
+#   Description:    Removes unwanted characters                                                                               #
+#   Usage:          Sanitise([String])                                                                                        #
+#   Returns:        String                                                                                                    #
+########################################################################################################################################################
+sub Sanitise {
+    my $input = $_[0];
+    $input =~ s/[^a-zA-Z0-9\|\.\"\,\']//g;
+    return $input;
+}
