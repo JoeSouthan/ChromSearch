@@ -167,15 +167,15 @@ sub GetRES{
 sub DatabaseConnect{
 	
 	#Defined the connection details to the database
-	#my $dbname = 'scouls01'; 
-	#my $user = 'scouls01';
-	#my $password = 'iwr8sh8vb'; 
-	#my $dbserver = 'localhost';
-	
-	my $dbname = 'biocomp2'; 
-	my $user = 'c2';
-	my $password = 'coursework123'; 
+	my $dbname = 'scouls01'; 
+	my $user = 'scouls01';
+	my $password = 'iwr8sh8vb'; 
 	my $dbserver = 'localhost';
+	
+	#my $dbname = 'biocomp2'; 
+	#my $user = 'c2';
+	#my $password = 'coursework123'; 
+	#my $dbserver = 'localhost';
 	
 	# Specify the location and name of the database
 	my $datasource = "dbi:mysql:database=$dbname;host=$dbserver;";
@@ -375,6 +375,8 @@ sub BuildCodingSeq{
 	# Fetch the exon coding sequence information from database, array will progress as 
 	# Type, start, stop then repeat for next item.
 	my @tableRows = DoQuery($sqlQuery);
+	
+	# Check that at least one entry exists in the array
 	unless( $tableRows[0]->[0] ){
 		SetLastErrorMessage('ERROR:DB_COLUMN_EMPTY');
 		return undef;
@@ -386,6 +388,8 @@ sub BuildCodingSeq{
 	
 	# Run the query
 	my @sequenceLength = DoQuery($sqlQuerySeqlength);
+	
+	# Check that the length data was returned
 	unless( $sequenceLength[0]->[0] ){
 		SetLastErrorMessage('ERROR:DB_COLUMN_EMPTY');
 		return undef;
@@ -400,63 +404,59 @@ sub BuildCodingSeq{
 	# Used to track position in array
 	my $tableRowIndex = 0; 
 	
-	
 	# All entries are exons, all non-coding introns are inferred from the data and must 
 	# be present in the final array.
 	
-	# Deal with first entry outside of loop as it is a bit inefficient to run the check
-	# every iteration of the loop below.
+	# Workout how many elements there are and place each one in array
+	# with a gap between them.
+
 	
-	# Is first entry an exon? If so, does it start at one? 
-	if( '1' == $tableRows[0][0] ){
-	
-		# If yes, then sequecne starts with exon.
-		# Get first and second numbers of first entry and format them into a string
-		my $entry = join("","EXON;",$tableRows[0][0],":",$tableRows[0][1]);
-		push(@CDSarray, $entry);
+	for( my $i = 0; $i < @tableRows; $i++){
 		
-		# In the event that the first entry is the only entry
-		if(defined($tableRows[2])){
-			# Set the segement follwing as an NCS
-			my $ncsEntry = join("","NCS;",$tableRows[0][1]+1,":",$tableRows[1][0]-1);
-			push(@CDSarray, $ncsEntry);
-		}else{
-			# This is the only entry so set rest of sequecne as NCS.
-			my $ncsEntry = join("","NCS;",$tableRows[0][1]+1,":",$sequenceLength[0][0]);
-			push(@CDSarray, $ncsEntry);
-		}
+		# Extract start position for next exon, used for intron entry
+		my ($segStart, $segStop);
 		
-	}else{
-		# If no then infer an NCS and calculate NCS length.
-		my $entry = join("","NCS;","0",":",$tableRows[0][0]-1);
-		push(@CDSarray, $entry);
-	}
-	
-	# Extract start and end positions of the exons, put them into array.
-	for( my $i = $tableRowIndex; $i < scalar(@tableRows); $i++){
-		
-		# Temporary variables for the start and stop positions of the exons
-		my ($segStart, $segStop); 
-		
-		# Get start number of current exon
 		$segStart = $tableRows[$i][0];
-		
-		# Extract stop position of exon 
 		$segStop = $tableRows[$i][1];
+	
 		
 		# Write the start/stop information into the string
 		my $entry = join("","EXON;",$segStart,":",$segStop);
 		push(@CDSarray, $entry);
-	
-		# Find distance between current exon and next and denote as NCS if last in array.
-		if( defined($tableRows[$i+1]) )
-		{
-			my $nextEntry = join("","INTRON;",$tableRows[$i][1]+1,":",$tableRows[$i+1][0]-1);
-			push(@CDSarray, $nextEntry);
-		}else{
-			my $nextEntry = join("","NCS;",$segStop+1,":",$sequenceLength[0][0]);
+		
+		
+		
+		# Calculate and insert intron data, only do this if there is more than one seq.feat.
+		# and that the current position is one from the end of the array.
+		if( scalar(@tableRows) > 1 && $i < @tableRows-1 ){
+		
+			my $nextEntry = join("","INTRON;", $segStop + 1,":", ($tableRows[$i+1][0]-1));
 			push(@CDSarray, $nextEntry);
 		}
+	}	
+	
+	# Inspect the first element to see if starts at 1, if so leave the array alone.
+	my @firstElement = split(/;/,$CDSarray[0]);
+	my @startStopData = split(/:/,$firstElement[1]);
+	
+	# If not infer an NCS, calculate and insert it at the start of the array.
+	if( $startStopData[0] > 1){
+		my $NCS = join("","NCS;",1,":",$startStopData[0]-1);
+		unshift(@CDSarray, $NCS);
+	}
+	
+	# Inspect the last element and see if it matches the length of the sequence 
+	# i.e. it it the last sequence feature, it if does leaves the array alone.
+	my $lastSeqFeatElem = $CDSarray[$#CDSarray];
+	
+	my @lastElement = split(/;/,$lastSeqFeatElem);
+	my @endStartStopData = split(/:/,$lastElement[1]);
+	
+	# If not infer and NCS, calculate the difference from the last exon to the end of the
+	# sequence and insert it at the end of the array.
+	if($endStartStopData[1] != $sequenceLength[0]->[0]){
+		my $NCS = join("","NCS;",$endStartStopData[1],":",$sequenceLength[0]->[0]);
+		push(@CDSarray, $NCS);
 	}
 	
 	return @CDSarray;
