@@ -421,6 +421,7 @@ $(document).ready(function() {
                             <h3>Sequence Features</h3> \
                             <div class="seq-feats" id="seq-feats-span"> \
                             </div> \
+                            <div class="seq-feats-show" id="seq-feats-show">Click to show sequence features.</div> \
                             <h3>Codon Usage</h3> \
                             <div id="codon_img" class="center"> \
                                 <a href="cgi-bin/codon_img.pl?download=true&gene='+i+'" alt="Codon Usage"><img src="cgi-bin/codon_img.pl?show=true&gene='+i+'" alt="Codon Usage" width="500" height="324" /></a> \
@@ -747,6 +748,10 @@ $(document).ready(function() {
         //Shows Codon Usage on single
         $("#show3").live("click" ,function() { 
             $("#codonusage").slideToggle("fast");
+        });
+        $("#seq-feats-show").live("click", function() {
+            $("#seq-feats-span").css({"height":"auto", "overflow":"auto"});
+            $("#seq-feats-show").fadeOut("slow");
         });
     //
     //  Navbar

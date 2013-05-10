@@ -79,9 +79,7 @@ sub outputSingleHTML {
         unshift (@AAmod, ">gi|$geneName|gb|$pID|$name");
             
         my @featsWithSeqs; 
-        my @seq_feats = qw (NCS;0:262 INTRON;290:300 EXON;301:352);
-
-       # my @seq_feats = @{$result{$query}{"SeqFeat"}};
+        my @seq_feats = @{$result{$gene}{"SeqFeat"}};
         if (@seq_feats){
             foreach my $feats (@seq_feats) {
                 if ($feats =~ /(\w+)\;(\d*)\:(\d*)/) {
@@ -117,7 +115,7 @@ sub outputSingleHTML {
                             <p>$name</p>
                             <h2>Sequence Characteristics</h2> 
                             <h3>Sequence Features</h3> 
-                            <div class="seq-feats" id="seq-feats-span">
+                            <div class="seq-feats" id="seq-feats-span" style="overflow:auto; height:auto;">
 __HTML
                             if (@featsWithSeqs > 1) {
                                 foreach my $seqs_f (@featsWithSeqs) {

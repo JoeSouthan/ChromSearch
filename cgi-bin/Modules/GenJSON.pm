@@ -68,9 +68,7 @@ sub doSingle {
             $result{$query}{"AASeqFASTA"} = \@AAmod;
         #Break sequence into different parts
             my @featsWithSeqs; 
-            my @seq_feats = qw (NCS;0:262 INTRON;290:300 EXON;301:352);
-
-           # my @seq_feats = @{$result{$query}{"SeqFeat"}};
+            my @seq_feats = @{$result{$query}{"SeqFeat"}};
             if (@seq_feats){
                 foreach my $feats (@seq_feats) {
                     if ($feats =~ /(\w+)\;(\d*)\:(\d*)/) {
